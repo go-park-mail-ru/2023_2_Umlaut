@@ -19,7 +19,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	mux.HandleFunc("/auth/logout", h.logoutHandler)
 	mux.HandleFunc("/auth/sign-up", h.signUpHandler)
 
-	mux.HandleFunc("/api/users/", h.userHandler)
+	mux.HandleFunc("/api/feed/", h.feedHandler)
 
 	return mux
 }

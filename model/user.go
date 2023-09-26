@@ -1,15 +1,16 @@
 package model
 
 type User struct {
-	Id          int    `json:"-" db:"id"`
-	Name        string `json:"name" binding:"required"`
-	Username    string `json:"username" binding:"required"`
-	Mail        string `json:"mail" binding:"required"`
-	Password    string `json:"password" binding:"required"`
-	Description string `json:"description"`
-	Age         int    `json:"age"`
-	Looking     string `json:"looking"`
-	Education   string `json:"education"`
-	Hobbies     string `json:"hobbies"`
-	Tags        string `json:"tags"`
+	Id           int    `json:"-" db:"id"`
+	Name         string `json:"name" db:"name" binding:"required"`
+	Mail         string `json:"mail" db:"mail" binding:"required"`
+	PasswordHash string `json:"-" db:"password_hash" binding:"required"`
+	UserGender   string `json:"user_gender" db:"user_gender"`
+	PreferGender string `json:"prefer_gender" db:"prefer_gender"`
+	Description  string `json:"description" db:"description"`
+	Age          int    `json:"age" db:"age"`
+	Looking      string `json:"looking" db:"looking"`
+	Education    string `json:"education" db:"education"`
+	Hobbies      string `json:"hobbies" db:"hobbies"`
+	Tags         string `json:"tags" db:"tags"`
 }

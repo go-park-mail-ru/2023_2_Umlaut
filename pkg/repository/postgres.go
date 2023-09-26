@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
+const (
+	usersTable = "users"
+)
+
 type PostgresConfig struct {
 	Host     string
 	Port     string
