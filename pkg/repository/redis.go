@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/redis/go-redis/v9"
 )
 
@@ -16,6 +18,9 @@ func NewRedisClient(cfg RedisConfig) (*redis.Client, error) {
 		Password: cfg.Password,
 		DB:       cfg.DB,
 	})
-	// TODO: пингануть, и вернуть ошибку, если не ответит
+	err := client.Ping(context.Background()).Err()
+	if err != nil {
+		return nil, err
+	}
 	return client, nil
 }
