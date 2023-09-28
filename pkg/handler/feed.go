@@ -13,7 +13,8 @@ func (h *Handler) feedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		id, err := h.Repositories.GetSession(session.Value)
+		ctx := r.Context()
+		id, err := h.Repositories.GetSession(ctx, session.Value)
 		if err != nil {
 			http.Error(w, "Redis server is unavailable", http.StatusInternalServerError)
 			return

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
@@ -16,9 +17,9 @@ type User interface {
 }
 
 type Store interface {
-	SetSession(SID string, id int, lifetime time.Duration) error
-	GetSession(SID string) (int, error)
-	DeleteSession(SID string) error
+	SetSession(ctx context.Context, SID string, id int, lifetime time.Duration) error
+	GetSession(ctx context.Context, SID string) (int, error)
+	DeleteSession(ctx context.Context, SID string) error
 }
 
 type Repository struct {

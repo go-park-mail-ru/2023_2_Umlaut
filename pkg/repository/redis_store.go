@@ -14,14 +14,14 @@ func NewRedisStore(client *redis.Client) *RedisStore {
 	return &RedisStore{client: client}
 }
 
-func (r *RedisStore) SetSession(SID string, id int, lifetime time.Duration) error {
+func (r *RedisStore) SetSession(ctx context.Context, SID string, id int, lifetime time.Duration) error {
 	if err := r.client.Set(context.Background(), SID, id, lifetime).Err(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *RedisStore) GetSession(SID string) (int, error) {
+func (r *RedisStore) GetSession(ctx context.Context, SID string) (int, error) {
 	val, err := r.client.Get(context.Background(), SID).Int()
 	if err != nil {
 		return 0, err
@@ -29,7 +29,7 @@ func (r *RedisStore) GetSession(SID string) (int, error) {
 	return val, nil
 }
 
-func (r *RedisStore) DeleteSession(SID string) error {
+func (r *RedisStore) DeleteSession(ctx context.Context, SID string) error {
 	err := r.client.Del(context.Background(), SID).Err()
 	if err != nil {
 		return err

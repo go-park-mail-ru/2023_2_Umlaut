@@ -17,6 +17,7 @@ const (
 
 func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		ctx := r.Context()
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read request body", http.StatusBadRequest)
@@ -35,7 +36,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		user, err := h.Repositories.GetUser(requestData.Mail, generatePasswordHash(requestData.Password))
 
 		SID := generateCookie()
-		if err := h.Repositories.SetSession(SID, user.Id, 10 * time.Hour); err == nil {
+		if err := h.Repositories.SetSession(ctx, SID, user.Id, 10 * time.Hour); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,
@@ -68,8 +69,8 @@ func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "no session", http.StatusUnauthorized)
 		return
 	}
-
-	if err := h.Repositories.DeleteSession(session.Value); err != nil {
+	ctx := r.Context()
+	if err := h.Repositories.DeleteSession(ctx, session.Value); err != nil {
 		http.Error(w, "Invalid cookie deletion", http.StatusInternalServerError)
 		return
 	}
@@ -82,6 +83,7 @@ func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
+		ctx := r.Context()
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read request body", http.StatusBadRequest)
@@ -97,7 +99,7 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		id, err := h.Repositories.CreateUser(user)
 
 		SID := generateCookie()
-		if err := h.Repositories.SetSession(SID, id, 10 * time.Hour); err == nil {
+		if err := h.Repositories.SetSession(ctx, SID, id, 10 * time.Hour); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,
