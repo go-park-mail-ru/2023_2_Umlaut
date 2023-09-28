@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -27,7 +27,7 @@ type Repository struct {
 	Store
 }
 
-func NewRepository(db *sql.DB, client *redis.Client) *Repository {
+func NewRepository(db *sqlx.DB, client *redis.Client) *Repository {
 	return &Repository{
 		User:  NewUserPostgres(db),
 		Store: NewRedisStore(client),

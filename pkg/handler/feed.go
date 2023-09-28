@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -14,35 +15,32 @@ import (
 // @Success 200
 // @Router /api/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		newErrorResponse(w, http.StatusBadRequest, "Failed")
+	}
+
 	session, err := r.Cookie("session_id")
-	if err == http.ErrNoCookie {
-		http.Error(w, "no session", http.StatusUnauthorized)
+	if errors.Is(err, http.ErrNoCookie) {
+		newErrorResponse(w, http.StatusUnauthorized, "no session")
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		ctx := r.Context()
-		id, err := h.Repositories.GetSession(ctx, session.Value)
-		if err != nil {
-			http.Error(w, "Redis server is unavailable", http.StatusInternalServerError)
-			return
-		}
-		userId := id
-		user, _ := h.Repositories.GetUserById(userId)
-		nextUser, err := h.Repositories.GetNextUser(user)
-		if err == nil {
-			jsonResponse, _ := json.Marshal(nextUser)
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			w.Write(jsonResponse)
-			return
-		}
+	ctx := r.Context()
+	id, err := h.Repositories.GetSession(ctx, session.Value)
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, "Redis server is unavailable")
+		return
 	}
-	response := map[string]string{
-		"error": "Failed",
+
+	user, _ := h.Repositories.GetUserById(id)
+	nextUser, err := h.Repositories.GetNextUser(user)
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
 	}
-	jsonResponse, _ := json.Marshal(response)
+
+	jsonResponse, _ := json.Marshal(nextUser)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResponse)
 }

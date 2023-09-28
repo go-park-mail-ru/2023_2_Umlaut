@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.signInInput:
+    properties:
+      mail:
+        type: string
+      password:
+        type: string
+    required:
+    - mail
+    - password
+    type: object
   model.User:
     properties:
       age:
@@ -56,11 +71,26 @@ paths:
       - application/json
       description: login
       operationId: login
+      parameters:
+      - description: Sign-in input parameters
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
       summary: signIn
       tags:
       - auth
@@ -75,6 +105,14 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
       summary: logout
       tags:
       - auth
@@ -85,7 +123,7 @@ paths:
       description: create account
       operationId: create-account
       parameters:
-      - description: account info
+      - description: Sign-up input user
         in: body
         name: input
         required: true
@@ -98,6 +136,14 @@ paths:
           description: OK
           schema:
             type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
       summary: signUp
       tags:
       - auth

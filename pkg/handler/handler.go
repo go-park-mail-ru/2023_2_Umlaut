@@ -17,7 +17,7 @@ func NewHandler(repositories *repository.Repository) *Handler {
 
 func (h *Handler) InitRoutes() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/docs/", httpSwagger.WrapHandler)
+	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
 	mux.HandleFunc("/auth/login", h.signIn)
 	mux.HandleFunc("/auth/logout", h.logout)

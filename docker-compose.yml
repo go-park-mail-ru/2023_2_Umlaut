@@ -17,7 +17,7 @@ services:
     image: postgres:latest
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
-      - ./migrations/000001_create_users_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=1474
     ports:
