@@ -2,11 +2,11 @@ package handler
 
 import (
 	"crypto/sha1"
-	"math/rand"
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"io"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -15,6 +15,14 @@ const (
 	salt = "LKJksdfbdkjhgk213234dfhLKJnlkj"
 )
 
+// @Summary loginHandler
+// @Tags auth
+// @Description login
+// @ID login
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Router /auth/login [post]
 func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		ctx := r.Context()
@@ -36,7 +44,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		user, err := h.Repositories.GetUser(requestData.Mail, generatePasswordHash(requestData.Password))
 
 		SID := generateCookie()
-		if err := h.Repositories.SetSession(ctx, SID, user.Id, 10 * time.Hour); err == nil {
+		if err := h.Repositories.SetSession(ctx, SID, user.Id, 10*time.Hour); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,
@@ -63,6 +71,14 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+// @Summary logoutHandler
+// @Tags auth
+// @Description logout
+// @ID logout
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Router /auth/logout [get]
 func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
@@ -81,6 +97,15 @@ func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/auth/login", http.StatusFound)
 }
 
+// @Summary signUpHandler
+// @Tags auth
+// @Description create account
+// @ID create-account
+// @Accept  json
+// @Produce  json
+// @Param input body model.User true "account info"
+// @Success 200 {integer} integer 1
+// @Router /auth/sign-up [post]
 func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		ctx := r.Context()
@@ -99,7 +124,7 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		id, err := h.Repositories.CreateUser(user)
 
 		SID := generateCookie()
-		if err := h.Repositories.SetSession(ctx, SID, id, 10 * time.Hour); err == nil {
+		if err := h.Repositories.SetSession(ctx, SID, id, 10*time.Hour); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,

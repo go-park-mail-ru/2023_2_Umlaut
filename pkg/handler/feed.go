@@ -5,6 +5,14 @@ import (
 	"net/http"
 )
 
+// @Summary feedHandler
+// @Tags feed
+// @Description feed
+// @ID feed
+// @Accept  json
+// @Produce  json
+// @Success 200
+// @Router /api/feed [get]
 func (h *Handler) feedHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {

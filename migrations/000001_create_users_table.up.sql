@@ -1,9 +1,9 @@
-CREATE TYPE IF NOT EXISTS gender AS ENUM (
+CREATE TYPE gender AS ENUM (
 	'Male',
 	'Female'
 );
 
-CREATE TABLE IF NOT EXISTS users(
+CREATE TABLE users(
     id            serial PRIMARY KEY,
     name          VARCHAR (255) NOT NULL,
     mail          VARCHAR (255) UNIQUE NOT NULL,

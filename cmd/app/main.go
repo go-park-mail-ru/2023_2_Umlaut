@@ -21,7 +21,7 @@ func main() {
 		Username: viper.GetString("postgres.username"),
 		DBName:   viper.GetString("postgres.dbname"),
 		SSLMode:  viper.GetString("postgres.sslmode"),
-		Password: os.Getenv("PG_PASSWORD"),
+		Password: os.Getenv("DB_PASSWORD"),
 	})
 	if err != nil {
 		log.Fatalf("failed to initialize db: %s", err.Error())
@@ -34,7 +34,7 @@ func main() {
 	}
 	sessionStore, err := repository.NewRedisClient(repository.RedisConfig{
 		Addr:     viper.GetString("redis.addr"),
-		Password: os.Getenv("REDIS_PASSWORD"),
+		Password: "", //os.Getenv("DB_PASSWORD"),
 		DB:       redisDb,
 	})
 	if err != nil {

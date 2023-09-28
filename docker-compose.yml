@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  umlaut:
+    build: ./
+    command: ./wait-for-postgres.sh db ./umlaut
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_PASSWORD=1474
+
+  db:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - ./.database/postgres/data:/var/lib/postgresql/data
+      - ./migrations/000001_create_users_table.up.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=1474
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379

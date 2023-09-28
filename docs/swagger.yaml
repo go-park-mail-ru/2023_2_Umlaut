@@ -1,0 +1,96 @@
+definitions:
+  model.User:
+    properties:
+      age:
+        type: integer
+      description:
+        type: string
+      education:
+        type: string
+      hobbies:
+        type: string
+      looking:
+        type: string
+      mail:
+        type: string
+      name:
+        type: string
+      prefer_gender:
+        type: string
+      tags:
+        type: string
+      user_gender:
+        type: string
+    required:
+    - mail
+    - name
+    type: object
+info:
+  contact: {}
+paths:
+  /api/feed:
+    get:
+      consumes:
+      - application/json
+      description: feed
+      operationId: feed
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: feedHandler
+      tags:
+      - feed
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login
+      operationId: login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: loginHandler
+      tags:
+      - auth
+  /auth/logout:
+    get:
+      consumes:
+      - application/json
+      description: logout
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: logoutHandler
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: signUpHandler
+      tags:
+      - auth
+swagger: "2.0"
