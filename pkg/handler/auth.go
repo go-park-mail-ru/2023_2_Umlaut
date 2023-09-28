@@ -35,7 +35,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		user, err := h.Repositories.GetUser(requestData.Mail, generatePasswordHash(requestData.Password))
 
 		SID := generateCookie()
-		if err := h.Repositories.Set(SID, user.Id); err == nil {
+		if err := h.Repositories.SetSession(SID, user.Id); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,
@@ -69,7 +69,7 @@ func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.Repositories.Delete(session.Value); err != nil {
+	if err := h.Repositories.DeleteSession(session.Value); err != nil {
 		http.Error(w, "Invalid cookie deletion", http.StatusInternalServerError)
 		return
 	}
@@ -97,7 +97,7 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		id, err := h.Repositories.CreateUser(user)
 
 		SID := generateCookie()
-		if err := h.Repositories.Set(SID, id); err == nil {
+		if err := h.Repositories.SetSession(SID, id); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,
@@ -105,7 +105,7 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			http.SetCookie(w, cookie)
 		}
-		
+
 		if err == nil {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)

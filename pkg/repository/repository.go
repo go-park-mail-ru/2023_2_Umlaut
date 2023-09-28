@@ -15,9 +15,9 @@ type User interface {
 }
 
 type Store interface {
-	Set(SID string, id int) error
-	Get(SID string) (string, error)
-	Delete(SID string) error
+	SetSession(SID string, id int) error
+	GetSession(SID string) (int, error)
+	DeleteSession(SID string) error
 }
 
 type Repository struct {
