@@ -1,12 +1,17 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API Server for Umlaut Application",
+        "title": "Umlaut API",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "localhost:8000",
+    "basePath": "/",
     "paths": {
         "/api/feed": {
             "get": {
-                "description": "feed",
+                "description": "Next user for feed",
                 "consumes": [
                     "application/json"
                 ],
@@ -16,7 +21,7 @@
                 "tags": [
                     "feed"
                 ],
-                "summary": "feedHandler",
+                "summary": "feed",
                 "operationId": "feed",
                 "responses": {
                     "200": {
@@ -37,7 +42,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "loginHandler",
+                "summary": "signIn",
                 "operationId": "login",
                 "responses": {
                     "200": {
@@ -58,7 +63,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "logoutHandler",
+                "summary": "logout",
                 "operationId": "logout",
                 "responses": {
                     "200": {
@@ -79,7 +84,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "signUpHandler",
+                "summary": "signUp",
                 "operationId": "create-account",
                 "parameters": [
                     {
@@ -108,7 +113,8 @@
             "type": "object",
             "required": [
                 "mail",
-                "name"
+                "name",
+                "password"
             ],
             "properties": {
                 "age": {
@@ -130,6 +136,9 @@
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "prefer_gender": {

@@ -11,11 +11,7 @@ import (
 	"time"
 )
 
-const (
-	salt = "LKJksdfbdkjhgk213234dfhLKJnlkj"
-)
-
-// @Summary loginHandler
+// @Summary signIn
 // @Tags auth
 // @Description login
 // @ID login
@@ -23,7 +19,7 @@ const (
 // @Produce  json
 // @Success 200
 // @Router /auth/login [post]
-func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		ctx := r.Context()
 		body, err := io.ReadAll(r.Body)
@@ -41,7 +37,18 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		user, err := h.Repositories.GetUser(requestData.Mail, generatePasswordHash(requestData.Password))
+		user, err := h.Repositories.GetUser(requestData.Mail)
+
+		if generatePasswordHash(requestData.Password, user.Salt) != user.PasswordHash {
+			response := map[string]string{
+				"error": "invalid mail or password",
+			}
+			jsonResponse, _ := json.Marshal(response)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write(jsonResponse)
+			return
+		}
 
 		SID := generateCookie()
 		if err := h.Repositories.SetSession(ctx, SID, user.Id, 10*time.Hour); err == nil {
@@ -71,7 +78,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-// @Summary logoutHandler
+// @Summary logout
 // @Tags auth
 // @Description logout
 // @ID logout
@@ -79,7 +86,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Success 200
 // @Router /auth/logout [get]
-func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		http.Error(w, "no session", http.StatusUnauthorized)
@@ -97,7 +104,7 @@ func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/auth/login", http.StatusFound)
 }
 
-// @Summary signUpHandler
+// @Summary signUp
 // @Tags auth
 // @Description create account
 // @ID create-account
@@ -106,7 +113,7 @@ func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
 // @Param input body model.User true "account info"
 // @Success 200 {integer} integer 1
 // @Router /auth/sign-up [post]
-func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		ctx := r.Context()
 		body, err := io.ReadAll(r.Body)
@@ -120,7 +127,8 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid JSON data", http.StatusBadRequest)
 			return
 		}
-		user.PasswordHash = generatePasswordHash(user.PasswordHash)
+		user.Salt = generateSalt()
+		user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 		id, err := h.Repositories.CreateUser(user)
 
 		SID := generateCookie()
@@ -153,7 +161,7 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-func generatePasswordHash(password string) string {
+func generatePasswordHash(password, salt string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
 
@@ -162,6 +170,10 @@ func generatePasswordHash(password string) string {
 
 func generateCookie() string {
 	return randStringRunes(32)
+}
+
+func generateSalt() string {
+	return randStringRunes(22)
 }
 
 func randStringRunes(n int) string {

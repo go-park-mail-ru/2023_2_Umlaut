@@ -11,7 +11,7 @@ import (
 
 type User interface {
 	CreateUser(user model.User) (int, error)
-	GetUser(mail, password string) (model.User, error)
+	GetUser(mail string) (model.User, error)
 	GetUserById(id int) (model.User, error)
 	GetNextUser(user model.User) (model.User, error)
 }

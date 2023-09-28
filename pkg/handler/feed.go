@@ -5,15 +5,15 @@ import (
 	"net/http"
 )
 
-// @Summary feedHandler
+// @Summary feed
 // @Tags feed
-// @Description feed
+// @Description Next user for feed
 // @ID feed
 // @Accept  json
 // @Produce  json
 // @Success 200
 // @Router /api/feed [get]
-func (h *Handler) feedHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		http.Error(w, "no session", http.StatusUnauthorized)

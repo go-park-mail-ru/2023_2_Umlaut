@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   model.User:
     properties:
@@ -15,6 +16,8 @@ definitions:
         type: string
       name:
         type: string
+      password:
+        type: string
       prefer_gender:
         type: string
       tags:
@@ -24,22 +27,27 @@ definitions:
     required:
     - mail
     - name
+    - password
     type: object
+host: localhost:8000
 info:
   contact: {}
+  description: API Server for Umlaut Application
+  title: Umlaut API
+  version: "1.0"
 paths:
   /api/feed:
     get:
       consumes:
       - application/json
-      description: feed
+      description: Next user for feed
       operationId: feed
       produces:
       - application/json
       responses:
         "200":
           description: OK
-      summary: feedHandler
+      summary: feed
       tags:
       - feed
   /auth/login:
@@ -53,7 +61,7 @@ paths:
       responses:
         "200":
           description: OK
-      summary: loginHandler
+      summary: signIn
       tags:
       - auth
   /auth/logout:
@@ -67,7 +75,7 @@ paths:
       responses:
         "200":
           description: OK
-      summary: logoutHandler
+      summary: logout
       tags:
       - auth
   /auth/sign-up:
@@ -90,7 +98,7 @@ paths:
           description: OK
           schema:
             type: integer
-      summary: signUpHandler
+      summary: signUp
       tags:
       - auth
 swagger: "2.0"

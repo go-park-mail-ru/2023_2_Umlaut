@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/api/feed": {
             "get": {
-                "description": "feed",
+                "description": "Next user for feed",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "feed"
                 ],
-                "summary": "feedHandler",
+                "summary": "feed",
                 "operationId": "feed",
                 "responses": {
                     "200": {
@@ -48,7 +48,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "loginHandler",
+                "summary": "signIn",
                 "operationId": "login",
                 "responses": {
                     "200": {
@@ -69,7 +69,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "logoutHandler",
+                "summary": "logout",
                 "operationId": "logout",
                 "responses": {
                     "200": {
@@ -90,7 +90,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "signUpHandler",
+                "summary": "signUp",
                 "operationId": "create-account",
                 "parameters": [
                     {
@@ -119,7 +119,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "mail",
-                "name"
+                "name",
+                "password"
             ],
             "properties": {
                 "age": {
@@ -143,6 +144,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
                 "prefer_gender": {
                     "type": "string"
                 },
@@ -159,12 +163,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8000",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Umlaut API",
+	Description:      "API Server for Umlaut Application",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

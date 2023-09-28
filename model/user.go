@@ -4,7 +4,8 @@ type User struct {
 	Id           int    `json:"-" db:"id"`
 	Name         string `json:"name" db:"name" binding:"required"`
 	Mail         string `json:"mail" db:"mail" binding:"required"`
-	PasswordHash string `json:"-" db:"password_hash" binding:"required"`
+	PasswordHash string `json:"password" db:"password_hash" binding:"required"`
+	Salt         string `json:"-" db:"salt"`
 	UserGender   string `json:"user_gender" db:"user_gender"`
 	PreferGender string `json:"prefer_gender" db:"prefer_gender"`
 	Description  string `json:"description" db:"description"`

@@ -1,15 +1,11 @@
-CREATE TYPE gender AS ENUM (
-	'Male',
-	'Female'
-);
-
-CREATE TABLE users(
+CREATE TABLE users (
     id            serial PRIMARY KEY,
     name          VARCHAR (255) NOT NULL,
     mail          VARCHAR (255) UNIQUE NOT NULL,
     password_hash VARCHAR (255) NOT NULL,
-    user_gender   gender,
-    prefer_gender gender,
+    salt          VARCHAR (255) NOT NULL,
+    user_gender   VARCHAR (255),
+    prefer_gender VARCHAR (255),
     description   VARCHAR (255),
     age           INT,
     looking       VARCHAR (255),
