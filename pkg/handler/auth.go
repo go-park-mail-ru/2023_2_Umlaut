@@ -2,11 +2,13 @@ package handler
 
 import (
 	"crypto/sha1"
+	"math/rand"
 	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"io"
 	"net/http"
+	"time"
 )
 
 const (
@@ -14,8 +16,7 @@ const (
 )
 
 func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
-	//TODO: попробовать достать сессию из редиса
-	if r.Method == http.MethodPost {
+	if r.Method != http.MethodPost {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "Failed to read request body", http.StatusBadRequest)
@@ -32,6 +33,17 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		user, err := h.Repositories.GetUser(requestData.Mail, generatePasswordHash(requestData.Password))
+
+		SID := generateCookie()
+		if err := h.Repositories.Set(SID, user.Id); err == nil {
+			cookie := &http.Cookie{
+				Name:    "session_id",
+				Value:   SID,
+				Expires: time.Now().Add(10 * time.Hour),
+			}
+			http.SetCookie(w, cookie)
+		}
+
 		if err == nil {
 			jsonResponse, _ := json.Marshal(user)
 			w.Header().Set("Content-Type", "application/json")
@@ -40,6 +52,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
 	response := map[string]string{
 		"error": "Authentication failed",
 	}
@@ -50,12 +63,24 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	//TODO: очистить сессию
+	session, err := r.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		http.Error(w, "no session", http.StatusUnauthorized)
+		return
+	}
+
+	if err := h.Repositories.Delete(session.Value); err != nil {
+		http.Error(w, "Invalid cookie deletion", http.StatusInternalServerError)
+		return
+	}
+
+	session.Expires = time.Now().AddDate(0, 0, -1)
+	http.SetCookie(w, session)
+
 	http.Redirect(w, r, "/auth/login", http.StatusFound)
 }
 
 func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
-	//TODO: попробовать достать сессию из редиса, вдруг уже зареган пользователь
 	if r.Method == http.MethodPost {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -70,6 +95,17 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		user.PasswordHash = generatePasswordHash(user.PasswordHash)
 		id, err := h.Repositories.CreateUser(user)
+
+		SID := generateCookie()
+		if err := h.Repositories.Set(SID, id); err == nil {
+			cookie := &http.Cookie{
+				Name:    "session_id",
+				Value:   SID,
+				Expires: time.Now().Add(10 * time.Hour),
+			}
+			http.SetCookie(w, cookie)
+		}
+		
 		if err == nil {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -95,4 +131,17 @@ func generatePasswordHash(password string) string {
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func generateCookie() string {
+	return randStringRunes(32)
+}
+
+func randStringRunes(n int) string {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/redis/go-redis/v9"
 )
@@ -13,14 +14,20 @@ type User interface {
 	GetNextUser(user model.User) (model.User, error)
 }
 
-type Repository struct {
-	User
-	SessionStore *redis.Client
+type Store interface {
+	Set(SID string, id int) error
+	Get(SID string) (string, error)
+	Delete(SID string) error
 }
 
-func NewRepository(db *sql.DB, store *redis.Client) *Repository {
+type Repository struct {
+	User
+	Store
+}
+
+func NewRepository(db *sql.DB, client *redis.Client) *Repository {
 	return &Repository{
-		User:         NewUserPostgres(db),
-		SessionStore: store,
+		User:  NewUserPostgres(db),
+		Store: NewRedisStore(client),
 	}
 }

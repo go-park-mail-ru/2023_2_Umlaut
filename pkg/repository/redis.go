@@ -18,6 +18,7 @@ func NewRedisClient(cfg RedisConfig) (*redis.Client, error) {
 		Password: cfg.Password,
 		DB:       cfg.DB,
 	})
+
 	err := client.Ping(context.Background()).Err()
 	if err != nil {
 		return nil, err
