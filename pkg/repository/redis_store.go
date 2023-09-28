@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
+	"time"
 )
 
 type RedisStore struct {
@@ -13,8 +14,8 @@ func NewRedisStore(client *redis.Client) *RedisStore {
 	return &RedisStore{client: client}
 }
 
-func (r *RedisStore) SetSession(SID string, id int) error {
-	if err := r.client.Set(context.Background(), SID, id, 0).Err(); err != nil {
+func (r *RedisStore) SetSession(SID string, id int, lifetime time.Duration) error {
+	if err := r.client.Set(context.Background(), SID, id, lifetime).Err(); err != nil {
 		return err
 	}
 	return nil

@@ -35,7 +35,7 @@ func (h *Handler) loginHandler(w http.ResponseWriter, r *http.Request) {
 		user, err := h.Repositories.GetUser(requestData.Mail, generatePasswordHash(requestData.Password))
 
 		SID := generateCookie()
-		if err := h.Repositories.SetSession(SID, user.Id); err == nil {
+		if err := h.Repositories.SetSession(SID, user.Id, 10 * time.Hour); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,
@@ -97,7 +97,7 @@ func (h *Handler) signUpHandler(w http.ResponseWriter, r *http.Request) {
 		id, err := h.Repositories.CreateUser(user)
 
 		SID := generateCookie()
-		if err := h.Repositories.SetSession(SID, id); err == nil {
+		if err := h.Repositories.SetSession(SID, id, 10 * time.Hour); err == nil {
 			cookie := &http.Cookie{
 				Name:    "session_id",
 				Value:   SID,

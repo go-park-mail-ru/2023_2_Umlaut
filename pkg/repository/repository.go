@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/redis/go-redis/v9"
@@ -15,7 +16,7 @@ type User interface {
 }
 
 type Store interface {
-	SetSession(SID string, id int) error
+	SetSession(SID string, id int, lifetime time.Duration) error
 	GetSession(SID string) (int, error)
 	DeleteSession(SID string) error
 }
