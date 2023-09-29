@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
-	"github.com/jmoiron/sqlx"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/redis/go-redis/v9"

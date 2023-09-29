@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"net/http"
+
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"net/http"
 )
 
 type Handler struct {

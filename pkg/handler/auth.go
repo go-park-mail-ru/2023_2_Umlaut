@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"io"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 )
 
 type signInInput struct {
@@ -63,6 +64,8 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		Name:    "session_id",
 		Value:   SID,
 		Expires: time.Now().Add(10 * time.Hour),
+		Path:    "/",
+		HttpOnly: true,
 	}
 	http.SetCookie(w, cookie)
 
@@ -142,6 +145,8 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		Name:    "session_id",
 		Value:   SID,
 		Expires: time.Now().Add(10 * time.Hour),
+		Path:    "/",
+		HttpOnly: true,
 	}
 	http.SetCookie(w, cookie)
 
