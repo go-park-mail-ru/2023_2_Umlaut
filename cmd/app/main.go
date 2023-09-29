@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/spf13/viper"
+	"github.com/rs/cors"
 	"log"
 	"os"
 	"strconv"
@@ -50,10 +51,15 @@ func main() {
 
 	repos := repository.NewRepository(db, sessionStore)
 	handlers := handler.NewHandler(repos)
-
 	srv := new(umlaut.Server)
 
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins: viper.GetStringSlice("cors.origins"),
+		AllowedMethods: viper.GetStringSlice("cors.methods"),
+		AllowCredentials: true,
+	})
+
+	if err := srv.Run(viper.GetString("port"), corsMiddleware.Handler(handlers.InitRoutes())); err != nil {
 		log.Fatalf("error occured while running http server: %s", err.Error())
 	}
 }

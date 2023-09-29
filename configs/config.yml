@@ -10,3 +10,16 @@ postgres:
 redis:
   addr: "redis:6379"
   db: "0"
+
+cors:
+  origins: [
+    "http://localhost:8000"
+  ]
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "HEAD",
+    "OPTIONS"
+  ]
