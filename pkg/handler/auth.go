@@ -56,14 +56,16 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 	SID := generateCookie()
 	ctx := r.Context()
-	if err = h.Repositories.SetSession(ctx, SID, user.Id, 10*time.Hour); err == nil {
-		cookie := &http.Cookie{
-			Name:    "session_id",
-			Value:   SID,
-			Expires: time.Now().Add(10 * time.Hour),
-		}
-		http.SetCookie(w, cookie)
+	if err = h.Repositories.SetSession(ctx, SID, user.Id, 10*time.Hour); err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
+	cookie := &http.Cookie{
+		Name:    "session_id",
+		Value:   SID,
+		Expires: time.Now().Add(10 * time.Hour),
+	}
+	http.SetCookie(w, cookie)
+
 	jsonResponse, _ := json.Marshal(user)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -133,14 +135,16 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	SID := generateCookie()
-	if err := h.Repositories.SetSession(ctx, SID, id, 10*time.Hour); err == nil {
-		cookie := &http.Cookie{
-			Name:    "session_id",
-			Value:   SID,
-			Expires: time.Now().Add(10 * time.Hour),
-		}
-		http.SetCookie(w, cookie)
+	if err = h.Repositories.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
+	cookie := &http.Cookie{
+		Name:    "session_id",
+		Value:   SID,
+		Expires: time.Now().Add(10 * time.Hour),
+	}
+	http.SetCookie(w, cookie)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	response := map[string]int{
