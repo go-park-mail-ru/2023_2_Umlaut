@@ -50,12 +50,15 @@ func (r *UserPostgres) GetUserById(id int) (model.User, error) {
 func (r *UserPostgres) GetNextUser(user model.User) (model.User, error) {
 	var nextUser model.User
 	var query string
+	var err error
 	if user.PreferGender != nil {
 		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 and user_gender = $2 ORDER BY RANDOM() LIMIT 1", usersTable)
+		err = r.db.Get(&nextUser, query, user.Id, user.PreferGender)
 	} else {
 		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 ORDER BY RANDOM() LIMIT 1", usersTable)
+		err = r.db.Get(&nextUser, query, user.Id)
 	}
-	err := r.db.Get(&nextUser, query, user.Id, user.PreferGender)
+	
 	if err != nil {
 		return model.User{}, err
 	}
