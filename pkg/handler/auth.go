@@ -46,7 +46,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Repositories.GetUser(input.Mail)
 	if err != nil {
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		newErrorResponse(w, http.StatusUnauthorized, "invalid mail or password")
 		return
 	}
 
