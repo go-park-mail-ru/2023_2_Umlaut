@@ -4,8 +4,9 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"github.com/spf13/viper"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/rs/cors"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strconv"
@@ -50,12 +51,13 @@ func main() {
 	defer sessionStore.Close()
 
 	repos := repository.NewRepository(db, sessionStore)
-	handlers := handler.NewHandler(repos)
+	services := service.NewService(repos)
+	handlers := handler.NewHandler(services)
 	srv := new(umlaut.Server)
 
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins: viper.GetStringSlice("cors.origins"),
-		AllowedMethods: viper.GetStringSlice("cors.methods"),
+		AllowedOrigins:   viper.GetStringSlice("cors.origins"),
+		AllowedMethods:   viper.GetStringSlice("cors.methods"),
 		AllowCredentials: true,
 	})
 

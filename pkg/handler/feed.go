@@ -25,18 +25,10 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	id, err := h.Repositories.GetSession(ctx, session.Value)
-	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, "Redis server is unavailable")
-		return
-	}
-
-	user, _ := h.Repositories.GetUserById(id)
-	nextUser, err := h.Repositories.GetNextUser(user)
+	nextUser, err := h.services.GetNextUser(r.Context(), session)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
-		return
+
 	}
 
 	jsonResponse, _ := json.Marshal(nextUser)

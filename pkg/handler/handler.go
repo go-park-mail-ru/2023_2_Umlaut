@@ -1,19 +1,19 @@
 package handler
 
 import (
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Handler struct {
-	Repositories *repository.Repository
+	services *service.Service
 }
 
-func NewHandler(repositories *repository.Repository) *Handler {
-	return &Handler{Repositories: repositories}
+func NewHandler(services *service.Service) *Handler {
+	return &Handler{services: services}
 }
 
 func (h *Handler) InitRoutes() http.Handler {

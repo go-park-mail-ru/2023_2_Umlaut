@@ -1,16 +1,11 @@
 package handler
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
-	"math/rand"
-	"net/http"
-	"time"
-
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"io"
+	"net/http"
 )
 
 type signInInput struct {
@@ -37,6 +32,7 @@ type signUpInput struct {
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		newErrorResponse(w, http.StatusBadRequest, "Authentication failed")
+		return
 	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -50,28 +46,15 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.Repositories.GetUser(input.Mail)
+	user, err := h.services.GetUser(input.Mail, input.Password)
 	if err != nil {
 		newErrorResponse(w, http.StatusUnauthorized, "invalid mail or password")
 		return
 	}
-
-	if generatePasswordHash(input.Password, user.Salt) != user.PasswordHash {
-		newErrorResponse(w, http.StatusUnauthorized, "invalid mail or password")
-		return
-	}
-
-	SID := generateCookie()
-	ctx := r.Context()
-	if err = h.Repositories.SetSession(ctx, SID, user.Id, 10*time.Hour); err != nil {
+	cookie, err := h.services.GenerateCookie(r.Context(), user.Id)
+	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
-	}
-	cookie := &http.Cookie{
-		Name:     "session_id",
-		Value:    SID,
-		Expires:  time.Now().Add(10 * time.Hour),
-		Path:     "/",
-		HttpOnly: true,
+		return
 	}
 	http.SetCookie(w, cookie)
 
@@ -96,15 +79,11 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusUnauthorized, "no session")
 		return
 	}
-	ctx := r.Context()
-	if err = h.Repositories.DeleteSession(ctx, session.Value); err != nil {
+	if err = h.services.DeleteCookie(r.Context(), session); err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, "Invalid cookie deletion")
-		return
+
 	}
-
-	session.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, session)
-
 	http.Redirect(w, r, "/auth/login", http.StatusFound)
 }
 
@@ -121,6 +100,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		newErrorResponse(w, http.StatusBadRequest, "Registration failed")
+		return
 	}
 
 	body, err := io.ReadAll(r.Body)
@@ -134,28 +114,21 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusBadRequest, "Invalid JSON data")
 		return
 	}
-	user := model.User{Name: input.Name, Mail: input.Mail}
-	user.Salt = generateSalt()
-	user.PasswordHash = generatePasswordHash(input.Password, user.Salt)
-	id, err := h.Repositories.CreateUser(user)
+	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
+
+	id, err := h.services.CreateUser(user)
 	if err != nil {
 		newErrorResponse(w, http.StatusBadRequest, "Account with this email already exists")
+		return
 	}
 
-	ctx := r.Context()
-	SID := generateCookie()
-	if err = h.Repositories.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
+	cookie, err := h.services.GenerateCookie(r.Context(), user.Id)
+	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
 	}
-	cookie := &http.Cookie{
-		Name:     "session_id",
-		Value:    SID,
-		Expires:  time.Now().Add(10 * time.Hour),
-		Path:     "/",
-		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
 
+	http.SetCookie(w, cookie)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	response := map[string]int{
@@ -163,28 +136,4 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	}
 	jsonResponse, _ := json.Marshal(response)
 	w.Write(jsonResponse)
-}
-
-func generatePasswordHash(password, salt string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
-}
-
-func generateCookie() string {
-	return randStringRunes(32)
-}
-
-func generateSalt() string {
-	return randStringRunes(22)
-}
-
-func randStringRunes(n int) string {
-	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
 }
