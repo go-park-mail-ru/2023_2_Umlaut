@@ -15,16 +15,15 @@ import (
 
 func TestHandler_signUp(t *testing.T) {
 	mockCookie := &http.Cookie{
-		Name:     "your_cookie_name",
-		Value:    "your_cookie_value",
+		Name:     "name",
+		Value:    "value",
 		HttpOnly: true,
 	}
-	type mockBehavior func(r *mock_service.MockAuthorization, user model.User)
 	tests := []struct {
 		name                 string
 		inputBody            string
 		inputUser            model.User
-		mockBehavior         mockBehavior
+		mockBehavior         func(r *mock_service.MockAuthorization, user model.User)
 		expectedStatusCode   int
 		expectedResponseBody string
 	}{
@@ -89,8 +88,7 @@ func TestHandler_signUp(t *testing.T) {
 			mux.HandleFunc("/auth/sign-up", handler.signUp)
 
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("POST", "/auth/sign-up",
-				bytes.NewBufferString(test.inputBody))
+			req := httptest.NewRequest("POST", "/auth/sign-up", bytes.NewBufferString(test.inputBody))
 
 			mux.ServeHTTP(w, req)
 
