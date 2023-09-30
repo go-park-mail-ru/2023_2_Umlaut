@@ -139,7 +139,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	user.PasswordHash = generatePasswordHash(input.Password, user.Salt)
 	id, err := h.Repositories.CreateUser(user)
 	if err != nil {
-		newErrorResponse(w, http.StatusBadRequest, err.Error())
+		newErrorResponse(w, http.StatusBadRequest, "Account with this email already exists")
 	}
 
 	ctx := r.Context()
