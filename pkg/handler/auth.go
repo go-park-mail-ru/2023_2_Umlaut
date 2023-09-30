@@ -18,6 +18,12 @@ type signInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type signUpInput struct {
+	Name     string `json:"name" binding:"required"`
+	Mail     string `json:"mail" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 // @Summary signIn
 // @Tags auth
 // @Description login
@@ -108,7 +114,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @ID create-account
 // @Accept  json
 // @Produce  json
-// @Param input body model.User true "Sign-up input user"
+// @Param input body signUpInput true "Sign-up input user"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Router /auth/sign-up [post]
@@ -123,14 +129,14 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := model.User{}
-	if err = json.Unmarshal(body, &user); err != nil {
+	var input signUpInput
+	if err = json.Unmarshal(body, &input); err != nil {
 		newErrorResponse(w, http.StatusBadRequest, "Invalid JSON data")
 		return
 	}
-
+	user := model.User{Name: input.Name, Mail: input.Mail}
 	user.Salt = generateSalt()
-	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
+	user.PasswordHash = generatePasswordHash(input.Password, user.Salt)
 	id, err := h.Repositories.CreateUser(user)
 	if err != nil {
 		newErrorResponse(w, http.StatusBadRequest, err.Error())

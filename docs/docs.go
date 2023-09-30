@@ -134,7 +134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.signUpInput"
                         }
                     }
                 ],
@@ -185,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.User": {
+        "handler.signUpInput": {
             "type": "object",
             "required": [
                 "mail",
@@ -193,21 +193,6 @@ const docTemplate = `{
                 "password"
             ],
             "properties": {
-                "age": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "education": {
-                    "type": "string"
-                },
-                "hobbies": {
-                    "type": "string"
-                },
-                "looking": {
-                    "type": "string"
-                },
                 "mail": {
                     "type": "string"
                 },
@@ -215,15 +200,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "prefer_gender": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "string"
-                },
-                "user_gender": {
                     "type": "string"
                 }
             }
