@@ -5,6 +5,17 @@ import (
 	"net/http"
 )
 
+type signInInput struct {
+	Mail     string `json:"mail" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type signUpInput struct {
+	Name     string `json:"name" binding:"required"`
+	Mail     string `json:"mail" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 type errorResponse struct {
 	Message string `json:"message"`
 }

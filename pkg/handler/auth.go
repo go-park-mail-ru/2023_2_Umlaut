@@ -4,20 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"io"
 	"net/http"
 )
-
-type signInInput struct {
-	Mail     string `json:"mail" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type signUpInput struct {
-	Name     string `json:"name" binding:"required"`
-	Mail     string `json:"mail" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
 
 // @Summary signIn
 // @Tags auth
@@ -34,15 +22,15 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusBadRequest, "Authentication failed")
 		return
 	}
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "Failed to read request body")
+	decoder := json.NewDecoder(r.Body)
+	var input signInInput
+	if err := decoder.Decode(&input); err != nil {
+		newErrorResponse(w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	var input signInInput
-	if err = json.Unmarshal(body, &input); err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "Invalid JSON data")
+	if input.Mail == "" || input.Password == "" {
+		newErrorResponse(w, http.StatusBadRequest, "missing required fields")
 		return
 	}
 
@@ -103,17 +91,18 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "Failed to read request body")
+	decoder := json.NewDecoder(r.Body)
+	var input signUpInput
+	if err := decoder.Decode(&input); err != nil {
+		newErrorResponse(w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	var input signUpInput
-	if err = json.Unmarshal(body, &input); err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "Invalid JSON data")
+	if input.Name == "" || input.Mail == "" || input.Password == "" {
+		newErrorResponse(w, http.StatusBadRequest, "missing required fields")
 		return
 	}
+
 	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
 
 	id, err := h.services.CreateUser(user)
