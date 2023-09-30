@@ -1,4 +1,5 @@
-//package repository
+package repository
+
 //
 //import (
 //	"github.com/DATA-DOG/go-sqlmock"
