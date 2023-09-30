@@ -46,7 +46,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Repositories.GetUser(input.Mail)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
 		return
 	}
 
@@ -61,10 +61,10 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
 	cookie := &http.Cookie{
-		Name:    "session_id",
-		Value:   SID,
-		Expires: time.Now().Add(10 * time.Hour),
-		Path:    "/",
+		Name:     "session_id",
+		Value:    SID,
+		Expires:  time.Now().Add(10 * time.Hour),
+		Path:     "/",
 		HttpOnly: true,
 	}
 	http.SetCookie(w, cookie)
@@ -142,10 +142,10 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
 	cookie := &http.Cookie{
-		Name:    "session_id",
-		Value:   SID,
-		Expires: time.Now().Add(10 * time.Hour),
-		Path:    "/",
+		Name:     "session_id",
+		Value:    SID,
+		Expires:  time.Now().Add(10 * time.Hour),
+		Path:     "/",
 		HttpOnly: true,
 	}
 	http.SetCookie(w, cookie)
