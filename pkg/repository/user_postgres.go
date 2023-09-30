@@ -69,6 +69,7 @@ func ScanUser(row *sql.Row, user *model.User) error {
 		&user.Name,
 		&user.Mail,
 		&user.PasswordHash,
+		&user.Salt,
 		&user.UserGender,
 		&user.PreferGender,
 		&user.Description,
