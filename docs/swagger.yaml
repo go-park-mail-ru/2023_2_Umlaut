@@ -48,6 +48,19 @@ paths:
       summary: get user for feed
       tags:
       - feed
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      operationId: user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get user information
+      tags:
+      - user
   /auth/login:
     post:
       consumes:

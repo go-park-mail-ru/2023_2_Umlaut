@@ -35,6 +35,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "get user information",
+                "operationId": "user",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "consumes": [

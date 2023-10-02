@@ -1,6 +1,6 @@
 package model
 
-import "strings"
+import "net/mail"
 
 type User struct {
 	Id           int     `json:"-" db:"id"`
@@ -23,6 +23,6 @@ func (u *User) Sanitize() {
 }
 
 func (u *User) IsValid() bool {
-	return len(u.Name) > 1 && len(u.PasswordHash) > 5 &&
-		strings.Contains(u.Mail, "@") && strings.Contains(u.Mail, ".") && len(u.Mail) > 5
+	_, err := mail.ParseAddress(u.Mail)
+	return err == nil && len(u.Name) > 1 && len(u.PasswordHash) > 5
 }
