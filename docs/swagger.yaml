@@ -28,6 +28,35 @@ definitions:
     - name
     - password
     type: object
+  model.User:
+    properties:
+      age:
+        type: integer
+      description:
+        type: string
+      education:
+        type: string
+      hobbies:
+        type: string
+      looking:
+        type: string
+      mail:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      prefer_gender:
+        type: string
+      tags:
+        type: string
+      user_gender:
+        type: string
+    required:
+    - mail
+    - name
+    - password
+    type: object
 host: 37.139.32.76:8000
 info:
   contact: {}
@@ -58,6 +87,16 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
       summary: get user information
       tags:
       - user

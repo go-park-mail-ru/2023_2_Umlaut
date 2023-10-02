@@ -22,6 +22,7 @@ type Feed interface {
 
 type User interface {
 	GetCurrentUser(ctx context.Context, session string) (model.User, error)
+	//TODO: edit user
 }
 
 type Service struct {
