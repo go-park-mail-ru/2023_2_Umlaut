@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8000",
+    "host": "37.139.32.76:8000",
     "basePath": "/",
     "paths": {
         "/api/feed": {

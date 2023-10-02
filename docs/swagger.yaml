@@ -28,7 +28,7 @@ definitions:
     - name
     - password
     type: object
-host: localhost:8000
+host: 37.139.32.76:8000
 info:
   contact: {}
   description: API Server for Umlaut Application

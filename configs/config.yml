@@ -13,7 +13,10 @@ redis:
 
 cors:
   origins: [
-    "*"
+    "http://37.139.32.76:80",
+    "http://37.139.32.76",
+    "http://localhost:8000"
+    "http://37.139.32.76:8000",
   ]
   methods: [
     "GET",
