@@ -71,15 +71,9 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 
 	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
+	session.Path = "/"
 
 	http.SetCookie(w, session)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	response := map[string]string{
-		"status": "Ok",
-	}
-	jsonResponse, _ := json.Marshal(response)
-	w.Write(jsonResponse)
 }
 
 // @Summary sign up account
