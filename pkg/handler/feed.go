@@ -6,9 +6,8 @@ import (
 	"net/http"
 )
 
-// @Summary feed
+// @Summary get user for feed
 // @Tags feed
-// @Description Next user for feed
 // @ID feed
 // @Accept  json
 // @Produce  json
@@ -25,10 +24,10 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nextUser, err := h.services.GetNextUser(r.Context(), session)
+	nextUser, err := h.services.GetNextUser(r.Context(), session.Value)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
-
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
 	}
 
 	jsonResponse, _ := json.Marshal(nextUser)

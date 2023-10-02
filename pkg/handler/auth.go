@@ -5,11 +5,11 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"net/http"
+	"time"
 )
 
-// @Summary signIn
+// @Summary log in to account
 // @Tags auth
-// @Description login
 // @ID login
 // @Accept  json
 // @Produce  json
@@ -39,12 +39,12 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusUnauthorized, "invalid mail or password")
 		return
 	}
-	cookie, err := h.services.GenerateCookie(r.Context(), user.Id)
+	SID, err := h.services.GenerateCookie(r.Context(), user.Id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	http.SetCookie(w, cookie)
+	http.SetCookie(w, createCookie(SID))
 
 	jsonResponse, _ := json.Marshal(user)
 	w.Header().Set("Content-Type", "application/json")
@@ -52,9 +52,8 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-// @Summary logout
+// @Summary log out of account
 // @Tags auth
-// @Description logout
 // @ID logout
 // @Accept  json
 // @Produce  json
@@ -67,17 +66,16 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusUnauthorized, "no session")
 		return
 	}
-	if err = h.services.DeleteCookie(r.Context(), session); err != nil {
+	if err = h.services.DeleteCookie(r.Context(), session.Value); err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, "Invalid cookie deletion")
 
 	}
+	session.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, session)
-	http.Redirect(w, r, "/auth/login", http.StatusFound)
 }
 
-// @Summary signUp
+// @Summary sign up account
 // @Tags auth
-// @Description create account
 // @ID create-account
 // @Accept  json
 // @Produce  json
@@ -111,13 +109,12 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := h.services.GenerateCookie(r.Context(), user.Id)
+	SID, err := h.services.GenerateCookie(r.Context(), user.Id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	http.SetCookie(w, cookie)
+	http.SetCookie(w, createCookie(SID))
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	response := map[string]int{
@@ -125,4 +122,14 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	}
 	jsonResponse, _ := json.Marshal(response)
 	w.Write(jsonResponse)
+}
+
+func createCookie(SID string) *http.Cookie {
+	return &http.Cookie{
+		Name:     "session_id",
+		Value:    SID,
+		Expires:  time.Now().Add(10 * time.Hour),
+		Path:     "/",
+		HttpOnly: true,
+	}
 }

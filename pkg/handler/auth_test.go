@@ -14,11 +14,6 @@ import (
 )
 
 func TestHandler_signUp(t *testing.T) {
-	mockCookie := &http.Cookie{
-		Name:     "name",
-		Value:    "value",
-		HttpOnly: true,
-	}
 	tests := []struct {
 		name                 string
 		inputBody            string
@@ -37,7 +32,7 @@ func TestHandler_signUp(t *testing.T) {
 			},
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
 				r.EXPECT().CreateUser(user).Return(1, nil)
-				r.EXPECT().GenerateCookie(gomock.Any(), user.Id).Return(mockCookie, nil)
+				r.EXPECT().GenerateCookie(gomock.Any(), user.Id).Return("", nil)
 			},
 			expectedStatusCode:   200,
 			expectedResponseBody: `{"id":1}`,

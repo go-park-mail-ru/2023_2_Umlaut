@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"net/http"
 )
 
 type FeedService struct {
@@ -16,8 +15,8 @@ func NewFeedService(repoUser repository.User, repoStore repository.Store) *FeedS
 	return &FeedService{repoUser: repoUser, repoStore: repoStore}
 }
 
-func (s *FeedService) GetNextUser(ctx context.Context, session *http.Cookie) (model.User, error) {
-	id, err := s.repoStore.GetSession(ctx, session.Value)
+func (s *FeedService) GetNextUser(ctx context.Context, session string) (model.User, error) {
+	id, err := s.repoStore.GetSession(ctx, session)
 	if err != nil {
 		return model.User{}, err
 	}

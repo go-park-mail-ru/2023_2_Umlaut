@@ -6,11 +6,10 @@ package mock_service
 
 import (
 	context "context"
-	_ "github.com/go-park-mail-ru/2023_2_Umlaut"
+	reflect "reflect"
+
 	model "github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	gomock "github.com/golang/mock/gomock"
-	http "net/http"
-	reflect "reflect"
 )
 
 // MockAuthorization is a mock of Authorization interface.
@@ -52,7 +51,7 @@ func (mr *MockAuthorizationMockRecorder) CreateUser(user interface{}) *gomock.Ca
 }
 
 // DeleteCookie mocks base method.
-func (m *MockAuthorization) DeleteCookie(ctx context.Context, session *http.Cookie) error {
+func (m *MockAuthorization) DeleteCookie(ctx context.Context, session string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCookie", ctx, session)
 	ret0, _ := ret[0].(error)
@@ -66,10 +65,10 @@ func (mr *MockAuthorizationMockRecorder) DeleteCookie(ctx, session interface{}) 
 }
 
 // GenerateCookie mocks base method.
-func (m *MockAuthorization) GenerateCookie(ctx context.Context, id int) (*http.Cookie, error) {
+func (m *MockAuthorization) GenerateCookie(ctx context.Context, id int) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateCookie", ctx, id)
-	ret0, _ := ret[0].(*http.Cookie)
+	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -119,7 +118,7 @@ func (m *MockFeed) EXPECT() *MockFeedMockRecorder {
 }
 
 // GetNextUser mocks base method.
-func (m *MockFeed) GetNextUser(ctx context.Context, session *http.Cookie) (model.User, error) {
+func (m *MockFeed) GetNextUser(ctx context.Context, session string) (model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextUser", ctx, session)
 	ret0, _ := ret[0].(model.User)

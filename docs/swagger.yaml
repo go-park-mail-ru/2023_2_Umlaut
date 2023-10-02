@@ -39,21 +39,19 @@ paths:
     get:
       consumes:
       - application/json
-      description: Next user for feed
       operationId: feed
       produces:
       - application/json
       responses:
         "200":
           description: OK
-      summary: feed
+      summary: get user for feed
       tags:
       - feed
   /auth/login:
     post:
       consumes:
       - application/json
-      description: login
       operationId: login
       parameters:
       - description: Sign-in input parameters
@@ -75,14 +73,13 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handler.errorResponse'
-      summary: signIn
+      summary: log in to account
       tags:
       - auth
   /auth/logout:
     get:
       consumes:
       - application/json
-      description: logout
       operationId: logout
       produces:
       - application/json
@@ -97,14 +94,13 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handler.errorResponse'
-      summary: logout
+      summary: log out of account
       tags:
       - auth
   /auth/sign-up:
     post:
       consumes:
       - application/json
-      description: create account
       operationId: create-account
       parameters:
       - description: Sign-up input user
@@ -128,7 +124,7 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handler.errorResponse'
-      summary: signUp
+      summary: sign up account
       tags:
       - auth
 swagger: "2.0"

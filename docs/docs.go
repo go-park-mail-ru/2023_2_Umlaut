@@ -17,7 +17,6 @@ const docTemplate = `{
     "paths": {
         "/api/feed": {
             "get": {
-                "description": "Next user for feed",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,7 +26,7 @@ const docTemplate = `{
                 "tags": [
                     "feed"
                 ],
-                "summary": "feed",
+                "summary": "get user for feed",
                 "operationId": "feed",
                 "responses": {
                     "200": {
@@ -38,7 +37,6 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
-                "description": "login",
                 "consumes": [
                     "application/json"
                 ],
@@ -48,7 +46,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "signIn",
+                "summary": "log in to account",
                 "operationId": "login",
                 "parameters": [
                     {
@@ -82,7 +80,6 @@ const docTemplate = `{
         },
         "/auth/logout": {
             "get": {
-                "description": "logout",
                 "consumes": [
                     "application/json"
                 ],
@@ -92,7 +89,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "logout",
+                "summary": "log out of account",
                 "operationId": "logout",
                 "responses": {
                     "200": {
@@ -115,7 +112,6 @@ const docTemplate = `{
         },
         "/auth/sign-up": {
             "post": {
-                "description": "create account",
                 "consumes": [
                     "application/json"
                 ],
@@ -125,7 +121,7 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "signUp",
+                "summary": "sign up account",
                 "operationId": "create-account",
                 "parameters": [
                     {

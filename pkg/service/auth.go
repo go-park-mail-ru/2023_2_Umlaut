@@ -8,7 +8,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"math/rand"
-	"net/http"
 	"time"
 )
 
@@ -42,27 +41,20 @@ func (s *AuthService) GetUser(mail, password string) (model.User, error) {
 	return user, nil
 }
 
-func (s *AuthService) GenerateCookie(ctx context.Context, id int) (*http.Cookie, error) {
+func (s *AuthService) GenerateCookie(ctx context.Context, id int) (string, error) {
 	SID := generateCookie()
 	if err := s.repoStore.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
-		return nil, err
+		return SID, err
 	}
-	cookie := &http.Cookie{
-		Name:     "session_id",
-		Value:    SID,
-		Expires:  time.Now().Add(10 * time.Hour),
-		Path:     "/",
-		HttpOnly: true,
-	}
-	return cookie, nil
+
+	return SID, nil
 }
 
-func (s *AuthService) DeleteCookie(ctx context.Context, session *http.Cookie) error {
-	if err := s.repoStore.DeleteSession(ctx, session.Value); err != nil {
+func (s *AuthService) DeleteCookie(ctx context.Context, session string) error {
+	if err := s.repoStore.DeleteSession(ctx, session); err != nil {
 		return err
 	}
 
-	session.Expires = time.Now().AddDate(0, 0, -1)
 	return nil
 }
 

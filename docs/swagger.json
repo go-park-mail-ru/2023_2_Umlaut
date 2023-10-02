@@ -11,7 +11,6 @@
     "paths": {
         "/api/feed": {
             "get": {
-                "description": "Next user for feed",
                 "consumes": [
                     "application/json"
                 ],
@@ -21,7 +20,7 @@
                 "tags": [
                     "feed"
                 ],
-                "summary": "feed",
+                "summary": "get user for feed",
                 "operationId": "feed",
                 "responses": {
                     "200": {
@@ -32,7 +31,6 @@
         },
         "/auth/login": {
             "post": {
-                "description": "login",
                 "consumes": [
                     "application/json"
                 ],
@@ -42,7 +40,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "signIn",
+                "summary": "log in to account",
                 "operationId": "login",
                 "parameters": [
                     {
@@ -76,7 +74,6 @@
         },
         "/auth/logout": {
             "get": {
-                "description": "logout",
                 "consumes": [
                     "application/json"
                 ],
@@ -86,7 +83,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "logout",
+                "summary": "log out of account",
                 "operationId": "logout",
                 "responses": {
                     "200": {
@@ -109,7 +106,6 @@
         },
         "/auth/sign-up": {
             "post": {
-                "description": "create account",
                 "consumes": [
                     "application/json"
                 ],
@@ -119,7 +115,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "signUp",
+                "summary": "sign up account",
                 "operationId": "create-account",
                 "parameters": [
                     {
