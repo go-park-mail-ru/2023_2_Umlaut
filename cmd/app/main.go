@@ -16,7 +16,7 @@ import (
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host localhost:8000
+// @host 37.139.32.76:8000
 // @BasePath /
 func main() {
 	if err := initConfig(); err != nil {
