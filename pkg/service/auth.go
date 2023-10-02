@@ -21,6 +21,9 @@ func NewAuthService(repoUser repository.User, repoStore repository.Store) *AuthS
 }
 
 func (s *AuthService) CreateUser(user model.User) (int, error) {
+	if !user.IsValid() {
+		return 0, errors.New("invalid fields")
+	}
 	user.Salt = generateSalt()
 	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(user)

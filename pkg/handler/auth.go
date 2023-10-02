@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -105,8 +104,8 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(input.Name) < 1 || !validateEmail(input.Mail) || !validatePassword(input.Password) {
-		newErrorResponse(w, http.StatusBadRequest, "invalidate fields")
+	if input.Name == "" || input.Mail == "" || input.Password == "" {
+		newErrorResponse(w, http.StatusBadRequest, "missing required fields")
 		return
 	}
 
@@ -131,14 +130,6 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	}
 	jsonResponse, _ := json.Marshal(response)
 	w.Write(jsonResponse)
-}
-
-func validatePassword(password string) bool {
-	return len(password) > 5
-}
-
-func validateEmail(email string) bool {
-	return strings.Contains(email, "@") && strings.Contains(email, ".") && len(email) > 5
 }
 
 func createCookie(SID string) *http.Cookie {

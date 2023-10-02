@@ -1,5 +1,7 @@
 package model
 
+import "strings"
+
 type User struct {
 	Id           int     `json:"-" db:"id"`
 	Name         string  `json:"name" db:"name" binding:"required"`
@@ -18,4 +20,9 @@ type User struct {
 
 func (u *User) Sanitize() {
 	u.PasswordHash = ""
+}
+
+func (u *User) IsValid() bool {
+	return len(u.Name) > 1 && len(u.PasswordHash) > 5 &&
+		strings.Contains(u.Mail, "@") && strings.Contains(u.Mail, ".") && len(u.Mail) > 5
 }
