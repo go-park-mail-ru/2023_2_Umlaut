@@ -38,6 +38,8 @@ func (s *AuthService) GetUser(mail, password string) (model.User, error) {
 	if generatePasswordHash(password, user.Salt) != user.PasswordHash {
 		return user, errors.New("invalid")
 	}
+	user.Sanitize()
+
 	return user, nil
 }
 

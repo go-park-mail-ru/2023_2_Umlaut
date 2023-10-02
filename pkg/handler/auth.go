@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -71,7 +72,15 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 
 	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
+
 	http.SetCookie(w, session)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := map[string]string{
+		"status": "Ok",
+	}
+	jsonResponse, _ := json.Marshal(response)
+	w.Write(jsonResponse)
 }
 
 // @Summary sign up account
@@ -96,8 +105,8 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if input.Name == "" || input.Mail == "" || input.Password == "" {
-		newErrorResponse(w, http.StatusBadRequest, "missing required fields")
+	if len(input.Name) < 1 || !validateEmail(input.Mail) || !validatePassword(input.Password) {
+		newErrorResponse(w, http.StatusBadRequest, "invalidate fields")
 		return
 	}
 
@@ -122,6 +131,14 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	}
 	jsonResponse, _ := json.Marshal(response)
 	w.Write(jsonResponse)
+}
+
+func validatePassword(password string) bool {
+	return len(password) > 5
+}
+
+func validateEmail(email string) bool {
+	return strings.Contains(email, "@") && strings.Contains(email, ".") && len(email) > 5
 }
 
 func createCookie(SID string) *http.Cookie {

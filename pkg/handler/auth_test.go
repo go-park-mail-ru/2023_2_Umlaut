@@ -43,7 +43,7 @@ func TestHandler_signUp(t *testing.T) {
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":"missing required fields"}`,
+			expectedResponseBody: `{"message":"invalidate fields"}`,
 		},
 		{
 			name:                 "Wrong json",
