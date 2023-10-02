@@ -28,7 +28,7 @@ func (s *AuthService) CreateUser(user model.User) (int, error) {
 	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(user)
 	if err != nil {
-		return 0, err
+		return 0, errors.New("account with this email already exists")
 	}
 	return id, err
 }

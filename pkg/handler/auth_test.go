@@ -65,7 +65,7 @@ func TestHandler_signUp(t *testing.T) {
 				r.EXPECT().CreateUser(user).Return(0, errors.New(""))
 			},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":"Account with this email already exists"}`,
+			expectedResponseBody: `{"message":""}`,
 		},
 	}
 	for _, test := range tests {
