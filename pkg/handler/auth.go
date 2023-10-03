@@ -106,7 +106,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SID, err := h.services.GenerateCookie(r.Context(), user.Id)
+	SID, err := h.services.GenerateCookie(r.Context(), id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
