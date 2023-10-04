@@ -32,7 +32,7 @@ func TestHandler_signUp(t *testing.T) {
 			},
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
 				r.EXPECT().CreateUser(user).Return(1, nil)
-				r.EXPECT().GenerateCookie(gomock.Any(), user.Id).Return("", nil)
+				r.EXPECT().GenerateCookie(gomock.Any(), 1).Return("", nil)
 			},
 			expectedStatusCode:   200,
 			expectedResponseBody: `{"id":1}`,
