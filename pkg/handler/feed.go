@@ -11,7 +11,8 @@ import (
 // @ID feed
 // @Accept  json
 // @Produce  json
-// @Success 200
+// @Success 200 {object} model.User
+// @Failure 401,404 {object} errorResponse
 // @Router /api/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

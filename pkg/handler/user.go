@@ -12,7 +12,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} model.User
-// @Failure 400,404 {object} errorResponse
+// @Failure 401,404 {object} errorResponse
 // @Router /api/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
