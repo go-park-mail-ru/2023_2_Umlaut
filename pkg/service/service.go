@@ -12,16 +12,17 @@ import (
 type Authorization interface {
 	GenerateCookie(ctx context.Context, id int) (string, error)
 	DeleteCookie(ctx context.Context, session string) error
+	GetSessionValue(ctx context.Context, session string) (int, error)
 	CreateUser(user model.User) (int, error)
 	GetUser(mail, password string) (model.User, error)
 }
 
 type Feed interface {
-	GetNextUser(ctx context.Context, session string) (model.User, error)
+	GetNextUser(ctx context.Context, userId int) (model.User, error)
 }
 
 type User interface {
-	GetCurrentUser(ctx context.Context, session string) (model.User, error)
+	GetCurrentUser(ctx context.Context, userId int) (model.User, error)
 	//TODO: edit user
 }
 

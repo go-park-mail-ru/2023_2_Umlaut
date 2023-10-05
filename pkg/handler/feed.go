@@ -25,7 +25,13 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nextUser, err := h.services.GetNextUser(r.Context(), session.Value)
+	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	if err != nil {
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	nextUser, err := h.services.GetNextUser(r.Context(), id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return

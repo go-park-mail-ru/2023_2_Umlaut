@@ -25,7 +25,13 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser, err := h.services.GetCurrentUser(r.Context(), session.Value)
+	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	if err != nil {
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return

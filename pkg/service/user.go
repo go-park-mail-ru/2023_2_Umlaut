@@ -15,13 +15,8 @@ func NewUserService(repoUser repository.User, repoStore repository.Store) *UserS
 	return &UserService{repoUser: repoUser, repoStore: repoStore}
 }
 
-func (s *UserService) GetCurrentUser(ctx context.Context, session string) (model.User, error) {
-	id, err := s.repoStore.GetSession(ctx, session)
-	if err != nil {
-		return model.User{}, err
-	}
-
-	user, err := s.repoUser.GetUserById(id)
+func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
+	user, err := s.repoUser.GetUserById(userId)
 	if err != nil {
 		return model.User{}, err
 	}

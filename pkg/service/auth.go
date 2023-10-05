@@ -63,6 +63,15 @@ func (s *AuthService) DeleteCookie(ctx context.Context, session string) error {
 	return nil
 }
 
+func (s *AuthService) GetSessionValue(ctx context.Context, session string) (int, error) {
+	id, err := s.repoStore.GetSession(ctx, session)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
 func generatePasswordHash(password, salt string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
