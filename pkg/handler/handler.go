@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"net/http"
-
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"net/http"
 )
 
 type Handler struct {
@@ -17,15 +17,20 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+	r := mux.NewRouter()
+	r.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
-	mux.HandleFunc("/auth/login", h.signIn)
-	mux.HandleFunc("/auth/logout", h.logout)
-	mux.HandleFunc("/auth/sign-up", h.signUp)
+	r.HandleFunc("/auth/login", h.signIn).Methods("POST")
+	r.HandleFunc("/auth/sign-up", h.signUp).Methods("POST")
+	r.HandleFunc("/auth/logout", h.logout)
 
-	mux.HandleFunc("/api/feed", h.feed)
-	mux.HandleFunc("/api/user", h.user)
+	r.HandleFunc("/api/feed", h.feed).Methods("GET")
+	r.HandleFunc("/api/user", h.user).Methods("GET")
 
-	return mux
+	r.Use(
+		loggingMiddleware,
+		panicRecoveryMiddleware,
+	)
+
+	return r
 }

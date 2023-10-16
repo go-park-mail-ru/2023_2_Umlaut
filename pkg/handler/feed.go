@@ -15,10 +15,6 @@ import (
 // @Failure 401,404 {object} errorResponse
 // @Router /api/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		newErrorResponse(w, http.StatusBadRequest, "Failed")
-	}
-
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
 		newErrorResponse(w, http.StatusUnauthorized, "no session")

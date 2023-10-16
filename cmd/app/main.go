@@ -6,8 +6,8 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/rs/cors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"log"
 	"os"
 	"strconv"
 )
@@ -19,8 +19,9 @@ import (
 // @host 37.139.32.76:8000
 // @BasePath /
 func main() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
 	if err := initConfig(); err != nil {
-		log.Fatalf("error initializing configs: %s", err.Error())
+		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.PostgresConfig{
@@ -32,13 +33,13 @@ func main() {
 		Password: os.Getenv("DB_PASSWORD"),
 	})
 	if err != nil {
-		log.Fatalf("failed to initialize db: %s", err.Error())
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 	defer db.Close()
 
 	redisDb, err := strconv.Atoi(viper.GetString("redis.db"))
 	if err != nil {
-		log.Fatalf("failed to initialize db: %s", err.Error())
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 	sessionStore, err := repository.NewRedisClient(repository.RedisConfig{
 		Addr:     viper.GetString("redis.addr"),
@@ -46,7 +47,7 @@ func main() {
 		DB:       redisDb,
 	})
 	if err != nil {
-		log.Fatalf("failed to initialize db: %s", err.Error())
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 	defer sessionStore.Close()
 
@@ -62,7 +63,7 @@ func main() {
 	})
 
 	if err := srv.Run(viper.GetString("port"), corsMiddleware.Handler(handlers.InitRoutes())); err != nil {
-		log.Fatalf("error occured while running http server: %s", err.Error())
+		logrus.Fatalf("error occured while running http server: %s", err.Error())
 	}
 }
 
