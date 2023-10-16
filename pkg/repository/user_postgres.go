@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -15,43 +16,43 @@ func NewUserPostgres(db *sql.DB) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
-func (r *UserPostgres) CreateUser(user model.User) (int, error) {
+func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (name, mail, password_hash, salt) values ($1, $2, $3, $4) RETURNING id", usersTable)
-	row := r.db.QueryRow(query, user.Name, user.Mail, user.PasswordHash, user.Salt)
+	row := r.db.QueryRowContext(ctx, query, user.Name, user.Mail, user.PasswordHash, user.Salt)
 	err := row.Scan(&id)
 
 	return id, err
 }
 
-func (r *UserPostgres) GetUser(mail string) (model.User, error) {
+func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
 	var user model.User
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE mail=$1", usersTable)
-	row := r.db.QueryRow(query, mail)
+	row := r.db.QueryRowContext(ctx, query, mail)
 	err := ScanUser(row, &user)
 
 	return user, err
 }
 
-func (r *UserPostgres) GetUserById(id int) (model.User, error) {
+func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, error) {
 	var user model.User
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1", usersTable)
-	row := r.db.QueryRow(query, id)
+	row := r.db.QueryRowContext(ctx, query, id)
 	err := ScanUser(row, &user)
 
 	return user, err
 }
 
-func (r *UserPostgres) GetNextUser(user model.User) (model.User, error) {
+func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
 	var nextUser model.User
 	var query string
 	var err error
 	if user.PreferGender != nil {
 		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 and user_gender = $2 ORDER BY RANDOM() LIMIT 1", usersTable)
-		row := r.db.QueryRow(query, user.Id, user.PreferGender)
+		row := r.db.QueryRowContext(ctx, query, user.Id, user.PreferGender)
 		err = ScanUser(row, &nextUser)
 	} else {
 		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 ORDER BY RANDOM() LIMIT 1", usersTable)

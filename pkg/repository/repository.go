@@ -10,10 +10,10 @@ import (
 )
 
 type User interface {
-	CreateUser(user model.User) (int, error)
-	GetUser(mail string) (model.User, error)
-	GetUserById(id int) (model.User, error)
-	GetNextUser(user model.User) (model.User, error)
+	CreateUser(ctx context.Context, user model.User) (int, error)
+	GetUser(ctx context.Context, mail string) (model.User, error)
+	GetUserById(ctx context.Context, id int) (model.User, error)
+	GetNextUser(ctx context.Context, user model.User) (model.User, error)
 }
 
 type Store interface {
