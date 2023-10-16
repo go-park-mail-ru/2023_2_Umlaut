@@ -28,6 +28,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	r.HandleFunc("/api/user", h.user).Methods("GET")
 
 	r.Use(
+		corsMiddleware,
 		loggingMiddleware,
 		panicRecoveryMiddleware,
 	)

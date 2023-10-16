@@ -5,7 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
@@ -56,13 +55,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 	srv := new(umlaut.Server)
 
-	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   viper.GetStringSlice("cors.origins"),
-		AllowedMethods:   viper.GetStringSlice("cors.methods"),
-		AllowCredentials: true,
-	})
-
-	if err := srv.Run(viper.GetString("port"), corsMiddleware.Handler(handlers.InitRoutes())); err != nil {
+	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logrus.Fatalf("error occured while running http server: %s", err.Error())
 	}
 }
