@@ -16,7 +16,7 @@ func NewUserService(repoUser repository.User, repoStore repository.Store) *UserS
 }
 
 func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
-	user, err := s.repoUser.GetUserById(userId)
+	user, err := s.repoUser.GetUserById(ctx, userId)
 	if err != nil {
 		return model.User{}, err
 	}

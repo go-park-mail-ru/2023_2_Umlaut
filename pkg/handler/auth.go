@@ -30,7 +30,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.services.GetUser(input.Mail, input.Password)
+	user, err := h.services.GetUser(r.Context(), input.Mail, input.Password)
 	if err != nil {
 		newErrorResponse(w, http.StatusUnauthorized, "invalid mail or password")
 		return
@@ -91,7 +91,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
 
-	id, err := h.services.CreateUser(user)
+	id, err := h.services.CreateUser(r.Context(), user)
 	if err != nil {
 		newErrorResponse(w, http.StatusBadRequest, err.Error())
 		return

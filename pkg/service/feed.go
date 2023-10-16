@@ -16,8 +16,8 @@ func NewFeedService(repoUser repository.User, repoStore repository.Store) *FeedS
 }
 
 func (s *FeedService) GetNextUser(ctx context.Context, userId int) (model.User, error) {
-	user, _ := s.repoUser.GetUserById(userId)
-	nextUser, err := s.repoUser.GetNextUser(user)
+	user, _ := s.repoUser.GetUserById(ctx, userId)
+	nextUser, err := s.repoUser.GetNextUser(ctx, user)
 	if err != nil {
 		return model.User{}, err
 	}

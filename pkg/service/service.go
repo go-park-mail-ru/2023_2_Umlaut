@@ -13,8 +13,8 @@ type Authorization interface {
 	GenerateCookie(ctx context.Context, id int) (string, error)
 	DeleteCookie(ctx context.Context, session string) error
 	GetSessionValue(ctx context.Context, session string) (int, error)
-	CreateUser(user model.User) (int, error)
-	GetUser(mail, password string) (model.User, error)
+	CreateUser(ctx context.Context, user model.User) (int, error)
+	GetUser(ctx context.Context, mail, password string) (model.User, error)
 }
 
 type Feed interface {
