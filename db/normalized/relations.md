@@ -1,9 +1,8 @@
 ## Диаграммы
 
-[ER диаграмма в draw.io](https://drive.google.com/file/d/13nEG0242lOdOozOpXfhOZTflDkC_dgan/view?usp=sharing)
+[ER диаграмма в draw.io](Umlaut.drawio)
 
-[Mermaid описание](https://mermaid.live/edit#pako:eNqVlNFugjAUhl-l6bW8AHcojRIRCK0mJiTkKB02Cpi2ZjPqu6-o09HNhfWG04-_p-dvD5zwuik4djGXvoBSQpXVyIxRPEtCL4gYOp8dpzmhOSUpclFA85QkccpI2lfovxA-gMOWCTFLJh7N29DWn26gHaLWKJnmgf9Emn9oNONKQcmftADNERMVVxqq_Y1fbo9rgT1yRlBxC80Vl2NeF1x2l3ulrQybZivq0qKTZrUSXFmUQWmjoDJuEtAby9FQSL0p4NgxZB3kv6x9pUiJTyIWeKF1je2dPF_-EPe5GhA7CyWg1HsjCwtT2OlOVb7ZIh7bjRUt4nBBaN7Of9PdZs6MUOqN274axREzx0PzO-oseu2gU8QjXf9mZCbu1ZBhMCWWyRb5-XD5zeRV9ffuL_bAA1xxWYEozHd-zZBhveGmBbBrwgLkNsNZfTE6OOiGHus1drU88AE-7Nuc9z8Ddt9gp_jlE94WL_U)
-
+[Mermaid описание](https://mermaid.live/edit#pako:eNqVlNFuozAQRX_F8nPTD8gbLd4UlQDCbqVKkZATZhOrgCPbqK0S_n3tQEMgaTfhBeveM55hPHiHVzIHPMWgfMHXipeLCtnnhZIU7feTidyhx3iehF4QMTRFAc1SksQpI-m1oN-CR3PC3hJyKeTJo5nzRjzatYJ7RGVQ8pwFfi_pkheF01PYSmWo4abWvW1ECdrwcovY96o1m5P6f89g4NOgiJdwIemLBjWDKgd1wUwU_D23D9v5oFdKbI2Q1cgJpXwX1Xqkkrxe8Qv0k1wuBeiRGpR8DQk3m17PuQH0IJTZ5Pyrl5dSFiiubLkwaMvotG5q0PcWKfFJxAIvRM3-_n6_a3vdnnNvnsFX5JpzUYykhGv9IVU-kikvzPl5d8Pn23TxzA1r9BqHr4Rmf4KUsswx19CUPMaRf4J3yCBgMieUejNiAy3NbE9p1kmDoJ8_uznljttd0ybQ2g4Cs-sbf4juC8Lg2dXtXn728PZDYwYUi0-og_OfQo_l2JGbB_a6yDw2KIh5M9TIQ6ZugNwrszLtgdsGFN_hElTJRW5vvkPoApsNWB9P7TLn6n2BF5XjeG0k_apWeGpUDXe43ro_qbsrW7H5B0cZgh8)
 ## Описание таблиц
 
 1. **Таблица "COMPLAINT" (Жалобы):**
@@ -27,6 +26,12 @@
 7. **Таблица "LIKE" (Лайки):**
     -  Эта таблица используется для отслеживания действий "лайк" в приложении. Она включает в себя информацию о лайках, включая дату и связи с пользователями, которые поставили лайк и пользователями, которым поставили лайк.
 
+8. **Таблица "Tag" (Теги):**
+   -  Эта таблица хранит список тегов, которые могут быть привязаны к пользователям.
+
+9. **Таблица "UserTag" (Теги пользователей):**
+   -  Эта таблица представляет связь между пользователями и тегами. Она указывает, какие теги связаны с конкретными пользователями.
+
 ## Функциональные зависимости
 
 **Relation "COMPLAINT" (Жалобы):**
@@ -35,7 +40,7 @@
 
 **Relation "USER" (Пользователи):**
 
-{PK ID} -> {Name, UserGender, Age, Looking, Hobbies, Tags, ImagePath, Birthday}
+{PK ID} -> {Name, UserGender, Looking, Hobbies, Tags, ImagePath, Birthday}
 
 **Relation "COMPLAINT-TYPE" (Типы жалоб):**
 
@@ -47,7 +52,7 @@
 
 **Relation "DIALOG" (Диалоги):**
 
-{PK ID} -> {FK_User1ID, FK_User2ID, FK_LastMessageID}
+{PK ID} -> {FK_User1ID, FK_User2ID}
 
 **Relation "MESSAGE" (Сообщения в диалогах):**
 
@@ -56,3 +61,11 @@
 **Relation "LIKE" (Лайки):**
 
 {PK ID} -> {Timestamp, FK_LikedByUserID, FK_LikedToUserID}
+
+**Relation "Tag" (Теги):**
+
+{PK ID} -> {Name}
+
+**Relation "UserTag" (Теги пользователей):**
+
+{PK ID, UsersID, TagID} -> {}
