@@ -31,7 +31,7 @@ func TestHandler_signUp(t *testing.T) {
 				PasswordHash: "qwerty",
 			},
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
-				r.EXPECT().CreateUser(user).Return(1, nil)
+				r.EXPECT().CreateUser(gomock.Any(), user).Return(1, nil)
 				r.EXPECT().GenerateCookie(gomock.Any(), 1).Return("", nil)
 			},
 			expectedStatusCode:   200,
@@ -62,7 +62,7 @@ func TestHandler_signUp(t *testing.T) {
 				PasswordHash: "qwerty",
 			},
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
-				r.EXPECT().CreateUser(user).Return(0, errors.New(""))
+				r.EXPECT().CreateUser(gomock.Any(), user).Return(0, errors.New(""))
 			},
 			expectedStatusCode:   400,
 			expectedResponseBody: `{"message":""}`,
@@ -110,7 +110,7 @@ func TestHandler_signIn(t *testing.T) {
 				PasswordHash: "qwerty",
 			},
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
-				r.EXPECT().GetUser(user.Mail, user.PasswordHash).Return(user, nil)
+				r.EXPECT().GetUser(gomock.Any(), user.Mail, user.PasswordHash).Return(user, nil)
 				r.EXPECT().GenerateCookie(gomock.Any(), user.Id).Return("", nil)
 			},
 			expectedStatusCode:   200,
@@ -141,7 +141,7 @@ func TestHandler_signIn(t *testing.T) {
 				PasswordHash: "qwerty",
 			},
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
-				r.EXPECT().GetUser(user.Mail, user.PasswordHash).Return(user, errors.New("error"))
+				r.EXPECT().GetUser(gomock.Any(), user.Mail, user.PasswordHash).Return(user, errors.New("error"))
 			},
 			expectedStatusCode:   401,
 			expectedResponseBody: `{"message":"invalid mail or password"}`,
