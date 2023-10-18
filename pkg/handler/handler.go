@@ -18,7 +18,9 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
-	r.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://37.139.32.76:8000/swagger/doc.json"),
+	))
 
 	r.HandleFunc("/auth/login", h.signIn).Methods("POST")
 	r.HandleFunc("/auth/sign-up", h.signUp).Methods("POST")
