@@ -36,11 +36,11 @@
 
 **Relation "COMPLAINT" (Жалобы):**
 
-{PK ID, ReporterID} -> {Message, ReportedID, ComplaintTypeID, Timestamp}
+{PK ID} -> {Message, ReportedID, ComplaintTypeID, Timestamp}
 
 **Relation "USER" (Пользователи):**
 
-{PK ID} -> {Name, UserGender, Looking, Hobbies, Tags, ImagePath, Birthday}
+{PK ID} -> {Name, UserGender, Looking, Hobbies, ImagePath, Birthday}
 
 **Relation "COMPLAINT-TYPE" (Типы жалоб):**
 
@@ -68,4 +68,4 @@
 
 **Relation "UserTag" (Теги пользователей):**
 
-{PK ID, UsersID, TagID} -> {}
+{PK ID} -> {UsersID, TagID}
