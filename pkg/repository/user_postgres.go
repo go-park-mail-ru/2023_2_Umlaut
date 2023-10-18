@@ -56,11 +56,39 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 		err = ScanUser(row, &nextUser)
 	} else {
 		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 ORDER BY RANDOM() LIMIT 1", usersTable)
-		row := r.db.QueryRow(query, user.Id)
+		row := r.db.QueryRowContext(ctx, query, user.Id)
 		err = ScanUser(row, &nextUser)
 	}
 
 	return nextUser, err
+}
+
+func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+	query := fmt.Sprintf(`
+		UPDATE %s
+		SET name = $2, mail = $3, user_gender = $4, prefer_gender = $5, description = $6, age = $7, looking = $8, education = $9, hobbies = $10, tags = $11
+		WHERE id = $1
+		RETURNING *`, usersTable)
+
+	var updatedUser model.User
+	row := r.db.QueryRowContext(
+		ctx,
+		query,
+		user.Id,
+		user.Name,
+		user.Mail,
+		user.UserGender,
+		user.PreferGender,
+		user.Description,
+		user.Age,
+		user.Looking,
+		user.Education,
+		user.Hobbies,
+		user.Tags,
+	)
+	err := ScanUser(row, &updatedUser)
+
+	return updatedUser, err
 }
 
 func ScanUser(row *sql.Row, user *model.User) error {

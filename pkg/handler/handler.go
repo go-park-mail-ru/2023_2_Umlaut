@@ -25,7 +25,9 @@ func (h *Handler) InitRoutes() http.Handler {
 	r.HandleFunc("/auth/logout", h.logout)
 
 	r.HandleFunc("/api/feed", h.feed).Methods("GET")
+
 	r.HandleFunc("/api/user", h.user).Methods("GET")
+	r.HandleFunc("/api/user", h.updateUser).Methods("POST")
 
 	r.Use(
 		corsMiddleware,

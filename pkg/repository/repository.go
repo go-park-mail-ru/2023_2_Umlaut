@@ -14,6 +14,7 @@ type User interface {
 	GetUser(ctx context.Context, mail string) (model.User, error)
 	GetUserById(ctx context.Context, id int) (model.User, error)
 	GetNextUser(ctx context.Context, user model.User) (model.User, error)
+	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 }
 
 type Store interface {

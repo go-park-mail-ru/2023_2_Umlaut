@@ -110,6 +110,35 @@ paths:
       summary: get user information
       tags:
       - user
+    post:
+      consumes:
+      - application/json
+      operationId: user
+      parameters:
+      - description: User data to update
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: update user
+      tags:
+      - user
   /auth/login:
     post:
       consumes:

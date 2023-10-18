@@ -24,3 +24,13 @@ func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.Use
 
 	return user, nil
 }
+
+func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+	correctUser, err := s.repoUser.UpdateUser(ctx, user)
+	if err != nil {
+		return model.User{}, err
+	}
+	correctUser.Sanitize()
+
+	return correctUser, nil
+}
