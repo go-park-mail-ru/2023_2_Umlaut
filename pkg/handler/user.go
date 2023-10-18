@@ -56,7 +56,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.services.GetSessionValue(r.Context(), session.Value)
+	id, err := h.services.GetSessionValue(r.Context(), session.Value)
 	if err != nil {
 		newErrorResponse(w, http.StatusUnauthorized, err.Error())
 		return
@@ -69,6 +69,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.Id = id
 	currentUser, err := h.services.UpdateUser(r.Context(), user)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
