@@ -40,7 +40,9 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	http.SetCookie(w, createCookie(SID))
+	cookie := createCookie(SID)
+	cookie.SameSite = http.SameSiteNoneMode
+	http.SetCookie(w, cookie)
 }
 
 // @Summary log out of account
@@ -64,6 +66,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	session.Path = "/"
 
+	session.SameSite = http.SameSiteNoneMode
 	http.SetCookie(w, session)
 }
 
@@ -102,7 +105,9 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	http.SetCookie(w, createCookie(SID))
+	cookie := createCookie(SID)
+	cookie.SameSite = http.SameSiteNoneMode
+	http.SetCookie(w, cookie)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	response := map[string]int{
