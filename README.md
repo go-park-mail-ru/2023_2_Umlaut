@@ -9,7 +9,7 @@
 
 [Репозиторий фронтенд-части Ümlaut](https://github.com/frontend-park-mail-ru/2023_2_Umlaut)
 
-[Документация API](http://37.139.32.76:8000/swagger/index.html#/)
+[Документация API](http://umlaut-bmstu.me:8000/swagger/index.html#/)
 
 ## Команда Ümlaut
 
