@@ -22,7 +22,7 @@ func (h *Handler) InitRoutes() http.Handler {
 		httpSwagger.URL("http://37.139.32.76:8000/swagger/doc.json"),
 	))
 
-	r.HandleFunc("/auth/login", h.signIn).Methods("POST")
+	r.HandleFunc("/auth/login", h.signIn).Methods("POST", "OPTIONS")
 	r.HandleFunc("/auth/sign-up", h.signUp).Methods("POST")
 	r.HandleFunc("/auth/logout", h.logout)
 
@@ -32,9 +32,9 @@ func (h *Handler) InitRoutes() http.Handler {
 	r.HandleFunc("/api/user", h.updateUser).Methods("POST")
 
 	r.Use(
-		corsMiddleware,
 		loggingMiddleware,
 		panicRecoveryMiddleware,
+		corsMiddleware,
 	)
 
 	return r
