@@ -5,7 +5,7 @@
 
 ## Ссылки
 
-[Деплой](http://37.139.32.76)
+[Деплой](http://umlaut-bmstu.me)
 
 [Репозиторий фронтенд-части Ümlaut](https://github.com/frontend-park-mail-ru/2023_2_Umlaut)
 
