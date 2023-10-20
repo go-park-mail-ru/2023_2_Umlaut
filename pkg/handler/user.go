@@ -105,7 +105,7 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseMultipartForm(5 * 1024 * 1025)
-	file, head, err := r.FormFile("photo")
+	file, head, err := r.FormFile("file")
 	if err != nil {
 		newErrorResponse(w, http.StatusBadRequest, "invalid input body")
 		return
