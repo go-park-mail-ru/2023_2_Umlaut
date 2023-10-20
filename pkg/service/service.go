@@ -24,6 +24,7 @@ type Feed interface {
 type User interface {
 	GetCurrentUser(ctx context.Context, userId int) (model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
+	UpdatePhoto(ctx context.Context, userId int, img model.ImageUnit) (string, error)
 }
 
 type Service struct {

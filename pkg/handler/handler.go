@@ -1,11 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"net/http"
 )
 
 type Handler struct {
@@ -30,6 +31,7 @@ func (h *Handler) InitRoutes() http.Handler {
 
 	r.HandleFunc("/api/user", h.user).Methods("GET")
 	r.HandleFunc("/api/user", h.updateUser).Methods("POST")
+	r.HandleFunc("/api/user/photo", h.updateUserPhoto).Methods("POST")
 
 	r.Use(
 		loggingMiddleware,

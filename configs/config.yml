@@ -11,6 +11,12 @@ redis:
   addr: "redis:6379"
   db: "0"
 
+minio:
+  user: "umlaut"
+  password: "minio123"
+  sslmode: false
+  endpoint: "umlaut-bmstu.me"
+
 cors:
   origins: [
     "http://37.139.32.76:80",

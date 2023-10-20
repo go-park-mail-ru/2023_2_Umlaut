@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"time"
+	"strconv"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 )
@@ -9,6 +12,7 @@ import (
 type UserService struct {
 	repoUser  repository.User
 	repoStore repository.Store
+	repoMinio repository.MinioProvider
 }
 
 func NewUserService(repoUser repository.User, repoStore repository.Store) *UserService {
@@ -33,4 +37,15 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 	correctUser.Sanitize()
 
 	return correctUser, nil
+}
+
+func (s *UserService) UpdatePhoto(ctx context.Context, userId int, img model.ImageUnit) (string, error) {
+	img.Name = generateImageName(userId)
+	err := s.repoMinio.UploadFile(ctx, img)
+
+	return img.Name, err
+}
+
+func generateImageName(userId int) string {
+	return strconv.Itoa(userId) + "/" + time.Now().String()
 }

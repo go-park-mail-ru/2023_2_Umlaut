@@ -50,7 +50,17 @@ func main() {
 	}
 	defer sessionStore.Close()
 
-	repos := repository.NewRepository(db, sessionStore)
+	fileClient, err := repository.NewMinioClient(repository.MinioConfig{
+		User: viper.GetString("minio.user"),
+		Password: viper.GetString("minio.password"),
+		SSLMode: viper.GetBool("minio.sslmode"),
+		Endpoint: viper.GetString("minio.endpoint"),
+	})
+	if err != nil {
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db, sessionStore, fileClient)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 	srv := new(umlaut.Server)

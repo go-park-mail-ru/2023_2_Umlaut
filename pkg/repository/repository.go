@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -23,14 +24,20 @@ type Store interface {
 	DeleteSession(ctx context.Context, SID string) error
 }
 
+type FileServer interface {
+	UploadFile(ctx context.Context, item model.ImageUnit) error
+}
+
 type Repository struct {
 	User
 	Store
+	FileServer
 }
 
-func NewRepository(db *sql.DB, client *redis.Client) *Repository {
+func NewRepository(db *sql.DB, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:  NewUserPostgres(db),
-		Store: NewRedisStore(client),
+		Store: NewRedisStore(redisClient),
+		FileServer: NewMinioProvider(minioClient),
 	}
 }
