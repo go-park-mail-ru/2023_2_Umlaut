@@ -15,7 +15,7 @@ import (
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host 37.139.32.76:8000
+// @host umlaut-bmstu.me:8000
 // @BasePath /
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
