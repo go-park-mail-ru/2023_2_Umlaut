@@ -100,6 +100,7 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 
 	id, err := h.services.GetSessionValue(r.Context(), session.Value)
 	if err != nil {
+		//залогировать ошибку, не забыть про ID!!1!
 		newErrorResponse(w, http.StatusUnauthorized, err.Error())
 		return
 	}

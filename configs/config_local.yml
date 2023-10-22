@@ -2,21 +2,21 @@ port: "8000"
 
 postgres:
   username: "postgres"
-  host: "db"
-  port: "5432"
+  host: "localhost"
+  port: "5433"
   dbname: "postgres"
   sslmode: "disable"
   password: "1474"
 
 redis:
-  addr: "redis:6379"
+  addr: "localhost:6379"
   db: "0"
 
 minio:
   user: "umlaut"
   password: "minio123"
   sslmode: false
-  endpoint: "umlaut-bmstu.me"
+  endpoint: "localhost"
 
 cors:
   origins: [

@@ -7,7 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"os"
 	"strconv"
 )
 
@@ -29,7 +28,7 @@ func main() {
 		Username: viper.GetString("postgres.username"),
 		DBName:   viper.GetString("postgres.dbname"),
 		SSLMode:  viper.GetString("postgres.sslmode"),
-		Password: os.Getenv("DB_PASSWORD"),
+		Password: viper.GetString("postgres.password"), //os.Getenv("DB_PASSWORD"),
 	})
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())

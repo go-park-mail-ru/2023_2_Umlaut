@@ -37,6 +37,6 @@ func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repo.User, repo.Store),
 		Feed:          NewFeedService(repo.User, repo.Store),
-		User:          NewUserService(repo.User, repo.Store),
+		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
 	}
 }

@@ -12,11 +12,11 @@ import (
 type UserService struct {
 	repoUser  repository.User
 	repoStore repository.Store
-	repoMinio repository.MinioProvider
+	repoMinio repository.FileServer
 }
 
-func NewUserService(repoUser repository.User, repoStore repository.Store) *UserService {
-	return &UserService{repoUser: repoUser, repoStore: repoStore}
+func NewUserService(repoUser repository.User, repoStore repository.Store, repoMinio repository.FileServer) *UserService {
+	return &UserService{repoUser: repoUser, repoStore: repoStore, repoMinio: repoMinio}
 }
 
 func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
@@ -32,6 +32,7 @@ func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.Use
 func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
 	correctUser, err := s.repoUser.UpdateUser(ctx, user)
 	if err != nil {
+		//добавить текста к ошибкам fmt.Errorf(...)
 		return model.User{}, err
 	}
 	correctUser.Sanitize()
