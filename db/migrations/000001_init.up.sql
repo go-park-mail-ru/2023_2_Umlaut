@@ -67,7 +67,7 @@ CREATE TABLE complaint
     id                SERIAL PRIMARY KEY,
     reporter_user_id  INT REFERENCES "user" (id) ON DELETE CASCADE,
     reported_user_id  INT REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type_id INT REFERENCES complaint_type (id),
+    complaint_type_id INT REFERENCES complaint_type (id) ON DELETE CASCADE,
     report_status     SMALLINT NOT NULL,
     complaint_time    TIMESTAMP DEFAULT NOW()
 );
