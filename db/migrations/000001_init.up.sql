@@ -1,27 +1,64 @@
 CREATE TABLE users (
-    id            serial PRIMARY KEY,
-    name          VARCHAR (255) NOT NULL,
-    mail          VARCHAR (255) UNIQUE NOT NULL,
-    password_hash VARCHAR (255) NOT NULL,
-    salt          VARCHAR (255) NOT NULL,
-    user_gender   VARCHAR (255),
-    prefer_gender VARCHAR (255),
-    description   VARCHAR (255),
-    age           INT,
-    looking       VARCHAR (255),
-    education     VARCHAR (255),
-    hobbies       VARCHAR (255),
-    tags          VARCHAR (255)
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    user_gender SMALLINT,
+    prefer_gender SMALLINT,
+    description TEXT,
+    interests TEXT,
+    image_path TEXT,
+    education TEXT,
+    hobbies TEXT,
+    birthday DATE,
+    online BOOLEAN
 );
 
-INSERT INTO users (name, mail, password_hash, salt, user_gender, prefer_gender, description, age, looking, education, hobbies, tags) VALUES 
-    ('Фёдор', 'fedor@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'М', 'Ж', 'Студент второго семестра технопарка, backend', 20, 'Новые знакомства', 'Неполное высшее', 'Баскетбол, сноуборд', 'It, Технопарк, МГТУ'), 
-    ('Дмитрий', 'dmitry@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'М', 'Ж', 'Студент второго семестра технопарка, frontend', 20, 'Новые знакомства', 'Неполное высшее', 'Волейбол, авиамоделирование', 'It, Технопарк, МГТУ'), 
-    ('Максим', 'max@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'М', 'Ж', 'Студент второго семестра технопарка, backend', 20, 'Новые знакомства', 'Неполное высшее', 'Футбол, керлинг', 'It, Технопарк, МГТУ'), 
-    ('Иван', 'ivan@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'М', 'Ж', 'Студент 3 курса МГТУ им. Н. Э. Баумана', 20, 'Серьезные отношения', 'Неполное высшее', 'Волейбол, футбол', 'It, МГТУ, dota'), 
-    ('Алексей', 'Alexey@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'М', 'Ж', 'Студент 2 курса МФТИ', 20, 'Серьезные отношения', 'Неполное высшее', 'Компьютерные игры', 'Менеджмент, МФТИ'), 
-    ('Полина', 'polina@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'Ж', 'М', 'Студент второго семестра технопарка, frontend', 20, 'Новые знакомства', 'Танцы, настольные игры', 'Баскетбол, сноуборд', 'It, Технопарк, МГТУ'), 
-    ('Ирина', 'irina@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'Ж', 'М', 'Учусь в школе, собираюсь поступать в МГТУ', 18, 'Серьезные отношения', 'Неполное среднее', 'Дзюдо, бокс', 'Спорт, вечеринки'), 
-    ('Анна', 'anna@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'Ж', 'М', 'Студент МГТУ, направление 09.03.03', 20, 'Новые знакомства', 'Неполное высшее', 'Танцы, настольные игры', 'Клубы, бары'), 
-    ('Карина', 'karina@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'Ж', 'М', 'Спортшкольница, играю в сборной по футболу', 22, 'Серьезные отношения', 'Полное высшее', 'Футбол, фехтование', 'Спорт, МГТУ'), 
-    ('Юлия', 'julia@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b', 'cRbBjQPeCvjPxGcIYmtqPW', 'Ж', 'М', 'Студент 1 курса МГУ', 20, 'Новые знакомства', 'Неполное высшее', 'Волейбол, компьютерные игры', 'Менеджмент, МГУ');
+CREATE TABLE credentials (
+    user_id SERIAL PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
+    mail TEXT,
+    password_hash TEXT,
+    salt TEXT
+);
+
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name TEXT
+);
+
+CREATE TABLE user_tags (
+    user_id INT REFERENCES users (id) ON DELETE CASCADE,
+    tag_id INT REFERENCES tags (id) ON DELETE CASCADE
+);
+
+CREATE TABLE likes (
+    liked_by_user_id INT REFERENCES users (id) ON DELETE CASCADE,
+    liked_to_user_id INT REFERENCES users (id) ON DELETE CASCADE,
+    committed_at TIMESTAMP
+);
+
+CREATE TABLE dialogs (
+    id SERIAL PRIMARY KEY,
+    user1_id INT REFERENCES users (id) ON DELETE SET NULL,
+    user2_id INT REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    dialog_id INT REFERENCES dialogs (id) ON DELETE CASCADE,
+    sender_id INT REFERENCES users (id) ON DELETE SET NULL,
+    message_text TEXT,
+    message_time TIMESTAMP
+);
+
+CREATE TABLE complaint_types (
+    id SERIAL PRIMARY KEY,
+    type_name TEXT
+);
+
+CREATE TABLE complaints (
+    id SERIAL PRIMARY KEY,
+    reporter_user_id INT REFERENCES users (id) ON DELETE CASCADE,
+    reported_user_id INT REFERENCES users (id) ON DELETE CASCADE,
+    complaint_type_id INT REFERENCES complaint_types (id),
+    report_status SMALLINT,
+    complaint_time TIMESTAMP
+);
