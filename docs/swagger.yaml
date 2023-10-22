@@ -57,7 +57,7 @@ definitions:
     - name
     - password
     type: object
-host: 37.139.32.76:8000
+host: umlaut-bmstu.me:8000
 info:
   contact: {}
   description: API Server for Umlaut Application
@@ -108,6 +108,61 @@ paths:
           schema:
             $ref: '#/definitions/handler.errorResponse'
       summary: get user information
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      operationId: user
+      parameters:
+      - description: User data to update
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: update user
+      tags:
+      - user
+  /api/user/photo:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: update user photo
       tags:
       - user
   /auth/login:

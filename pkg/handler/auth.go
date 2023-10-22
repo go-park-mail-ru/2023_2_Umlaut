@@ -18,10 +18,6 @@ import (
 // @Failure 400,404 {object} errorResponse
 // @Router /auth/login [post]
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		newErrorResponse(w, http.StatusBadRequest, "Authentication failed")
-		return
-	}
 	decoder := json.NewDecoder(r.Body)
 	var input signInInput
 	if err := decoder.Decode(&input); err != nil {
@@ -34,7 +30,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.services.GetUser(input.Mail, input.Password)
+	user, err := h.services.GetUser(r.Context(), input.Mail, input.Password)
 	if err != nil {
 		newErrorResponse(w, http.StatusUnauthorized, "invalid mail or password")
 		return
@@ -81,11 +77,6 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} errorResponse
 // @Router /auth/sign-up [post]
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		newErrorResponse(w, http.StatusBadRequest, "Registration failed")
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var input signUpInput
 	if err := decoder.Decode(&input); err != nil {
@@ -100,7 +91,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
 
-	id, err := h.services.CreateUser(user)
+	id, err := h.services.CreateUser(r.Context(), user)
 	if err != nil {
 		newErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -112,6 +103,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, createCookie(SID))
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	response := map[string]int{
@@ -128,5 +120,7 @@ func createCookie(SID string) *http.Cookie {
 		Expires:  time.Now().Add(10 * time.Hour),
 		Path:     "/",
 		HttpOnly: true,
+		//SameSite: http.SameSiteNoneMode,
+		//Secure:   true,
 	}
 }

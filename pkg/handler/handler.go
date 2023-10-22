@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -17,15 +18,26 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+	r := mux.NewRouter()
+	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://37.139.32.76:8000/swagger/doc.json"),
+	))
 
-	mux.HandleFunc("/auth/login", h.signIn)
-	mux.HandleFunc("/auth/logout", h.logout)
-	mux.HandleFunc("/auth/sign-up", h.signUp)
+	r.HandleFunc("/auth/login", h.signIn).Methods("POST", "OPTIONS")
+	r.HandleFunc("/auth/sign-up", h.signUp).Methods("POST")
+	r.HandleFunc("/auth/logout", h.logout)
 
-	mux.HandleFunc("/api/feed", h.feed)
-	mux.HandleFunc("/api/user", h.user)
+	r.HandleFunc("/api/feed", h.feed).Methods("GET")
 
-	return mux
+	r.HandleFunc("/api/user", h.user).Methods("GET")
+	r.HandleFunc("/api/user", h.updateUser).Methods("POST")
+	r.HandleFunc("/api/user/photo", h.updateUserPhoto).Methods("POST")
+
+	r.Use(
+		loggingMiddleware,
+		panicRecoveryMiddleware,
+		corsMiddleware,
+	)
+
+	return r
 }

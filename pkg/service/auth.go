@@ -20,21 +20,21 @@ func NewAuthService(repoUser repository.User, repoStore repository.Store) *AuthS
 	return &AuthService{repoUser: repoUser, repoStore: repoStore}
 }
 
-func (s *AuthService) CreateUser(user model.User) (int, error) {
+func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, error) {
 	if !user.IsValid() {
 		return 0, errors.New("invalid fields")
 	}
 	user.Salt = generateSalt()
 	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
-	id, err := s.repoUser.CreateUser(user)
+	id, err := s.repoUser.CreateUser(ctx, user)
 	if err != nil {
 		return 0, errors.New("account with this email already exists")
 	}
 	return id, err
 }
 
-func (s *AuthService) GetUser(mail, password string) (model.User, error) {
-	user, err := s.repoUser.GetUser(mail)
+func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model.User, error) {
+	user, err := s.repoUser.GetUser(ctx, mail)
 	if err != nil {
 		return user, err
 	}
@@ -61,6 +61,15 @@ func (s *AuthService) DeleteCookie(ctx context.Context, session string) error {
 	}
 
 	return nil
+}
+
+func (s *AuthService) GetSessionValue(ctx context.Context, session string) (int, error) {
+	id, err := s.repoStore.GetSession(ctx, session)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func generatePasswordHash(password, salt string) string {
