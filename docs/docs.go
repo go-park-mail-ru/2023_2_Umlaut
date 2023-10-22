@@ -354,6 +354,9 @@ const docTemplate = `{
                 "hobbies": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "looking": {
                     "type": "string"
                 },

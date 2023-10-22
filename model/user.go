@@ -3,7 +3,7 @@ package model
 import "net/mail"
 
 type User struct {
-	Id           int     `json:"-" db:"id"`
+	Id           int     `json:"id" db:"id"`
 	Name         string  `json:"name" db:"name" binding:"required"`
 	Mail         string  `json:"mail" db:"mail" binding:"required"`
 	PasswordHash string  `json:"password,omitempty" db:"password_hash" binding:"required"`
