@@ -2,17 +2,18 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 )
 
 type UserPostgres struct {
-	db *sql.DB
+	db *pgx.Conn
 }
 
-func NewUserPostgres(db *sql.DB) *UserPostgres {
+func NewUserPostgres(db *pgx.Conn) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
@@ -20,7 +21,7 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (name, mail, password_hash, salt) values ($1, $2, $3, $4) RETURNING id", usersTable)
-	row := r.db.QueryRowContext(ctx, query, user.Name, user.Mail, user.PasswordHash, user.Salt)
+	row := r.db.QueryRow(ctx, query, user.Name, user.Mail, user.PasswordHash, user.Salt)
 	err := row.Scan(&id)
 
 	return id, err
@@ -29,9 +30,13 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
 	var user model.User
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE mail=$1", usersTable)
-	row := r.db.QueryRowContext(ctx, query, mail)
-	err := ScanUser(row, &user)
+	queryBuilder := sq.Select("*").From(usersTable).Where(sq.Eq{"mail": mail}).Limit(1)
+	query, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return user, err
+	}
+	row := r.db.QueryRow(ctx, query, args...)
+	err = ScanUser(row, &user)
 
 	return user, err
 }
@@ -40,7 +45,7 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	var user model.User
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1", usersTable)
-	row := r.db.QueryRowContext(ctx, query, id)
+	row := r.db.QueryRow(ctx, query, id)
 	err := ScanUser(row, &user)
 
 	return user, err
@@ -48,17 +53,18 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 
 func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
 	var nextUser model.User
-	var query string
-	var err error
+	queryBuilder := sq.Select("*").From(usersTable).Where(sq.NotEq{"id": user.Id})
 	if user.PreferGender != nil {
-		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 and user_gender = $2 ORDER BY RANDOM() LIMIT 1", usersTable)
-		row := r.db.QueryRowContext(ctx, query, user.Id, user.PreferGender)
-		err = ScanUser(row, &nextUser)
-	} else {
-		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 ORDER BY RANDOM() LIMIT 1", usersTable)
-		row := r.db.QueryRowContext(ctx, query, user.Id)
-		err = ScanUser(row, &nextUser)
+		queryBuilder = queryBuilder.Where(sq.Eq{"prefer_gender": user.PreferGender})
 	}
+	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
+
+	query, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return nextUser, err
+	}
+	row := r.db.QueryRow(ctx, query, args...)
+	err = ScanUser(row, &nextUser)
 
 	return nextUser, err
 }
@@ -71,7 +77,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		RETURNING *`, usersTable)
 
 	var updatedUser model.User
-	row := r.db.QueryRowContext(
+	row := r.db.QueryRow(
 		ctx,
 		query,
 		user.Id,
@@ -91,7 +97,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 	return updatedUser, err
 }
 
-func ScanUser(row *sql.Row, user *model.User) error {
+func ScanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,
 		&user.Name,
