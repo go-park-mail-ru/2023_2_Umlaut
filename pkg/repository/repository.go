@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
