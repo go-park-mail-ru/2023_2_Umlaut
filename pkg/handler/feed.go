@@ -15,17 +15,19 @@ import (
 // @Failure 401,404 {object} errorResponse
 // @Router /api/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		newErrorResponse(w, http.StatusBadRequest, "Failed")
-	}
-
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
 		newErrorResponse(w, http.StatusUnauthorized, "no session")
 		return
 	}
 
-	nextUser, err := h.services.GetNextUser(r.Context(), session.Value)
+	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	if err != nil {
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	nextUser, err := h.services.GetNextUser(r.Context(), id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return

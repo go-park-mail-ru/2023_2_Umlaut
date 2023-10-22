@@ -12,17 +12,19 @@ import (
 type Authorization interface {
 	GenerateCookie(ctx context.Context, id int) (string, error)
 	DeleteCookie(ctx context.Context, session string) error
-	CreateUser(user model.User) (int, error)
-	GetUser(mail, password string) (model.User, error)
+	GetSessionValue(ctx context.Context, session string) (int, error)
+	CreateUser(ctx context.Context, user model.User) (int, error)
+	GetUser(ctx context.Context, mail, password string) (model.User, error)
 }
 
 type Feed interface {
-	GetNextUser(ctx context.Context, session string) (model.User, error)
+	GetNextUser(ctx context.Context, userId int) (model.User, error)
 }
 
 type User interface {
-	GetCurrentUser(ctx context.Context, session string) (model.User, error)
-	//TODO: edit user
+	GetCurrentUser(ctx context.Context, userId int) (model.User, error)
+	UpdateUser(ctx context.Context, user model.User) (model.User, error)
+	UpdatePhoto(ctx context.Context, userId int, img model.ImageUnit) (string, error)
 }
 
 type Service struct {
