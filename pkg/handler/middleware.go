@@ -23,7 +23,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)
-		logrus.Printf("%s %s %s %s", r.Method, r.Response.Status, r.RequestURI, time.Since(start))
+		logrus.Printf("%s %s %s", r.Method, r.RequestURI, time.Since(start))
 	})
 }
 
