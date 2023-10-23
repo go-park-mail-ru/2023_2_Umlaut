@@ -1,7 +1,10 @@
 CREATE TABLE "user"
 (
     id            SERIAL PRIMARY KEY,
-    name          TEXT NOT NULL,
+    name          TEXT        NOT NULL,
+    mail          TEXT UNIQUE NOT NULL,
+    password_hash TEXT        NOT NULL,
+    salt          TEXT        NOT NULL,
     gender        SMALLINT,
     prefer_gender SMALLINT,
     description   TEXT,
@@ -11,14 +14,6 @@ CREATE TABLE "user"
     hobbies       TEXT,
     birthday      DATE,
     online        BOOLEAN DEFAULT FALSE
-);
-
-CREATE TABLE credential
-(
-    user_id       SERIAL PRIMARY KEY REFERENCES "user" (id) ON DELETE CASCADE,
-    mail          TEXT UNIQUE NOT NULL,
-    password_hash TEXT        NOT NULL,
-    salt          TEXT        NOT NULL
 );
 
 CREATE TABLE tag
