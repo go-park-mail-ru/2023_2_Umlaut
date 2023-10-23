@@ -8,7 +8,7 @@ CREATE TABLE "user"
     gender        SMALLINT,
     prefer_gender SMALLINT,
     description   TEXT,
-    interests     TEXT,
+    looking       TEXT,
     image_path    TEXT,
     education     TEXT,
     hobbies       TEXT,
