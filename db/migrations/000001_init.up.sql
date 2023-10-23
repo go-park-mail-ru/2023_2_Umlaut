@@ -5,7 +5,7 @@ CREATE TABLE "user"
     mail          TEXT UNIQUE NOT NULL,
     password_hash TEXT        NOT NULL,
     salt          TEXT        NOT NULL,
-    gender        SMALLINT,
+    user_gender   SMALLINT,
     prefer_gender SMALLINT,
     description   TEXT,
     looking       TEXT,

@@ -89,7 +89,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		Set("user_gender", user.UserGender).
 		Set("prefer_gender", user.PreferGender).
 		Set("description", user.Description).
-		Set("age", user.Age).
+		Set("birthday", user.Birthday).
 		Set("looking", user.Looking).
 		Set("education", user.Education).
 		Set("hobbies", user.Hobbies).
