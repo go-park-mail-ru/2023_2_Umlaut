@@ -39,6 +39,8 @@
 
 {PK ID} -> {Name, UserGender, Looking, Hobbies, ImagePath, Birthday, Mail, Password, Salt}
 
+{Mail} -> {Name, UserGender, Looking, Hobbies, ImagePath, Birthday, Password, Salt}
+
 **Relation "COMPLAINT-TYPE" (Типы жалоб):**
 
 {PK ID} -> {Name}
