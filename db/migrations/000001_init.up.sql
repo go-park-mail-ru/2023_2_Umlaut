@@ -17,8 +17,8 @@ CREATE TABLE credential
 (
     user_id       SERIAL PRIMARY KEY REFERENCES "user" (id) ON DELETE CASCADE,
     mail          TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    salt          TEXT NOT NULL
+    password_hash TEXT        NOT NULL,
+    salt          TEXT        NOT NULL
 );
 
 CREATE TABLE tag
@@ -51,8 +51,8 @@ CREATE TABLE message
 (
     id           SERIAL PRIMARY KEY,
     dialog_id    INT REFERENCES dialog (id) ON DELETE CASCADE,
-    sender_id    INT REFERENCES "user" (id) ON DELETE SET NULL,
-    message_text TEXT NOT NULL,
+    sender_id    INT       REFERENCES "user" (id) ON DELETE SET NULL,
+    message_text TEXT      NOT NULL,
     message_time TIMESTAMP NOT NULL
 );
 
