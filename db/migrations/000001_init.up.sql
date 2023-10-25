@@ -5,15 +5,15 @@ CREATE TABLE "user"
     mail          TEXT UNIQUE NOT NULL,
     password_hash TEXT        NOT NULL,
     salt          TEXT        NOT NULL,
-    user_gender   SMALLINT,
-    prefer_gender SMALLINT,
+    user_gender   SMALLINT CHECK (user_gender BETWEEN 0 AND 1),
+    prefer_gender SMALLINT CHECK (prefer_gender BETWEEN 0 AND 1),
     description   TEXT,
     looking       TEXT,
     image_path    TEXT,
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
-    online        BOOLEAN DEFAULT FALSE
+    online        BOOLEAN     NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE tag
@@ -24,29 +24,29 @@ CREATE TABLE tag
 
 CREATE TABLE user_tag
 (
-    user_id INT REFERENCES "user" (id) ON DELETE CASCADE,
-    tag_id  INT REFERENCES tag (id) ON DELETE CASCADE
+    user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    tag_id  INT NOT NULL REFERENCES tag (id) ON DELETE CASCADE
 );
 
 CREATE TABLE "like"
 (
-    liked_by_user_id INT REFERENCES "user" (id) ON DELETE CASCADE,
-    liked_to_user_id INT REFERENCES "user" (id) ON DELETE CASCADE,
-    committed_at     TIMESTAMP DEFAULT NOW()
+    liked_by_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    liked_to_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    committed_at     TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE dialog
 (
     id       SERIAL PRIMARY KEY,
-    user1_id INT REFERENCES "user" (id) ON DELETE SET NULL,
-    user2_id INT REFERENCES "user" (id) ON DELETE SET NULL
+    user1_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL
 );
 
 CREATE TABLE message
 (
     id           SERIAL PRIMARY KEY,
-    dialog_id    INT REFERENCES dialog (id) ON DELETE CASCADE,
-    sender_id    INT       REFERENCES "user" (id) ON DELETE SET NULL,
+    dialog_id    INT       NOT NULL REFERENCES dialog (id) ON DELETE CASCADE,
+    sender_id    INT       NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     message_text TEXT      NOT NULL,
     message_time TIMESTAMP NOT NULL
 );
@@ -60,9 +60,9 @@ CREATE TABLE complaint_type
 CREATE TABLE complaint
 (
     id                SERIAL PRIMARY KEY,
-    reporter_user_id  INT REFERENCES "user" (id) ON DELETE CASCADE,
-    reported_user_id  INT REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type_id INT REFERENCES complaint_type (id) ON DELETE CASCADE,
-    report_status     SMALLINT NOT NULL,
-    complaint_time    TIMESTAMP DEFAULT NOW()
+    reporter_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    reported_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    complaint_type_id INT       NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
+    report_status     SMALLINT  NOT NULL CHECK (report_status BETWEEN 0 AND 5),
+    complaint_time    TIMESTAMP NOT NULL DEFAULT NOW()
 );
