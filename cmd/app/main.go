@@ -71,6 +71,6 @@ func main() {
 
 func initConfig() error {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
+	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }

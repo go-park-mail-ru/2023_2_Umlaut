@@ -16,7 +16,7 @@ minio:
   user: "umlaut"
   password: "minio123"
   sslmode: false
-  endpoint: "umlaut-bmstu.me"
+  endpoint: "umlaut-bmstu.me:9000"
 
 cors:
   origins: [
