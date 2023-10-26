@@ -32,7 +32,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	r.HandleFunc("/api/user", h.user).Methods("GET")
 	r.HandleFunc("/api/user", h.updateUser).Methods("POST")
 	r.HandleFunc("/api/user/photo", h.updateUserPhoto).Methods("POST")
-	r.HandleFunc("/api/user/photo", h.getUserPhoto).Methods("GET")
+	r.HandleFunc("/api/user/{id}/photo", h.getUserPhoto).Methods("GET")
 	r.HandleFunc("/api/user/photo", h.deleteUserPhoto).Methods("DELETE")
 
 	r.Use(

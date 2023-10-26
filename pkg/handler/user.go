@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/gorilla/mux"
 )
 
 // @Summary get user information
@@ -123,9 +125,10 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Summary get user photo
 // @Tags user
 // @Accept  json
+// @Param id path integer true "User ID"
 // @Success 200
 // @Failure 401,404 {object} errorResponse
-// @Router /api/user/photo [get]
+// @Router /api/user/{id}/photo [get]
 func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
@@ -133,10 +136,16 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	_, err = h.services.GetSessionValue(r.Context(), session.Value)
 	if err != nil {
 		//залогировать ошибку, не забыть про ID!!1!
 		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorResponse(w, http.StatusBadRequest, "invalid params")
 		return
 	}
 
@@ -146,9 +155,10 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buffer, contentType, err := h.services.GetFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301") //TODO: добавить в модель поля для фото
+	buffer, contentType, err := h.services.GetFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301")
+	//TODO: добавить в модель поля для фото
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorResponse(w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -183,7 +193,8 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.services.DeleteFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301") //TODO: добавить в модель поля для фото
+	err = h.services.DeleteFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301")
+	//TODO: добавить в модель поля для фото
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
