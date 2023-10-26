@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
-	"time"
+	"mime/multipart"
+	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -40,13 +42,45 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 	return correctUser, nil
 }
 
-func (s *UserService) UpdatePhoto(ctx context.Context, userId int, img model.ImageUnit) (string, error) {
-	img.Name = generateImageName(userId)
-	err := s.repoMinio.UploadFile(ctx, img)
+func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error) {
+	bucketName := getBucketName(userId)
+	fileName := generateImageName()
+	if err := s.repoMinio.CreateBucket(ctx, bucketName); err != nil {
+		return "", err
+	}
 
-	return img.Name, err
+	buffer := make([]byte, size)
+	if _, err := file.Read(buffer); err != nil {
+		return "", err
+	}
+	if _, err := file.Seek(0, 0); err != nil {
+		return "", err
+	}
+
+	contentType := http.DetectContentType(buffer)
+	err := s.repoMinio.UploadFile(ctx, bucketName, fileName, contentType, file, size)
+
+	return fileName, err
 }
 
-func generateImageName(userId int) string {
-	return strconv.Itoa(userId) + "/" + time.Now().String()
+func (s *UserService) GetFile(ctx context.Context, userId int, fileName string) ([]byte, string, error) {
+	bucketName := getBucketName(userId)
+	buffer, contentType, err := s.repoMinio.GetFile(ctx, bucketName, fileName)
+
+	return buffer, contentType, err
+}
+
+func (s *UserService) DeleteFile(ctx context.Context, userId int, fileName string) error {
+	bucketName := getBucketName(userId)
+	err := s.repoMinio.DeleteFile(ctx, bucketName, fileName)
+
+	return err
+}
+
+func generateImageName() string {
+	return time.Now().String()
+}
+
+func getBucketName(userId int) string {
+	return "user-id-" + strconv.Itoa(userId)
 }

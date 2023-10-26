@@ -5,10 +5,6 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-const (
-	bucketName = "users-photos"
-)
-
 type MinioConfig struct {
 	Endpoint string
 	User     string

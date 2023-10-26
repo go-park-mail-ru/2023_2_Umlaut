@@ -112,15 +112,68 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-
-	_, err = h.services.UpdatePhoto(r.Context(), id, model.ImageUnit{
-		FileLoad:    file,
-		Size:        head.Size,
-		ContentType: r.Header.Get("Content-Type"),
-	})
+	_, err = h.services.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	//TODO:: обновление бд с ссылкой на фото
+}
+
+func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
+	session, err := r.Cookie("session_id")
+	if errors.Is(err, http.ErrNoCookie) {
+		newErrorResponse(w, http.StatusUnauthorized, "no session")
+		return
+	}
+
+	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	if err != nil {
+		//залогировать ошибку, не забыть про ID!!1!
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	_, err = h.services.GetCurrentUser(r.Context(), id)
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	buffer, contentType, err := h.services.GetFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301") //TODO: добавить в модель поля для фото
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", contentType)
+	w.WriteHeader(http.StatusOK)
+	w.Write(buffer)
+}
+
+func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
+	session, err := r.Cookie("session_id")
+	if errors.Is(err, http.ErrNoCookie) {
+		newErrorResponse(w, http.StatusUnauthorized, "no session")
+		return
+	}
+
+	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	if err != nil {
+		//залогировать ошибку, не забыть про ID!!1!
+		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	_, err = h.services.GetCurrentUser(r.Context(), id)
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.services.DeleteFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301") //TODO: добавить в модель поля для фото
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 }

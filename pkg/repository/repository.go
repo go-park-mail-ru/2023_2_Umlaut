@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"io"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -25,7 +26,10 @@ type Store interface {
 }
 
 type FileServer interface {
-	UploadFile(ctx context.Context, item model.ImageUnit) error
+	UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error
+	GetFile(ctx context.Context, bucketName, fileName string) ([]byte, string, error)
+	DeleteFile(ctx context.Context, bucketName, fileName string) error
+	CreateBucket(ctx context.Context, bucketName string) error
 }
 
 type Repository struct {

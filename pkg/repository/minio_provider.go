@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"io"
+
+	"fmt"
 
 	"github.com/minio/minio-go/v7"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 )
 
 type MinioProvider struct {
@@ -15,30 +17,66 @@ func NewMinioProvider(client *minio.Client) *MinioProvider {
 	return &MinioProvider{client: client}
 }
 
-func (m *MinioProvider) UploadFile(ctx context.Context, item model.ImageUnit) error {
+func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error {
 	_, err := m.client.PutObject(
-	   ctx,
-	   bucketName,
-	   item.Name,
-	   item.FileLoad,
-	   item.Size,
-	   minio.PutObjectOptions{ContentType: item.ContentType},
-	)
-	//"image/png"
-	return err
-}
-
-func (m *MinioProvider) DownloadFile(ctx context.Context, image string) (model.ImageUnit, error) {
-	reader, err := m.client.GetObject(
-	   ctx,
-	   bucketName,
-	   image,
-	   minio.GetObjectOptions{},
+		ctx,
+		bucketName,
+		fileName,
+		file,
+		size,
+		minio.PutObjectOptions{ContentType: contentType},
 	)
 	if err != nil {
-	   return model.ImageUnit{}, nil
+		return fmt.Errorf("failed to upload file. err: %w", err)
 	}
-	defer reader.Close()
-	//TODO
-	return model.ImageUnit{}, nil
-  }
+	return nil
+}
+
+func (m *MinioProvider) GetFile(ctx context.Context, bucketName, fileName string) ([]byte, string, error) {
+	obj, err := m.client.GetObject(
+		ctx,
+		bucketName,
+		fileName,
+		minio.GetObjectOptions{},
+	)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get file. err: %w", err)
+	}
+	defer obj.Close()
+
+	objectInfo, err := obj.Stat()
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get file. err: %w", err)
+	}
+	buffer := make([]byte, objectInfo.Size)
+	_, err = obj.Read(buffer)
+	if err != nil && err != io.EOF {
+		return nil, "", fmt.Errorf("failed to get file. err: %w", err)
+	}
+
+	return buffer, objectInfo.ContentType, nil
+}
+
+func (m *MinioProvider) DeleteFile(ctx context.Context, bucketName, fileName string) error {
+	err := m.client.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete file. err: %w", err)
+	}
+	
+	return nil
+}
+
+func (m *MinioProvider) CreateBucket(ctx context.Context, bucketName string) error {
+	exists, err := m.client.BucketExists(ctx, bucketName)
+	if err != nil {
+		return fmt.Errorf("failed to create bucket. err: %w", err)
+	}
+	if exists {
+		return nil
+	}
+	err = m.client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to create bucket. err: %w", err)
+	}
+	return nil
+}
