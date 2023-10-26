@@ -142,6 +142,40 @@ paths:
       tags:
       - user
   /api/user/photo:
+    delete:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: delete user photo
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: get user photo
+      tags:
+      - user
     post:
       consumes:
       - multipart/form-data

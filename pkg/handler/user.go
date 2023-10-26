@@ -120,6 +120,12 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	//TODO:: обновление бд с ссылкой на фото
 }
 
+// @Summary get user photo
+// @Tags user
+// @Accept  json
+// @Success 200
+// @Failure 401,404 {object} errorResponse
+// @Router /api/user/photo [get]
 func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
@@ -151,6 +157,12 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	w.Write(buffer)
 }
 
+// @Summary delete user photo
+// @Tags user
+// @Accept  json
+// @Success 200
+// @Failure 401,404 {object} errorResponse
+// @Router /api/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
