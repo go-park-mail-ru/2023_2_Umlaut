@@ -50,7 +50,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	var nextUser model.User
 	var query string
 	var err error
-	if user.PreferGender.Valid {
+	if user.PreferGender != nil {
 		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 and user_gender = $2 ORDER BY RANDOM() LIMIT 1", usersTable)
 		row := r.db.QueryRowContext(ctx, query, user.Id, user.PreferGender)
 		err = ScanUser(row, &nextUser)
