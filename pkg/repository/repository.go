@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -34,10 +34,10 @@ type Repository struct {
 	FileServer
 }
 
-func NewRepository(db *sql.DB, redisClient *redis.Client, minioClient *minio.Client) *Repository {
+func NewRepository(db *pgx.Conn, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
-		User:  NewUserPostgres(db),
-		Store: NewRedisStore(redisClient),
+		User:       NewUserPostgres(db),
+		Store:      NewRedisStore(redisClient),
 		FileServer: NewMinioProvider(minioClient),
 	}
 }
