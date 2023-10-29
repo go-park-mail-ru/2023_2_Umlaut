@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -33,7 +34,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
-	defer db.Close()
+	defer db.Close(context.Background())
 
 	redisDb, err := strconv.Atoi(viper.GetString("redis.db"))
 	if err != nil {
@@ -50,9 +51,9 @@ func main() {
 	defer sessionStore.Close()
 
 	fileClient, err := repository.NewMinioClient(repository.MinioConfig{
-		User: viper.GetString("minio.user"),
+		User:     viper.GetString("minio.user"),
 		Password: viper.GetString("minio.password"),
-		SSLMode: viper.GetBool("minio.sslmode"),
+		SSLMode:  viper.GetBool("minio.sslmode"),
 		Endpoint: viper.GetString("minio.endpoint"),
 	})
 	if err != nil {

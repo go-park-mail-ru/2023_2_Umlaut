@@ -1,14 +1,14 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5"
 )
 
 const (
-	usersTable = "users"
+	userTable = "\"user\""
 )
 
 type PostgresConfig struct {
@@ -20,15 +20,15 @@ type PostgresConfig struct {
 	SSLMode  string
 }
 
-func NewPostgresDB(cfg PostgresConfig) (*sql.DB, error) {
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+func NewPostgresDB(cfg PostgresConfig) (*pgx.Conn, error) {
+	db, err := pgx.Connect(context.Background(), fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
 
 	if err != nil {
 		return nil, err
 	}
 
-	if err = db.Ping(); err != nil {
+	if err = db.Ping(context.Background()); err != nil {
 		return nil, err
 	}
 
