@@ -67,7 +67,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	var nextUser model.User
 	queryBuilder := psql.Select("*").From(userTable).Where(sq.NotEq{"id": user.Id})
 	if user.PreferGender != nil {
-		queryBuilder = queryBuilder.Where(sq.Eq{"prefer_gender": user.PreferGender})
+		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
 	}
 	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
 
