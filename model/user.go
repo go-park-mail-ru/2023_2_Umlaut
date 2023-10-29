@@ -14,7 +14,7 @@ type User struct {
 	UserGender   *int       `json:"user_gender" db:"user_gender"`
 	PreferGender *int       `json:"prefer_gender" db:"prefer_gender"`
 	Description  *string    `json:"description" db:"description"`
-	Age          *int       `json:"age" db:"age"`
+	Age          *int       `json:"age"`
 	Looking      *string    `json:"looking" db:"looking"`
 	ImagePath    *string    `json:"image_path" db:"image_path"`
 	Education    *string    `json:"education" db:"education"`
