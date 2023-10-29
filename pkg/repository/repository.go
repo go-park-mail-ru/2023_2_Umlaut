@@ -17,6 +17,7 @@ type User interface {
 	GetUserById(ctx context.Context, id int) (model.User, error)
 	GetNextUser(ctx context.Context, user model.User) (model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
+	UpdateUserPhoto(ctx context.Context, userId int, imagePath string) (string, error)
 }
 
 type Store interface {

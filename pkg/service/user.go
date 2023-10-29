@@ -42,6 +42,16 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 	return correctUser, nil
 }
 
+func (s *UserService) UpdateUserPhoto(ctx context.Context, userId int, imagePath string) error {
+	_, err := s.repoUser.UpdateUserPhoto(ctx, userId, imagePath)
+	if err != nil {
+		//добавить текста к ошибкам fmt.Errorf(...)
+		return err
+	}
+	//TODO:: сделать добавление нескольких ссылок на фото в бд
+	return nil
+}
+
 func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error) {
 	bucketName := getBucketName(userId)
 	fileName := generateImageName()

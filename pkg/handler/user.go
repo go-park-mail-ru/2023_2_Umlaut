@@ -114,12 +114,17 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	_, err = h.services.CreateFile(r.Context(), id, file, head.Size)
+	fileName, err := h.services.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	//TODO:: обновление бд с ссылкой на фото
+
+	err = h.services.UpdateUserPhoto(r.Context(), id, fileName)
+	if err != nil {
+		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 }
 
 // @Summary get user photo
@@ -149,14 +154,13 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.services.GetCurrentUser(r.Context(), id)
+	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	buffer, contentType, err := h.services.GetFile(r.Context(), id, "2023-10-26 14:49:58.576226885 +0000 UTC m=+261.528072016")
-	//TODO: добавить в модель поля для фото
+	buffer, contentType, err := h.services.GetFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorResponse(w, http.StatusNotFound, err.Error())
 		return
@@ -187,14 +191,13 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.services.GetCurrentUser(r.Context(), id)
+	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	err = h.services.DeleteFile(r.Context(), id, "2023-10-26 14:49:58.576226885 +0000 UTC m=+261.528072016")
-	//TODO: добавить в модель поля для фото
+	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
