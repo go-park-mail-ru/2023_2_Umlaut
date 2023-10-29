@@ -78,7 +78,6 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = ScanUser(row, &nextUser)
-	nextUser.CalculateAge()
 
 	return nextUser, err
 }
@@ -145,5 +144,6 @@ func ScanUser(row pgx.Row, user *model.User) error {
 		&user.Birthday,
 		&user.Online,
 	)
+	user.CalculateAge()
 	return err
 }
