@@ -11,10 +11,10 @@ type User struct {
 	Mail         string     `json:"mail" db:"mail" binding:"required"`
 	PasswordHash string     `json:"password,omitempty" db:"password_hash" binding:"required"`
 	Salt         string     `json:"-" db:"salt"`
-	UserGender   *string    `json:"user_gender" db:"user_gender"`
-	PreferGender *string    `json:"prefer_gender" db:"prefer_gender"`
+	UserGender   *int       `json:"user_gender" db:"user_gender"`
+	PreferGender *int       `json:"prefer_gender" db:"prefer_gender"`
 	Description  *string    `json:"description" db:"description"`
-	Age          *int       `json:"age" db:"age"`
+	Age          *int       `json:"age"`
 	Looking      *string    `json:"looking" db:"looking"`
 	ImagePath    *string    `json:"image_path" db:"image_path"`
 	Education    *string    `json:"education" db:"education"`
@@ -31,4 +31,15 @@ func (u *User) Sanitize() {
 func (u *User) IsValid() bool {
 	_, err := mail.ParseAddress(u.Mail)
 	return err == nil && len(u.Name) > 1 && len(u.PasswordHash) > 5
+}
+
+func (u *User) CalculateAge() {
+	// currentTime := time.Now()
+	// age := currentTime.Year() - u.Birthday.Year()
+
+	// if currentTime.YearDay() < u.Birthday.YearDay() {
+	// 	age--
+	// }
+	age := 20
+	u.Age = &age
 }
