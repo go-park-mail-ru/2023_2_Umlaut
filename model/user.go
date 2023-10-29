@@ -34,12 +34,12 @@ func (u *User) IsValid() bool {
 }
 
 func (u *User) CalculateAge() {
-	currentTime := time.Now()
-	age := currentTime.Year() - u.Birthday.Year()
+	// currentTime := time.Now()
+	// age := currentTime.Year() - u.Birthday.Year()
 
-	if currentTime.YearDay() < u.Birthday.YearDay() {
-		age--
-	}
-
+	// if currentTime.YearDay() < u.Birthday.YearDay() {
+	// 	age--
+	// }
+	age := 20
 	u.Age = &age
 }
