@@ -155,7 +155,7 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buffer, contentType, err := h.services.GetFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301")
+	buffer, contentType, err := h.services.GetFile(r.Context(), id, "2023-10-26 14:49:58.576226885 +0000 UTC m=+261.528072016")
 	//TODO: добавить в модель поля для фото
 	if err != nil {
 		newErrorResponse(w, http.StatusNotFound, err.Error())
@@ -193,7 +193,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.services.DeleteFile(r.Context(), id, "2023-10-26 17:06:42.4120414 +0300 MSK m=+81.032036301")
+	err = h.services.DeleteFile(r.Context(), id, "2023-10-26 14:49:58.576226885 +0000 UTC m=+261.528072016")
 	//TODO: добавить в модель поля для фото
 	if err != nil {
 		newErrorResponse(w, http.StatusInternalServerError, err.Error())
