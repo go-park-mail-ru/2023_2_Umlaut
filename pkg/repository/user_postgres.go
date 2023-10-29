@@ -110,6 +110,23 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 	return updatedUser, err
 }
 
+func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePath string) (string, error) {
+	query, args, err := psql.Update(userTable).
+		Set("image_path", imagePath).
+		Where(sq.Eq{"id": userId}).
+		ToSql()
+	if err != nil {
+		return "", err
+	}
+
+	query += " RETURNING image_path"
+	var updatedImgPath string
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&updatedImgPath)
+
+	return updatedImgPath, err
+}
+
 func ScanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,
