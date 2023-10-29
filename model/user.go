@@ -32,3 +32,14 @@ func (u *User) IsValid() bool {
 	_, err := mail.ParseAddress(u.Mail)
 	return err == nil && len(u.Name) > 1 && len(u.PasswordHash) > 5
 }
+
+func (u *User) CalculateAge() {
+	currentTime := time.Now()
+	age := currentTime.Year() - u.Birthday.Year()
+
+	if currentTime.YearDay() < u.Birthday.YearDay() {
+		age--
+	}
+
+	u.Age = &age
+}

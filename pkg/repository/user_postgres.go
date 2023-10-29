@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
-	"github.com/Masterminds/squirrel"
+	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
 )
+
+var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
 	db *pgx.Conn
@@ -17,11 +19,11 @@ func NewUserPostgres(db *pgx.Conn) *UserPostgres {
 
 func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, error) {
 	var id int
-	queryBuilder := squirrel.Insert(userTable).
+	query, args, err := psql.Insert(userTable).
 		Columns("name", "mail", "password_hash", "salt").
-		Values(user.Name, user.Mail, user.PasswordHash, user.Salt)
+		Values(user.Name, user.Mail, user.PasswordHash, user.Salt).
+		ToSql()
 
-	query, args, err := queryBuilder.ToSql()
 	if err != nil {
 		return 0, err
 	}
@@ -36,8 +38,7 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
 	var user model.User
 
-	queryBuilder := squirrel.Select("*").From(userTable).Where(squirrel.Eq{"mail": mail}).Limit(1)
-	query, args, err := queryBuilder.ToSql()
+	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
 	if err != nil {
 		return user, err
 	}
@@ -51,8 +52,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, error) {
 	var user model.User
 
-	queryBuilder := squirrel.Select("*").From(userTable).Where(squirrel.Eq{"id": id})
-	query, args, err := queryBuilder.ToSql()
+	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"id": id}).ToSql()
 	if err != nil {
 		return user, err
 	}
@@ -65,9 +65,9 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 
 func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
 	var nextUser model.User
-	queryBuilder := squirrel.Select("*").From(userTable).Where(squirrel.NotEq{"id": user.Id})
+	queryBuilder := psql.Select("*").From(userTable).Where(sq.NotEq{"id": user.Id})
 	if user.PreferGender != nil {
-		queryBuilder = queryBuilder.Where(squirrel.Eq{"prefer_gender": user.PreferGender})
+		queryBuilder = queryBuilder.Where(sq.Eq{"prefer_gender": user.PreferGender})
 	}
 	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
 
@@ -78,12 +78,13 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = ScanUser(row, &nextUser)
+	user.CalculateAge()
 
 	return nextUser, err
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
-	queryBuilder := squirrel.Update(userTable).
+	query, args, err := psql.Update(userTable).
 		Set("name", user.Name).
 		Set("mail", user.Mail).
 		Set("user_gender", user.UserGender).
@@ -94,9 +95,9 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		Set("education", user.Education).
 		Set("hobbies", user.Hobbies).
 		//Set("tags", user.Tags).
-		Where(squirrel.Eq{"id": user.Id})
+		Where(sq.Eq{"id": user.Id}).
+		ToSql()
 
-	query, args, err := queryBuilder.ToSql()
 	if err != nil {
 		return model.User{}, err
 	}
@@ -136,7 +137,6 @@ func ScanUser(row pgx.Row, user *model.User) error {
 		&user.UserGender,
 		&user.PreferGender,
 		&user.Description,
-		&user.Age,
 		&user.Looking,
 		&user.Education,
 		&user.Hobbies,
