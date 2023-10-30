@@ -34,6 +34,9 @@ func (u *User) IsValid() bool {
 }
 
 func (u *User) CalculateAge() {
+	if u.Birthday == nil {
+		return
+	}
 	currentTime := time.Now()
 	age := currentTime.Year() - u.Birthday.Year()
 
