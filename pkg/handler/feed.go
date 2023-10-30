@@ -16,8 +16,8 @@ import (
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	nextUser, err := h.services.GetNextUser(r.Context(), r.Context().Value("userID").(int))
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto[model.User](w, nextUser)
+	NewSuccessClientResponseDto[model.User](h.ctx, w, nextUser)
 }

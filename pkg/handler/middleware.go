@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"github.com/rs/cors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
+	"log"
 	"net/http"
 	"runtime/debug"
 	"time"
 )
 
-func corsMiddleware(next http.Handler) http.Handler {
+func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins:   viper.GetStringSlice("cors.origins"),
 		AllowedMethods:   viper.GetStringSlice("cors.methods"),
@@ -21,44 +22,73 @@ func corsMiddleware(next http.Handler) http.Handler {
 	return corsMiddleware.Handler(next)
 }
 
-func authMiddleware(h *Handler) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			session, err := r.Cookie("session_id")
-			if errors.Is(err, http.ErrNoCookie) {
-				newErrorClientResponseDto(w, http.StatusUnauthorized, "Необходимо авторизироваться")
-				return
-			}
-
-			id, err := h.services.GetSessionValue(r.Context(), session.Value)
-			if err != nil {
-				logrus.Printf("[RequestID] %s [error] %v", r.Context().Value("RequestID"), err.Error())
-				newErrorClientResponseDto(w, http.StatusUnauthorized, "Необходимо авторизироваться")
-				return
-			}
-
-			ctx := context.WithValue(r.Context(), "userID", id)
-
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-}
-
-func loggingMiddleware(next http.Handler) http.Handler {
+func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		next.ServeHTTP(w, r)
-		logrus.Printf("[RequestID] %s [Method] %s [RequestURI] %s [time] %s",
-			r.Context().Value("RequestID"), r.Method, r.RequestURI, time.Since(start))
+		session, err := r.Cookie("session_id")
+		if errors.Is(err, http.ErrNoCookie) {
+			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Необходимо авторизироваться")
+			return
+		}
+
+		id, err := h.services.GetSessionValue(r.Context(), session.Value)
+		if err != nil {
+			logger, ok := h.ctx.Value("Logger").(*zap.Logger)
+			if !ok {
+				log.Fatal("Logger not found in context")
+			}
+
+			logger.Error("Request handled",
+				zap.String("Method", r.Method),
+				zap.String("RequestURI", r.RequestURI),
+				//zap.Any("Status", h.ctx.Value("Status")),
+				//zap.Any("Message", h.ctx.Value("Message")),
+				zap.String("Error", err.Error()),
+			)
+			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Необходимо авторизироваться")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "userID", id)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func panicRecoveryMiddleware(next http.Handler) http.Handler {
+func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r.WithContext(h.ctx))
+
+		logger, ok := h.ctx.Value("Logger").(*zap.Logger)
+		if !ok {
+			log.Fatal("Logger not found in context")
+		}
+
+		logger.Info("Request handled",
+			zap.String("Method", r.Method),
+			zap.String("RequestURI", r.RequestURI),
+			zap.Any("Status", h.ctx.Value("Status")),
+			zap.Any("Message", h.ctx.Value("Message")),
+			zap.Duration("Time", time.Since(start)),
+		)
+	})
+}
+
+func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				newErrorClientResponseDto(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-				logrus.Println(string(debug.Stack()))
+				logger, ok := h.ctx.Value("Logger").(*zap.SugaredLogger)
+				if !ok {
+					log.Fatal("Logger not found in context")
+				}
+
+				logger.Error("Request handled",
+					zap.String("Method", r.Method),
+					zap.String("RequestURI", r.RequestURI),
+					zap.String("Message", string(debug.Stack())),
+				)
+				newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 			}
 		}()
 		next.ServeHTTP(w, r)

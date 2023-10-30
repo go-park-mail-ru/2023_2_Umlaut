@@ -2,15 +2,29 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/sirupsen/logrus"
+	"github.com/jackc/pgx/v5"
+	"github.com/minio/minio-go/v7"
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
-	"math/rand"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"log"
 	"strconv"
 )
+
+func init() {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config_local")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // @title Umlaut API
 // @version 1.0
@@ -19,13 +33,62 @@ import (
 // @host localhost:8000
 // @BasePath /
 func main() {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("error initializing configs: %s", err.Error())
+	logger, err := initLogger()
+	if err != nil {
+		log.Fatal(err)
 	}
-	ctx := context.WithValue(context.Background(), "RequestID", rand.Int())
+	logger.Info("Starting server...")
+	defer logger.Sync()
 
-	db, err := repository.NewPostgresDB(repository.PostgresConfig{
+	ctx := context.WithValue(context.Background(), "Logger", logger)
+	ctx = context.WithValue(ctx, "Status", 0)
+	ctx = context.WithValue(ctx, "Message", "")
+
+	db, err := initPostgres()
+	if err != nil {
+		logger.Error("initialize Postgres",
+			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
+	}
+	defer db.Close(ctx)
+
+	sessionStore, err := initRedis()
+	if err != nil {
+		logger.Error("initialize redisDb",
+			zap.String("Error", fmt.Sprintf("failed to initialize redisDb: %s", err.Error())))
+	}
+	defer sessionStore.Close()
+
+	fileClient, err := initMinioClient()
+	if err != nil {
+		logger.Error("initialize Minio",
+			zap.String("Error", fmt.Sprintf("failed to initialize Minio: %s", err.Error())))
+	}
+
+	repos := repository.NewRepository(db, sessionStore, fileClient)
+	services := service.NewService(repos)
+	handlers := handler.NewHandler(services, ctx)
+	srv := new(umlaut.Server)
+
+	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		logger.Error("running http server",
+			zap.String("Error", fmt.Sprintf("error occured while running http server: %s", err.Error())))
+	}
+}
+
+func initLogger() (*zap.Logger, error) {
+	config := zap.Config{
+		Level:            zap.NewAtomicLevelAt(zapcore.DebugLevel),
+		Development:      true,
+		Encoding:         "json",
+		EncoderConfig:    zap.NewProductionEncoderConfig(),
+		OutputPaths:      []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+	return config.Build()
+}
+
+func initPostgres() (*pgx.Conn, error) {
+	return repository.NewPostgresDB(repository.PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),
 		Username: viper.GetString("postgres.username"),
@@ -33,47 +96,25 @@ func main() {
 		SSLMode:  viper.GetString("postgres.sslmode"),
 		Password: viper.GetString("postgres.password"), //os.Getenv("DB_PASSWORD"),
 	})
-	if err != nil {
-		logrus.Fatalf("failed to initialize db: %s", err.Error())
-	}
-	defer db.Close(ctx)
+}
 
+func initRedis() (*redis.Client, error) {
 	redisDb, err := strconv.Atoi(viper.GetString("redis.db"))
 	if err != nil {
-		logrus.Fatalf("failed to initialize db: %s", err.Error())
+		return nil, err
 	}
-	sessionStore, err := repository.NewRedisClient(repository.RedisConfig{
+	return repository.NewRedisClient(repository.RedisConfig{
 		Addr:     viper.GetString("redis.addr"),
 		Password: "", //os.Getenv("DB_PASSWORD"),
 		DB:       redisDb,
 	})
-	if err != nil {
-		logrus.Fatalf("failed to initialize db: %s", err.Error())
-	}
-	defer sessionStore.Close()
+}
 
-	fileClient, err := repository.NewMinioClient(repository.MinioConfig{
+func initMinioClient() (*minio.Client, error) {
+	return repository.NewMinioClient(repository.MinioConfig{
 		User:     viper.GetString("minio.user"),
 		Password: viper.GetString("minio.password"),
 		SSLMode:  viper.GetBool("minio.sslmode"),
 		Endpoint: viper.GetString("minio.endpoint"),
 	})
-	if err != nil {
-		logrus.Fatalf("failed to initialize db: %s", err.Error())
-	}
-
-	repos := repository.NewRepository(db, sessionStore, fileClient)
-	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
-	srv := new(umlaut.Server)
-
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error occured while running http server: %s", err.Error())
-	}
-}
-
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
-	return viper.ReadInConfig()
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
@@ -11,16 +12,17 @@ import (
 
 type Handler struct {
 	services *service.Service
+	ctx      context.Context
 }
 
-func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+func NewHandler(services *service.Service, ctx context.Context) *Handler {
+	return &Handler{services: services, ctx: ctx}
 }
 
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://37.139.32.76:8000/swagger/doc.json"),
+		httpSwagger.URL("http://localhost:8000/swagger/doc.json"),
 	))
 
 	authRouter := r.PathPrefix("/auth").Subrouter()
@@ -29,7 +31,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	authRouter.HandleFunc("/logout", h.logout)
 
 	apiRouter := r.PathPrefix("/api/v1").Subrouter()
-	apiRouter.Use(authMiddleware(h))
+	apiRouter.Use(h.authMiddleware)
 	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
 	apiRouter.HandleFunc("/user", h.user).Methods("GET")
 	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
@@ -38,9 +40,9 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
 
 	r.Use(
-		loggingMiddleware,
-		panicRecoveryMiddleware,
-		corsMiddleware,
+		h.loggingMiddleware,
+		h.panicRecoveryMiddleware,
+		h.corsMiddleware,
 	)
 
 	return r

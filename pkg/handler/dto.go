@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 )
@@ -26,7 +27,7 @@ type ClientResponseDto[K comparable] struct {
 	Payload K      `json:"payload"`
 }
 
-func NewClientResponseDto[K comparable](w http.ResponseWriter, statusCode int, message string, payload K) {
+func NewClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, statusCode int, message string, payload K) {
 	response := ClientResponseDto[K]{
 		Status:  statusCode,
 		Message: message,
@@ -38,16 +39,17 @@ func NewClientResponseDto[K comparable](w http.ResponseWriter, statusCode int, m
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 		return
 	}
-
+	ctx = context.WithValue(ctx, "Status", statusCode)
+	ctx = context.WithValue(ctx, "Message", message)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(responseJSON)
 }
 
-func NewSuccessClientResponseDto[K comparable](w http.ResponseWriter, payload K) {
-	NewClientResponseDto[K](w, 200, "success", payload)
+func NewSuccessClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, payload K) {
+	NewClientResponseDto[K](ctx, w, 200, "success", payload)
 }
 
-func newErrorClientResponseDto(w http.ResponseWriter, statusCode int, message string) {
-	NewClientResponseDto[string](w, statusCode, message, "")
+func newErrorClientResponseDto(ctx context.Context, w http.ResponseWriter, statusCode int, message string) {
+	NewClientResponseDto[string](ctx, w, statusCode, message, "")
 }

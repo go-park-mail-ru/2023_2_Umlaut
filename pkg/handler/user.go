@@ -21,11 +21,11 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value("userID").(int)
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseDto(w, currentUser)
+	NewSuccessClientResponseDto(h.ctx, w, currentUser)
 }
 
 // @Summary update user
@@ -41,18 +41,18 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user model.User
 	if err := decoder.Decode(&user); err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
 	user.Id = r.Context().Value("userID").(int)
 	currentUser, err := h.services.UpdateUser(r.Context(), user)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseDto(w, currentUser)
+	NewSuccessClientResponseDto(h.ctx, w, currentUser)
 }
 
 // @Summary update user photo
@@ -68,22 +68,22 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	defer file.Close()
 	fileName, err := h.services.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = h.services.UpdateUserPhoto(r.Context(), id, fileName)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto[string](w, "")
+	NewSuccessClientResponseDto[string](h.ctx, w, "")
 }
 
 // @Summary get user photo
@@ -96,19 +96,19 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid params")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid params")
 		return
 	}
 
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	buffer, contentType, err := h.services.GetFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusNotFound, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -127,14 +127,14 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value("userID").(int)
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto[string](w, "")
+	NewSuccessClientResponseDto[string](h.ctx, w, "")
 }

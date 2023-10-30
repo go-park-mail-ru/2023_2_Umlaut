@@ -21,27 +21,27 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signInInput
 	if err := decoder.Decode(&input); err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
 	if input.Mail == "" || input.Password == "" {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "missing required fields")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "missing required fields")
 		return
 	}
 
 	user, err := h.services.GetUser(r.Context(), input.Mail, input.Password)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusUnauthorized, "invalid mail or password")
+		newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "invalid mail or password")
 		return
 	}
 	SID, err := h.services.GenerateCookie(r.Context(), user.Id)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	http.SetCookie(w, createCookie(SID))
-	NewSuccessClientResponseDto[string](w, "")
+	NewSuccessClientResponseDto[string](h.ctx, w, "")
 }
 
 // @Summary log out of account
@@ -55,18 +55,18 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
-		newErrorClientResponseDto(w, http.StatusUnauthorized, "no session")
+		newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "no session")
 		return
 	}
 	if err = h.services.DeleteCookie(r.Context(), session.Value); err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, "Invalid cookie deletion")
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "Invalid cookie deletion")
 
 	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	session.Path = "/"
 
 	http.SetCookie(w, session)
-	NewSuccessClientResponseDto[string](w, "")
+	NewSuccessClientResponseDto[string](h.ctx, w, "")
 }
 
 // @Summary sign up account
@@ -82,12 +82,12 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signUpInput
 	if err := decoder.Decode(&input); err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
 	if input.Name == "" || input.Mail == "" || input.Password == "" {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "missing required fields")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "missing required fields")
 		return
 	}
 
@@ -95,18 +95,18 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	id, err := h.services.CreateUser(r.Context(), user)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	SID, err := h.services.GenerateCookie(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	http.SetCookie(w, createCookie(SID))
 
-	NewSuccessClientResponseDto[idResponse](w, idResponse{Id: id})
+	NewSuccessClientResponseDto[idResponse](h.ctx, w, idResponse{Id: id})
 }
 
 func createCookie(SID string) *http.Cookie {
