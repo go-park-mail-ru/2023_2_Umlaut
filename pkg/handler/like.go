@@ -21,7 +21,7 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var likeJson likeDto
 	if err := decoder.Decode(&likeJson); err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -29,19 +29,19 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	like := model.Like{LikedByUserId: userId, LikedToUserId: likeJson.LikedUserId, CommittedAt: time.Time(likeJson.CommittedAt)}
 
 	if err := h.services.CreateLike(r.Context(), like); err != nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	exists, err := h.services.IsUserLiked(r.Context(), like)
 	if err != nil {
-		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if exists {
-		NewSuccessClientResponseDto(w, "Matching likes")
+		NewSuccessClientResponseDto(h.ctx, w, "Matching likes")
 		return
 	}
-	NewSuccessClientResponseDto(w, "")
+	NewSuccessClientResponseDto(h.ctx, w, "")
 }

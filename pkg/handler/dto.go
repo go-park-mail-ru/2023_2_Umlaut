@@ -58,8 +58,8 @@ func NewClientResponseDto[K comparable](ctx context.Context, w http.ResponseWrit
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 		return
 	}
-	ctx = context.WithValue(ctx, "Status", statusCode)
-	ctx = context.WithValue(ctx, "Message", message)
+	ctx = context.WithValue(ctx, keyStatus, statusCode)
+	ctx = context.WithValue(ctx, keyMessage, message)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(responseJSON)

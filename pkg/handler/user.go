@@ -107,7 +107,7 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "This user has no photos")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "This user has no photos")
 		return
 	}
 	buffer, contentType, err := h.services.GetFile(r.Context(), id, *currentUser.ImagePath)
@@ -136,7 +136,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(w, http.StatusBadRequest, "This user has no photos")
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "This user has no photos")
 		return
 	}
 	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
