@@ -32,16 +32,6 @@ definitions:
       id:
         type: integer
     type: object
-  handler.likeDto:
-    properties:
-      commited_at:
-        type: string
-      liked_user_id:
-        type: integer
-    required:
-    - commited_at
-    - liked_user_id
-    type: object
   handler.signInInput:
     properties:
       mail:
@@ -64,6 +54,11 @@ definitions:
     - mail
     - name
     - password
+    type: object
+  model.Like:
+    properties:
+      liked_to_user_id:
+        type: integer
     type: object
   model.User:
     properties:
@@ -140,7 +135,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/handler.likeDto'
+          $ref: '#/definitions/model.Like'
       produces:
       - application/json
       responses:

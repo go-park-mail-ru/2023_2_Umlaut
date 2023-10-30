@@ -2,10 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"net/http"
-	"time"
-
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"net/http"
 )
 
 // @Summary create user like
@@ -13,20 +11,20 @@ import (
 // @ID like
 // @Accept  json
 // @Produce  json
-// @Param input body likeDto true "Like data to update"
+// @Param input body model.Like true "Like data to update"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/like [post]
 func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var likeJson likeDto
-	if err := decoder.Decode(&likeJson); err != nil {
+	var like model.Like
+	if err := decoder.Decode(&like); err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	userId := r.Context().Value(keyUserID).(int)
-	like := model.Like{LikedByUserId: userId, LikedToUserId: likeJson.LikedUserId, CommittedAt: time.Time(likeJson.CommittedAt)}
+	like.LikedByUserId = userId
 
 	if err := h.services.CreateLike(r.Context(), like); err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())

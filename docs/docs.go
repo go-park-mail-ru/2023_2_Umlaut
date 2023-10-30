@@ -70,7 +70,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.likeDto"
+                            "$ref": "#/definitions/model.Like"
                         }
                     }
                 ],
@@ -487,21 +487,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.likeDto": {
-            "type": "object",
-            "required": [
-                "commited_at",
-                "liked_user_id"
-            ],
-            "properties": {
-                "commited_at": {
-                    "type": "string"
-                },
-                "liked_user_id": {
-                    "type": "integer"
-                }
-            }
-        },
         "handler.signInInput": {
             "type": "object",
             "required": [
@@ -533,6 +518,14 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "model.Like": {
+            "type": "object",
+            "properties": {
+                "liked_to_user_id": {
+                    "type": "integer"
                 }
             }
         },

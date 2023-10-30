@@ -20,8 +20,8 @@ func NewLikePostgres(db *pgx.Conn) *LikePostgres {
 
 func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.Like, error) {
 	query, args, err := psql.Insert(likeTable).
-		Columns("liked_by_user_id", "liked_to_user_id", "committed_at").
-		Values(like.LikedByUserId, like.LikedToUserId, like.CommittedAt).
+		Columns("liked_by_user_id", "liked_to_user_id").
+		Values(like.LikedByUserId, like.LikedToUserId).
 		ToSql()
 
 	if err != nil {

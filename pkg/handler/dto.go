@@ -19,11 +19,6 @@ type signUpInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type likeDto struct {
-	LikedUserId int      `json:"liked_user_id" binding:"required"`
-	CommittedAt JsonTime `json:"committed_at" binding:"required"`
-}
-
 type idResponse struct {
 	Id int `json:"id"`
 }
