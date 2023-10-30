@@ -15,6 +15,7 @@ import (
 type ctxKey string
 
 const keyUserID ctxKey = "user_id"
+const keyLogger ctxKey = "Logger"
 
 func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
 	corsMiddleware := cors.New(cors.Options{
@@ -36,7 +37,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 
 		id, err := h.services.GetSessionValue(r.Context(), session.Value)
 		if err != nil {
-			logger, ok := h.ctx.Value("Logger").(*zap.Logger)
+			logger, ok := h.ctx.Value(keyLogger).(*zap.Logger)
 			if !ok {
 				log.Fatal("Logger not found in context")
 			}
@@ -63,7 +64,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		start := time.Now()
 		next.ServeHTTP(w, r.WithContext(h.ctx))
 
-		logger, ok := h.ctx.Value("Logger").(*zap.Logger)
+		logger, ok := h.ctx.Value(keyLogger).(*zap.Logger)
 		if !ok {
 			log.Fatal("Logger not found in context")
 		}
@@ -82,7 +83,7 @@ func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				logger, ok := h.ctx.Value("Logger").(*zap.SugaredLogger)
+				logger, ok := h.ctx.Value(keyLogger).(*zap.SugaredLogger)
 				if !ok {
 					log.Fatal("Logger not found in context")
 				}
