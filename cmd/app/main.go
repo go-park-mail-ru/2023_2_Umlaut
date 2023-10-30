@@ -41,8 +41,6 @@ func main() {
 	defer logger.Sync()
 
 	ctx := context.WithValue(context.Background(), "logger", logger)
-	//ctx = context.WithValue(ctx, "Status", 0)
-	//ctx = context.WithValue(ctx, "Message", "")
 
 	db, err := initPostgres()
 	if err != nil {
