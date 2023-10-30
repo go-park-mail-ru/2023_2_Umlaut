@@ -41,7 +41,7 @@ func (j *JsonTime) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func NewClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, statusCode int, message string, payload K) {
+func NewClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWriter, statusCode int, message string, payload K) {
 	response := ClientResponseDto[K]{
 		Status:  statusCode,
 		Message: message,
@@ -53,17 +53,17 @@ func NewClientResponseDto[K comparable](ctx context.Context, w http.ResponseWrit
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 		return
 	}
-	ctx = context.WithValue(ctx, keyStatus, statusCode)
-	ctx = context.WithValue(ctx, keyMessage, message)
+	*ctx = context.WithValue(*ctx, keyStatus, statusCode)
+	*ctx = context.WithValue(*ctx, keyMessage, message)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(responseJSON)
 }
 
-func NewSuccessClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, payload K) {
+func NewSuccessClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWriter, payload K) {
 	NewClientResponseDto[K](ctx, w, 200, "success", payload)
 }
 
-func newErrorClientResponseDto(ctx context.Context, w http.ResponseWriter, statusCode int, message string) {
+func newErrorClientResponseDto(ctx *context.Context, w http.ResponseWriter, statusCode int, message string) {
 	NewClientResponseDto[string](ctx, w, statusCode, message, "")
 }

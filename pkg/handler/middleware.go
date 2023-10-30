@@ -38,7 +38,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 
 		id, err := h.services.GetSessionValue(r.Context(), session.Value)
 		if err != nil {
-			logger, ok := h.ctx.Value("logger").(*zap.Logger)
+			logger, ok := (*h.ctx).Value("logger").(*zap.Logger)
 			if !ok {
 				log.Fatal("Logger not found in context")
 			}
@@ -46,8 +46,8 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			logger.Error("Request handled",
 				zap.String("Method", r.Method),
 				zap.String("RequestURI", r.RequestURI),
-				zap.Any("Status", h.ctx.Value(keyStatus)),
-				zap.Any("Message", h.ctx.Value(keyMessage)),
+				zap.Any("Status", (*h.ctx).Value(keyStatus)),
+				zap.Any("Message", (*h.ctx).Value(keyMessage)),
 				zap.String("Error", err.Error()),
 			)
 			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Необходимо авторизироваться")
@@ -63,9 +63,9 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		next.ServeHTTP(w, r.WithContext(h.ctx))
+		next.ServeHTTP(w, r)
 
-		logger, ok := h.ctx.Value("logger").(*zap.Logger)
+		logger, ok := (*h.ctx).Value("logger").(*zap.Logger)
 		if !ok {
 			log.Fatal("Logger not found in context")
 		}
@@ -73,8 +73,8 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		logger.Info("Request handled",
 			zap.String("Method", r.Method),
 			zap.String("RequestURI", r.RequestURI),
-			zap.Any("Status", h.ctx.Value(keyStatus)),
-			zap.Any("Message", h.ctx.Value(keyMessage)),
+			zap.Any("Status", (*h.ctx).Value(keyStatus)),
+			zap.Any("Message", (*h.ctx).Value(keyMessage)),
 			zap.Duration("Time", time.Since(start)),
 		)
 	})
@@ -84,7 +84,7 @@ func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				logger, ok := h.ctx.Value("logger").(*zap.Logger)
+				logger, ok := (*h.ctx).Value("logger").(*zap.Logger)
 				if !ok {
 					log.Fatal("Logger not found in context")
 				}
