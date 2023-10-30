@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
 	"io"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/minio/minio-go/v7"
@@ -18,6 +19,11 @@ type User interface {
 	GetNextUser(ctx context.Context, user model.User) (model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 	UpdateUserPhoto(ctx context.Context, userId int, imagePath string) (string, error)
+}
+
+type Like interface {
+	CreateLike(ctx context.Context, like model.Like) (model.Like, error)
+	Exists(ctx context.Context, like model.Like) (bool, error)
 }
 
 type Store interface {
@@ -35,6 +41,7 @@ type FileServer interface {
 
 type Repository struct {
 	User
+	Like
 	Store
 	FileServer
 }
@@ -42,6 +49,7 @@ type Repository struct {
 func NewRepository(db *pgx.Conn, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:       NewUserPostgres(db),
+		Like:       NewLikePostgres(db),
 		Store:      NewRedisStore(redisClient),
 		FileServer: NewMinioProvider(minioClient),
 	}

@@ -32,6 +32,16 @@ definitions:
       id:
         type: integer
     type: object
+  handler.likeDto:
+    properties:
+      commited_at:
+        type: string
+      liked_user_id:
+        type: integer
+    required:
+    - commited_at
+    - liked_user_id
+    type: object
   handler.signInInput:
     properties:
       mail:
@@ -119,6 +129,40 @@ paths:
       summary: get user for feed
       tags:
       - feed
+  /api/v1/like:
+    post:
+      consumes:
+      - application/json
+      operationId: like
+      parameters:
+      - description: Like data to update
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.likeDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: create user like
+      tags:
+      - like
   /api/v1/user:
     get:
       consumes:
@@ -184,6 +228,10 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
@@ -202,6 +250,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
@@ -229,6 +281,10 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":

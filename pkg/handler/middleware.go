@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+type ctxKey string
+
+const keyUserID ctxKey = "user_id"
+
 func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins:   viper.GetStringSlice("cors.origins"),
@@ -48,7 +52,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "userID", id)
+		ctx := context.WithValue(r.Context(), keyUserID, id)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

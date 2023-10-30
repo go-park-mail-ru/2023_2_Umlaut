@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
+	"time"
 )
 
 type signInInput struct {
@@ -17,6 +19,11 @@ type signUpInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type likeDto struct {
+	LikedUserId int      `json:"liked_user_id" binding:"required"`
+	CommittedAt JsonTime `json:"committed_at" binding:"required"`
+}
+
 type idResponse struct {
 	Id int `json:"id"`
 }
@@ -25,6 +32,18 @@ type ClientResponseDto[K comparable] struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 	Payload K      `json:"payload"`
+}
+
+type JsonTime time.Time
+
+func (j *JsonTime) UnmarshalJSON(b []byte) error {
+	s := strings.Trim(string(b), "\"")
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return err
+	}
+	*j = JsonTime(t)
+	return nil
 }
 
 func NewClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, statusCode int, message string, payload K) {

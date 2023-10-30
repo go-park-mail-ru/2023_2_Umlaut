@@ -1,0 +1,67 @@
+package repository
+
+import (
+	"context"
+
+	sq "github.com/Masterminds/squirrel"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/jackc/pgx/v5"
+)
+
+type LikePostgres struct {
+	db *pgx.Conn
+}
+
+func NewLikePostgres(db *pgx.Conn) *LikePostgres {
+	return &LikePostgres{db: db}
+}
+
+func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.Like, error) {
+	query, args, err := psql.Insert(likeTable).
+		Columns("liked_by_user_id", "liked_to_user_id", "committed_at").
+		Values(like.LikedByUserId, like.LikedToUserId, like.CommittedAt).
+		ToSql()
+
+	if err != nil {
+		return model.Like{}, err
+	}
+
+	query += " RETURNING *"
+	var newLike model.Like
+	row := r.db.QueryRow(ctx, query, args...)
+	err = ScanLike(row, &newLike)
+
+	return newLike, err
+}
+
+func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error) {
+	query, args, err := psql.Select("*").
+	From(likeTable).
+	Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
+	ToSql()
+	if err != nil {
+		return false, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = ScanLike(row, &like)
+	if err == pgx.ErrNoRows {
+		return false, nil
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func ScanLike(row pgx.Row, like *model.Like) error {
+	err := row.Scan(
+		&like.LikedByUserId,
+		&like.LikedToUserId,
+		&like.CommittedAt,
+	)
+	return err
+}
