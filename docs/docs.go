@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/feed": {
+        "/api/v1/feed": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -32,25 +32,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
             }
         },
-        "/api/user": {
+        "/api/v1/user": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -67,19 +67,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -111,25 +111,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
             }
         },
-        "/api/user/photo": {
+        "/api/v1/user/photo": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -152,18 +152,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -178,24 +181,27 @@ const docTemplate = `{
                 "summary": "delete user photo",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
             }
         },
-        "/api/user/{id}/photo": {
+        "/api/v1/user/{id}/photo": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -220,13 +226,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -258,18 +264,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -290,18 +299,21 @@ const docTemplate = `{
                 "operationId": "logout",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -335,19 +347,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/handler.ClientResponseDto-handler_idResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -355,11 +367,53 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.errorResponse": {
+        "handler.ClientResponseDto-handler_idResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/handler.idResponse"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-model_User": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-string": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.idResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -401,12 +455,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "mail",
-                "name",
-                "password"
+                "name"
             ],
             "properties": {
                 "age": {
                     "type": "integer"
+                },
+                "birthday": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -420,6 +476,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "image_path": {
+                    "type": "string"
+                },
                 "looking": {
                     "type": "string"
                 },
@@ -429,17 +488,17 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
+                "online": {
+                    "type": "boolean"
                 },
                 "prefer_gender": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "tags": {
                     "type": "string"
                 },
                 "user_gender": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }
@@ -449,7 +508,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "umlaut-bmstu.me:8000",
+	Host:             "localhost:8000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",

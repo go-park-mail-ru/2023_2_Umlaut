@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -15,32 +14,18 @@ import (
 // @ID user
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.User
-// @Failure 401,404 {object} errorResponse
-// @Router /api/user [get]
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	id, err := h.services.GetSessionValue(r.Context(), session.Value)
-	if err != nil {
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
+	id := r.Context().Value("userID").(int)
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(currentUser)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	NewSuccessClientResponseDto(w, currentUser)
 }
 
 // @Summary update user
@@ -49,40 +34,25 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body model.User true "User data to update"
-// @Success 200 {object} model.User
-// @Failure 401,404 {object} errorResponse
-// @Router /api/user [post]
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user [post]
 func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	id, err := h.services.GetSessionValue(r.Context(), session.Value)
-	if err != nil {
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var user model.User
 	if err := decoder.Decode(&user); err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	user.Id = id
+	user.Id = r.Context().Value("userID").(int)
 	currentUser, err := h.services.UpdateUser(r.Context(), user)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(currentUser)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	NewSuccessClientResponseDto(w, currentUser)
 }
 
 // @Summary update user photo
@@ -90,41 +60,30 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "file"
-// @Success 200
-// @Failure 401,404 {object} errorResponse
-// @Router /api/user/photo [post]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user/photo [post]
 func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	id, err := h.services.GetSessionValue(r.Context(), session.Value)
-	if err != nil {
-		//залогировать ошибку, не забыть про ID!!1!
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
+	id := r.Context().Value("userID").(int)
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	defer file.Close()
 	fileName, err := h.services.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = h.services.UpdateUserPhoto(r.Context(), id, fileName)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	NewSuccessClientResponseDto[string](w, "")
 }
 
 // @Summary get user photo
@@ -132,37 +91,24 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "User ID"
 // @Success 200
-// @Failure 401,404 {object} errorResponse
-// @Router /api/user/{id}/photo [get]
+// @Failure 401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user/{id}/photo [get]
 func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	_, err = h.services.GetSessionValue(r.Context(), session.Value)
-	if err != nil {
-		//залогировать ошибку, не забыть про ID!!1!
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
-		newErrorResponse(w, http.StatusBadRequest, "invalid params")
+		newErrorClientResponseDto(w, http.StatusBadRequest, "invalid params")
 		return
 	}
 
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	buffer, contentType, err := h.services.GetFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorResponse(w, http.StatusNotFound, err.Error())
+		newErrorClientResponseDto(w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -174,32 +120,21 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Summary delete user photo
 // @Tags user
 // @Accept  json
-// @Success 200
-// @Failure 401,404 {object} errorResponse
-// @Router /api/user/photo [delete]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	id, err := h.services.GetSessionValue(r.Context(), session.Value)
-	if err != nil {
-		//залогировать ошибку, не забыть про ID!!1!
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
-		return
-	}
-
+	id := r.Context().Value("userID").(int)
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	NewSuccessClientResponseDto[string](w, "")
 }

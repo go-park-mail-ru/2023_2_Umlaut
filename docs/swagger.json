@@ -6,10 +6,10 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "umlaut-bmstu.me:8000",
+    "host": "localhost:8000",
     "basePath": "/",
     "paths": {
-        "/api/feed": {
+        "/api/v1/feed": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -26,25 +26,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
             }
         },
-        "/api/user": {
+        "/api/v1/user": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -61,19 +61,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -105,25 +105,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
             }
         },
-        "/api/user/photo": {
+        "/api/v1/user/photo": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -146,18 +146,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -172,24 +175,27 @@
                 "summary": "delete user photo",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
             }
         },
-        "/api/user/{id}/photo": {
+        "/api/v1/user/{id}/photo": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -214,13 +220,13 @@
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -252,18 +258,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -284,18 +293,21 @@
                 "operationId": "logout",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -329,19 +341,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/handler.ClientResponseDto-handler_idResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     }
                 }
@@ -349,11 +361,53 @@
         }
     },
     "definitions": {
-        "handler.errorResponse": {
+        "handler.ClientResponseDto-handler_idResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/handler.idResponse"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-model_User": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/model.User"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-string": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.idResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -395,12 +449,14 @@
             "type": "object",
             "required": [
                 "mail",
-                "name",
-                "password"
+                "name"
             ],
             "properties": {
                 "age": {
                     "type": "integer"
+                },
+                "birthday": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -414,6 +470,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "image_path": {
+                    "type": "string"
+                },
                 "looking": {
                     "type": "string"
                 },
@@ -423,17 +482,17 @@
                 "name": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
+                "online": {
+                    "type": "boolean"
                 },
                 "prefer_gender": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "tags": {
                     "type": "string"
                 },
                 "user_gender": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }

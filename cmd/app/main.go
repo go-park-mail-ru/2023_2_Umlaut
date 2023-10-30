@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"math/rand"
 	"strconv"
 )
 
@@ -15,13 +16,14 @@ import (
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host umlaut-bmstu.me:8000
+// @host localhost:8000
 // @BasePath /
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
+	ctx := context.WithValue(context.Background(), "RequestID", rand.Int())
 
 	db, err := repository.NewPostgresDB(repository.PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
@@ -34,7 +36,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
-	defer db.Close(context.Background())
+	defer db.Close(ctx)
 
 	redisDb, err := strconv.Atoi(viper.GetString("redis.db"))
 	if err != nil {
@@ -72,6 +74,6 @@ func main() {
 
 func initConfig() error {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
+	viper.SetConfigName("config_local")
 	return viper.ReadInConfig()
 }

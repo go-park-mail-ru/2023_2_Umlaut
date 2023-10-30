@@ -23,17 +23,19 @@ func (h *Handler) InitRoutes() http.Handler {
 		httpSwagger.URL("http://37.139.32.76:8000/swagger/doc.json"),
 	))
 
-	r.HandleFunc("/auth/login", h.signIn).Methods("POST", "OPTIONS")
-	r.HandleFunc("/auth/sign-up", h.signUp).Methods("POST", "OPTIONS")
-	r.HandleFunc("/auth/logout", h.logout)
+	authRouter := r.PathPrefix("/auth").Subrouter()
+	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
+	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
+	authRouter.HandleFunc("/logout", h.logout)
 
-	r.HandleFunc("/api/feed", h.feed).Methods("GET")
-
-	r.HandleFunc("/api/user", h.user).Methods("GET")
-	r.HandleFunc("/api/user", h.updateUser).Methods("POST", "OPTIONS")
-	r.HandleFunc("/api/user/photo", h.updateUserPhoto).Methods("POST")
-	r.HandleFunc("/api/user/{id}/photo", h.getUserPhoto).Methods("GET")
-	r.HandleFunc("/api/user/photo", h.deleteUserPhoto).Methods("DELETE")
+	apiRouter := r.PathPrefix("/api/v1").Subrouter()
+	apiRouter.Use(authMiddleware(h))
+	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
+	apiRouter.HandleFunc("/user", h.user).Methods("GET")
+	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user/photo", h.updateUserPhoto).Methods("POST")
+	apiRouter.HandleFunc("/user/{id}/photo", h.getUserPhoto).Methods("GET")
+	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
 
 	r.Use(
 		loggingMiddleware,

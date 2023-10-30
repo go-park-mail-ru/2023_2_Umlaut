@@ -16,13 +16,24 @@ type signUpInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type errorResponse struct {
-	Message string `json:"message"`
+type idResponse struct {
+	Id int `json:"id"`
 }
 
-func newErrorResponse(w http.ResponseWriter, statusCode int, message string) {
-	errorObj := errorResponse{Message: message}
-	responseJSON, err := json.Marshal(errorObj)
+type ClientResponseDto[K comparable] struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Payload K      `json:"payload"`
+}
+
+func NewClientResponseDto[K comparable](w http.ResponseWriter, statusCode int, message string, payload K) {
+	response := ClientResponseDto[K]{
+		Status:  statusCode,
+		Message: message,
+		Payload: payload,
+	}
+
+	responseJSON, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 		return
@@ -31,4 +42,12 @@ func newErrorResponse(w http.ResponseWriter, statusCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(responseJSON)
+}
+
+func NewSuccessClientResponseDto[K comparable](w http.ResponseWriter, payload K) {
+	NewClientResponseDto[K](w, 200, "success", payload)
+}
+
+func newErrorClientResponseDto(w http.ResponseWriter, statusCode int, message string) {
+	NewClientResponseDto[string](w, statusCode, message, "")
 }
