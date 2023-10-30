@@ -46,8 +46,8 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			logger.Error("Request handled",
 				zap.String("Method", r.Method),
 				zap.String("RequestURI", r.RequestURI),
-				zap.Any("Status", h.ctx.Value("Status")),
-				zap.Any("Message", h.ctx.Value("Message")),
+				zap.Any("Status", h.ctx.Value(keyStatus)),
+				zap.Any("Message", h.ctx.Value(keyMessage)),
 				zap.String("Error", err.Error()),
 			)
 			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Необходимо авторизироваться")
@@ -73,8 +73,8 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		logger.Info("Request handled",
 			zap.String("Method", r.Method),
 			zap.String("RequestURI", r.RequestURI),
-			zap.Any("Status", h.ctx.Value("Status")),
-			zap.Any("Message", h.ctx.Value("Message")),
+			zap.Any("Status", h.ctx.Value(keyStatus)),
+			zap.Any("Message", h.ctx.Value(keyMessage)),
 			zap.Duration("Time", time.Since(start)),
 		)
 	})
