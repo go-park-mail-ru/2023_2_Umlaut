@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -37,16 +38,16 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 
 func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error) {
 	query, args, err := psql.Select("*").
-	From(likeTable).
-	Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
-	ToSql()
+		From(likeTable).
+		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
+		ToSql()
 	if err != nil {
 		return false, err
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = ScanLike(row, &like)
-	if err == pgx.ErrNoRows {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
 	}
 

@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
@@ -39,12 +41,17 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	var user model.User
 
 	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
+
 	if err != nil {
 		return user, err
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = ScanUser(row, &user)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, errors.New(fmt.Sprintf("User with mail: %s not found", mail))
+	}
 
 	return user, err
 }
@@ -53,12 +60,17 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	var user model.User
 
 	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"id": id}).ToSql()
+
 	if err != nil {
 		return user, err
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = ScanUser(row, &user)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, errors.New(fmt.Sprintf("User with id: %d not found", id))
+	}
 
 	return user, err
 }
@@ -78,6 +90,10 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = ScanUser(row, &nextUser)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, errors.New(fmt.Sprintf("User for: %s not found", user.Mail))
+	}
 
 	return nextUser, err
 }
