@@ -9,6 +9,7 @@ import (
 
 const (
 	userTable = "\"user\""
+	likeTable = "\"like\""
 )
 
 type PostgresConfig struct {

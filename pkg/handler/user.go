@@ -18,7 +18,7 @@ import (
 // @Failure 401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value("userID").(int)
+	id := r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
@@ -45,7 +45,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Id = r.Context().Value("userID").(int)
+	user.Id = r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.UpdateUser(r.Context(), user)
 	if err != nil {
 		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
@@ -61,10 +61,10 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param file formData file true "file"
 // @Success 200 {object} ClientResponseDto[string]
-// @Failure 401,404 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [post]
 func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value("userID").(int)
+	id := r.Context().Value(keyUserID).(int)
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
@@ -91,7 +91,7 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "User ID"
 // @Success 200
-// @Failure 401,404 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/{id}/photo [get]
 func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -106,6 +106,10 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if currentUser.ImagePath == nil {
+		newErrorClientResponseDto(w, http.StatusBadRequest, "This user has no photos")
+		return
+	}
 	buffer, contentType, err := h.services.GetFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorClientResponseDto(w, http.StatusNotFound, err.Error())
@@ -121,16 +125,20 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Tags user
 // @Accept  json
 // @Success 200 {object} ClientResponseDto[string]
-// @Failure 401,404 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value("userID").(int)
+	id := r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	if currentUser.ImagePath == nil {
+		newErrorClientResponseDto(w, http.StatusBadRequest, "This user has no photos")
+		return
+	}
 	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorClientResponseDto(w, http.StatusInternalServerError, err.Error())
