@@ -408,6 +408,9 @@ const docTemplate = `{
                 "age": {
                     "type": "integer"
                 },
+                "birthday": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -420,6 +423,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "image_path": {
+                    "type": "string"
+                },
                 "looking": {
                     "type": "string"
                 },
@@ -429,17 +435,20 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "online": {
+                    "type": "boolean"
+                },
                 "password": {
                     "type": "string"
                 },
                 "prefer_gender": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "tags": {
                     "type": "string"
                 },
                 "user_gender": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }
