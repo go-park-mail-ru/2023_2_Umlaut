@@ -36,11 +36,17 @@ type Like interface {
 	IsUserLiked(ctx context.Context, like model.Like) (bool, error)
 }
 
+type Dialog interface {
+	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
+	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
+}
+
 type Service struct {
 	Authorization
 	Feed
 	User
 	Like
+	Dialog
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -49,5 +55,6 @@ func NewService(repo *repository.Repository) *Service {
 		Feed:          NewFeedService(repo.User, repo.Store),
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
 		Like:          NewLikeService(repo.Like),
+		Dialog:        NewDialogService(repo.Dialog),
 	}
 }

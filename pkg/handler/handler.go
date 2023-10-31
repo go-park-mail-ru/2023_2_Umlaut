@@ -39,6 +39,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/user/{id}/photo", h.getUserPhoto).Methods("GET")
 	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
 	apiRouter.HandleFunc("/like", h.createLike).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
 
 	r.Use(
 		h.loggingMiddleware,

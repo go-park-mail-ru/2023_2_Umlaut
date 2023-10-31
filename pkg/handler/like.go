@@ -37,9 +37,13 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if exists {
-		NewSuccessClientResponseDto(h.ctx, w, "Matching likes")
+	if !exists {
+		NewSuccessClientResponseDto(h.ctx, w, "")
 		return
 	}
-	NewSuccessClientResponseDto(h.ctx, w, "")
-}
+	_, err = h.services.CreateDialog(r.Context(), model.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId})
+	if err != nil {
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	NewSuccessClientResponseDto(h.ctx, w, "Matching likes")}
