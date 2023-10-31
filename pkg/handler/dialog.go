@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 )
 
@@ -20,15 +19,6 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 	}
-	dialogsJson, err := json.Marshal(dialogs)
-	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
-	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(dialogsJson)
-	// 																Так работает
-
-	//NewSuccessClientResponseDto(h.ctx, w, dialogsJson) 			А так нет
+	NewSuccessClientResponseArrayDto(h.ctx, w, dialogs)
 }

@@ -33,7 +33,37 @@ func NewClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWri
 		Message: message,
 		Payload: payload,
 	}
+	sendData(ctx, w, response, statusCode, message)
+}
 
+func NewSuccessClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWriter, payload K) {
+	NewClientResponseDto[K](ctx, w, 200, "success", payload)
+}
+
+func newErrorClientResponseDto(ctx *context.Context, w http.ResponseWriter, statusCode int, message string) {
+	NewClientResponseDto[string](ctx, w, statusCode, message, "")
+}
+
+type ClientResponseArrayDto[K comparable] struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Payload []K    `json:"payload"`
+}
+
+func NewClientResponseArrayDto[K comparable](ctx *context.Context, w http.ResponseWriter, statusCode int, message string, payload []K) {
+	response := ClientResponseArrayDto[K]{
+		Status:  statusCode,
+		Message: message,
+		Payload: payload,
+	}
+	sendData(ctx, w, response, statusCode, message)
+}
+
+func NewSuccessClientResponseArrayDto[K comparable](ctx *context.Context, w http.ResponseWriter, payload []K) {
+	NewClientResponseArrayDto[K](ctx, w, 200, "success", payload)
+}
+
+func sendData(ctx *context.Context, w http.ResponseWriter, response interface{}, statusCode int, message string) {
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
@@ -44,12 +74,4 @@ func NewClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWri
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(responseJSON)
-}
-
-func NewSuccessClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWriter, payload K) {
-	NewClientResponseDto[K](ctx, w, 200, "success", payload)
-}
-
-func newErrorClientResponseDto(ctx *context.Context, w http.ResponseWriter, statusCode int, message string) {
-	NewClientResponseDto[string](ctx, w, statusCode, message, "")
 }
