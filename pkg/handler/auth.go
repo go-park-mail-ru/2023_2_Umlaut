@@ -41,7 +41,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, createCookie(SID))
-	NewSuccessClientResponseDto[string](h.ctx, w, "")
+	NewSuccessClientResponseDto(h.ctx, w, "")
 }
 
 // @Summary log out of account
@@ -66,7 +66,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session.Path = "/"
 
 	http.SetCookie(w, session)
-	NewSuccessClientResponseDto[string](h.ctx, w, "")
+	NewSuccessClientResponseDto(h.ctx, w, "")
 }
 
 // @Summary sign up account
@@ -106,7 +106,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, createCookie(SID))
 
-	NewSuccessClientResponseDto[idResponse](h.ctx, w, idResponse{Id: id})
+	NewSuccessClientResponseDto(h.ctx, w, idResponse{Id: id})
 }
 
 func createCookie(SID string) *http.Cookie {

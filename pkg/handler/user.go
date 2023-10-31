@@ -83,7 +83,7 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto[string](h.ctx, w, "")
+	NewSuccessClientResponseDto(h.ctx, w, "")
 }
 
 // @Summary get user photo
@@ -144,5 +144,5 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto[string](h.ctx, w, "")
+	NewSuccessClientResponseDto(h.ctx, w, "")
 }

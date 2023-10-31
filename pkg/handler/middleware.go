@@ -14,9 +14,13 @@ import (
 
 type ctxKey string
 
-const keyUserID ctxKey = "user_id"
-const keyStatus ctxKey = "status"
-const keyMessage ctxKey = "message"
+const (
+	keyUserID  ctxKey = "user_id"
+	keyStatus  ctxKey = "status"
+	keyMessage ctxKey = "message"
+	secret            = "qrkjk#4#%35FSFJlja#4353KSFjH"
+	tokenTTL          = 24 * time.Hour
+)
 
 func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
 	corsMiddleware := cors.New(cors.Options{
@@ -32,31 +36,42 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, err := r.Cookie("session_id")
 		if errors.Is(err, http.ErrNoCookie) {
-			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Необходимо авторизироваться")
+			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Need auth")
 			return
 		}
 
 		id, err := h.services.GetSessionValue(r.Context(), session.Value)
 		if err != nil {
-			logger, ok := (*h.ctx).Value("logger").(*zap.Logger)
-			if !ok {
-				log.Fatal("Logger not found in context")
-			}
-
-			logger.Error("Request handled",
-				zap.String("Method", r.Method),
-				zap.String("RequestURI", r.RequestURI),
-				zap.Any("Status", (*h.ctx).Value(keyStatus)),
-				zap.Any("Message", (*h.ctx).Value(keyMessage)),
-				zap.String("Error", err.Error()),
-			)
-			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Необходимо авторизироваться")
+			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Need auth")
 			return
 		}
 
 		ctx := context.WithValue(r.Context(), keyUserID, id)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, _ := r.Cookie("session_id")
+		jwtToken := NewJwtToken(h.ctx, secret)
+
+		CSRFToken := r.Header.Get("csrf-token")
+
+		valid, err := jwtToken.Check(session.Value, CSRFToken)
+		if err != nil || !valid {
+			newErrorClientResponseDto(h.ctx, w, http.StatusForbidden, "Need csrf token")
+			return
+		}
+
+		next.ServeHTTP(w, r)
+
+		token, err := jwtToken.Create(session.Value, time.Now().Add(tokenTTL).Unix())
+		if err != nil {
+			newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
+			return
+		}
+		w.Header().Set("csrf-token", token)
 	})
 }
 
