@@ -22,10 +22,10 @@ type JwtCsrfClaims struct {
 	jwt.StandardClaims
 }
 
-func (tk *JwtToken) Create(SID string, tokenExpTime int64) (string, error) {
+func (tk *JwtToken) Create(SID string, id int, tokenExpTime int64) (string, error) {
 	data := JwtCsrfClaims{
 		SessionID: SID,
-		UserID:    (*tk.Ctx).Value(keyUserID).(int),
+		UserID:    id,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: tokenExpTime,
 			IssuedAt:  time.Now().Unix(),

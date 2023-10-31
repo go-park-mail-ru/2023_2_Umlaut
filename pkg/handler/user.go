@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/gorilla/mux"
@@ -24,6 +25,15 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	session, _ := r.Cookie("session_id")
+	jwtToken := NewJwtToken(h.ctx, secret)
+	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
+	if err != nil {
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
+		return
+	}
+	w.Header().Set("X-CSRF-Token", token)
 
 	NewSuccessClientResponseDto(h.ctx, w, currentUser)
 }

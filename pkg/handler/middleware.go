@@ -19,7 +19,6 @@ const (
 	keyStatus  ctxKey = "status"
 	keyMessage ctxKey = "message"
 	secret            = "qrkjk#4#%35FSFJlja#4353KSFjH"
-	tokenTTL          = 24 * time.Hour
 )
 
 func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
@@ -53,10 +52,14 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 }
 func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			next.ServeHTTP(w, r.WithContext(*h.ctx))
+			return
+		}
 		session, _ := r.Cookie("session_id")
 		jwtToken := NewJwtToken(h.ctx, secret)
 
-		CSRFToken := r.Header.Get("csrf-token")
+		CSRFToken := r.Header.Get("X-CSRF-Token")
 
 		valid, err := jwtToken.Check(session.Value, CSRFToken)
 		if err != nil || !valid {
@@ -64,14 +67,7 @@ func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		next.ServeHTTP(w, r)
-
-		token, err := jwtToken.Create(session.Value, time.Now().Add(tokenTTL).Unix())
-		if err != nil {
-			newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
-			return
-		}
-		w.Header().Set("csrf-token", token)
+		next.ServeHTTP(w, r.WithContext(*h.ctx))
 	})
 }
 
