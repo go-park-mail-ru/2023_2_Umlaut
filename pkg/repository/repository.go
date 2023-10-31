@@ -26,6 +26,12 @@ type Like interface {
 	Exists(ctx context.Context, like model.Like) (bool, error)
 }
 
+type Dialog interface {
+	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
+	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
+	Exists(ctx context.Context, dialog model.Dialog) (bool, error)
+}
+
 type Store interface {
 	SetSession(ctx context.Context, SID string, id int, lifetime time.Duration) error
 	GetSession(ctx context.Context, SID string) (int, error)
@@ -42,6 +48,7 @@ type FileServer interface {
 type Repository struct {
 	User
 	Like
+	Dialog
 	Store
 	FileServer
 }
@@ -50,6 +57,7 @@ func NewRepository(db *pgx.Conn, redisClient *redis.Client, minioClient *minio.C
 	return &Repository{
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),
+		Dialog:     NewDialogPostgres(db),
 		Store:      NewRedisStore(redisClient),
 		FileServer: NewMinioProvider(minioClient),
 	}
