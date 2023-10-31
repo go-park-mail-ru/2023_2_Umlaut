@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"net/http"
 )
 
@@ -19,5 +18,5 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto[model.User](h.ctx, w, nextUser)
+	NewSuccessClientResponseDto(h.ctx, w, nextUser)
 }

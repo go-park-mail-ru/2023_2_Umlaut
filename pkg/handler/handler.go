@@ -31,7 +31,10 @@ func (h *Handler) InitRoutes() http.Handler {
 	authRouter.HandleFunc("/logout", h.logout)
 
 	apiRouter := r.PathPrefix("/api/v1").Subrouter()
-	apiRouter.Use(h.authMiddleware)
+	apiRouter.Use(
+		//h.csrfMiddleware,
+		h.authMiddleware,
+	)
 	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
 	apiRouter.HandleFunc("/user", h.user).Methods("GET")
 	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
