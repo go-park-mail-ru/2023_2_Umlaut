@@ -51,7 +51,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	err = ScanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, errors.New(fmt.Sprintf("User with mail: %s not found", mail))
+		return model.User{}, fmt.Errorf("User with mail: %s not found", mail)
 	}
 
 	return user, err
@@ -70,7 +70,7 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	err = ScanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, errors.New(fmt.Sprintf("User with id: %d not found", id))
+		return model.User{}, fmt.Errorf("User with id: %d not found", id)
 	}
 
 	return user, err
@@ -93,7 +93,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	err = ScanUser(row, &nextUser)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, errors.New(fmt.Sprintf("User for: %s not found", user.Mail))
+		return model.User{}, fmt.Errorf("User for: %s not found", user.Mail)
 	}
 
 	return nextUser, err
@@ -161,6 +161,8 @@ func ScanUser(row pgx.Row, user *model.User) error {
 		&user.Birthday,
 		&user.Online,
 	)
+
+	user.Sanitize()
 	user.CalculateAge()
 	return err
 }
