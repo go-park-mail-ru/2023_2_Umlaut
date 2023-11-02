@@ -137,6 +137,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/tags": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tag"
+                ],
+                "summary": "get all tags",
+                "operationId": "tag",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Tag"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user": {
             "get": {
                 "consumes": [
@@ -489,6 +524,23 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.ClientResponseDto-array_model_Tag": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Tag"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-handler_idResponse": {
             "type": "object",
             "properties": {
@@ -595,6 +647,17 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Tag": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "required": [
@@ -652,7 +715,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "umlaut-bmstu.me:8000",
+	Host:             "localhost:8000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",

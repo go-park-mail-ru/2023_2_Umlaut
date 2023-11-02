@@ -78,7 +78,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 
 		logger, ok := (*h.ctx).Value("logger").(*zap.Logger)
 		if !ok {
-			log.Fatal("Logger not found in context")
+			log.Println("Logger not found in context")
 		}
 
 		logger.Info("Request handled",
@@ -97,7 +97,7 @@ func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				logger, ok := (*h.ctx).Value("logger").(*zap.Logger)
 				if !ok {
-					log.Fatal("Logger not found in context")
+					log.Println("Logger not found in context")
 				}
 
 				logger.Error("Panic",

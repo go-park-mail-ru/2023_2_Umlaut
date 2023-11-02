@@ -3,7 +3,11 @@ package model
 import (
 	"net/mail"
 	"time"
+
+	"github.com/microcosm-cc/bluemonday"
 )
+
+var policy = bluemonday.UGCPolicy()
 
 type User struct {
 	Id           int        `json:"id" db:"id"`
@@ -19,13 +23,9 @@ type User struct {
 	ImagePath    *string    `json:"image_path" db:"image_path"`
 	Education    *string    `json:"education" db:"education"`
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
-	Tags         *string    `json:"tags" db:"tags"`
+	Tags         *string    `json:"tags"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
 	Online       bool       `json:"online" db:"online"`
-}
-
-func (u *User) Sanitize() {
-	u.PasswordHash = ""
 }
 
 func (u *User) IsValid() bool {
@@ -44,4 +44,24 @@ func (u *User) CalculateAge() {
 		age--
 	}
 	u.Age = &age
+}
+
+func (u *User) Sanitize() {
+	if u.Description != nil {
+		*u.Description = policy.Sanitize(*u.Description)
+	}
+	if u.Looking != nil {
+		*u.Looking = policy.Sanitize(*u.Looking)
+	}
+	if u.ImagePath != nil {
+		*u.ImagePath = policy.Sanitize(*u.ImagePath)
+	}
+	if u.Education != nil {
+		*u.Education = policy.Sanitize(*u.Education)
+	}
+	if u.Hobbies != nil {
+		*u.Hobbies = policy.Sanitize(*u.Hobbies)
+	}
+
+	u.PasswordHash = ""
 }

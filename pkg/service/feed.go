@@ -21,7 +21,6 @@ func (s *FeedService) GetNextUser(ctx context.Context, userId int) (model.User, 
 	if err != nil {
 		return model.User{}, err
 	}
-	nextUser.Sanitize()
 
 	return nextUser, nil
 }

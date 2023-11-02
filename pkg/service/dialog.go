@@ -31,7 +31,5 @@ func (s *DialogService) CreateDialog(ctx context.Context, dialog model.Dialog) (
 }
 
 func (s *DialogService) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
-	dialogs, err := s.repoDialog.GetDialogs(ctx, userId)
-
-	return dialogs, err
+	return s.repoDialog.GetDialogs(ctx, userId)
 }
