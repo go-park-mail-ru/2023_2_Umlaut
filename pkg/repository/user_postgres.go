@@ -162,7 +162,6 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Online,
 	)
 
-	user.Sanitize()
 	user.CalculateAge()
 	return err
 }
