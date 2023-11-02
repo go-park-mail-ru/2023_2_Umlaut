@@ -31,7 +31,7 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 	query += " RETURNING *"
 	var newLike model.Like
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanLike(row, &newLike)
+	err = scanLike(row, &newLike)
 
 	return newLike, err
 }
@@ -46,7 +46,7 @@ func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanLike(row, &like)
+	err = scanLike(row, &like)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
 	}
@@ -58,7 +58,7 @@ func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error
 	return true, nil
 }
 
-func ScanLike(row pgx.Row, like *model.Like) error {
+func scanLike(row pgx.Row, like *model.Like) error {
 	err := row.Scan(
 		&like.LikedByUserId,
 		&like.LikedToUserId,

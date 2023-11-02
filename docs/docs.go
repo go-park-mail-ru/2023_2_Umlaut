@@ -24,15 +24,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "dialog"
+                    "tag"
                 ],
-                "summary": "get user dialogs",
-                "operationId": "dialog",
+                "summary": "get all tags",
+                "operationId": "tag",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Dialog"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Tag"
                         }
                     },
                     "401": {
@@ -489,6 +489,23 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.ClientResponseDto-array_model_Tag": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Tag"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-handler_idResponse": {
             "type": "object",
             "properties": {
@@ -592,6 +609,17 @@ const docTemplate = `{
             "properties": {
                 "liked_to_user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Tag": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

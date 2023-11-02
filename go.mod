@@ -13,7 +13,6 @@ require (
 	github.com/minio/minio-go/v7 v7.0.63
 	github.com/redis/go-redis/v9 v9.2.0
 	github.com/rs/cors v1.10.0
-	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/http-swagger v1.3.4
