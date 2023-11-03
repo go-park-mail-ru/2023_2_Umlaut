@@ -18,6 +18,7 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 	dialogs, err := h.services.GetDialogs(r.Context(), userId)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	NewSuccessClientResponseArrayDto(h.ctx, w, dialogs)

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -17,14 +16,6 @@ func NewDialogService(repoDialog repository.Dialog) *DialogService {
 }
 
 func (s *DialogService) CreateDialog(ctx context.Context, dialog model.Dialog) (int, error) {
-	exists, err := s.repoDialog.Exists(ctx, dialog)
-	if err != nil {
-		return 0, err
-	}
-	if exists {
-		return 0, fmt.Errorf("dialog is already exists")
-	}
-
 	id, err := s.repoDialog.CreateDialog(ctx, dialog)
 
 	return id, err

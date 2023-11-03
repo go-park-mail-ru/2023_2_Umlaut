@@ -7,13 +7,14 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DialogPostgres struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewDialogPostgres(db *pgx.Conn) *DialogPostgres {
+func NewDialogPostgres(db *pgxpool.Pool) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 
@@ -74,7 +75,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	if err != nil {
 		return []model.Dialog{}, err
 	}
-
+	defer rows.Close()
 	var dialogs []model.Dialog
 	for rows.Next() {
 		var dialog model.Dialog

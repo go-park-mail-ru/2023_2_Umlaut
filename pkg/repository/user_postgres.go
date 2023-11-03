@@ -8,15 +8,16 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db *pgx.Conn
+	db *pgxpool.Pool
 }
 
-func NewUserPostgres(db *pgx.Conn) *UserPostgres {
+func NewUserPostgres(db *pgxpool.Pool) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
@@ -162,7 +163,6 @@ func ScanUser(row pgx.Row, user *model.User) error {
 		&user.Online,
 	)
 
-	user.Sanitize()
 	user.CalculateAge()
 	return err
 }

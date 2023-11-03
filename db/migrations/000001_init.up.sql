@@ -32,14 +32,17 @@ CREATE TABLE "like"
 (
     liked_by_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     liked_to_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    committed_at     TIMESTAMP NOT NULL DEFAULT NOW()
+    committed_at     TIMESTAMP NOT NULL DEFAULT NOW(),
+    liked_to_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    UNIQUE (liked_by_user_id, liked_to_user_id)
 );
 
 CREATE TABLE dialog
 (
     id       SERIAL PRIMARY KEY,
     user1_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL
+    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    UNIQUE (user1_id, user2_id)
 );
 
 CREATE TABLE message

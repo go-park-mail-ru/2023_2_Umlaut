@@ -3,23 +3,24 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"strconv"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
-	"strconv"
 )
 
 func init() {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
+	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -30,7 +31,7 @@ func init() {
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host localhost:8000
+// @host umlaut-bmstu.me:8000
 // @BasePath /
 func main() {
 	logger, err := initLogger()
@@ -47,7 +48,7 @@ func main() {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
 	}
-	defer db.Close(ctx)
+	defer db.Close()
 
 	sessionStore, err := initRedis()
 	if err != nil {
@@ -85,7 +86,7 @@ func initLogger() (*zap.Logger, error) {
 	return config.Build()
 }
 
-func initPostgres() (*pgx.Conn, error) {
+func initPostgres() (*pgxpool.Pool, error) {
 	return repository.NewPostgresDB(repository.PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),
