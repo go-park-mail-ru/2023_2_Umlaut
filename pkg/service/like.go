@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -16,16 +15,8 @@ func NewLikeService(repoLike repository.Like) *LikeService {
 	return &LikeService{repoLike: repoLike}
 }
 
-func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {
-	exists, err := s.repoLike.Exists(ctx, like)
-	if err != nil {
-		return err
-	}
-	if exists {
-		return errors.New("this like is already exists")
-	}
-	
-	_, err = s.repoLike.CreateLike(ctx, like)
+func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {	
+	_, err := s.repoLike.CreateLike(ctx, like)
 
 	return err
 }
