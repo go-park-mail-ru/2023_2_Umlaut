@@ -14,7 +14,7 @@ type FeedService struct {
 }
 
 func NewFeedService(repoUser repository.User, repoStore repository.Store, repoDialog repository.Dialog) *FeedService {
-	return &FeedService{repoUser: repoUser, repoStore: repoStore}
+	return &FeedService{repoUser: repoUser, repoStore: repoStore, repoDialog: repoDialog}
 }
 
 func (s *FeedService) GetNextUser(ctx context.Context, userId int) (model.User, error) {
