@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -26,7 +27,7 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 		ToSql()
 
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to create dialog. err: %w", err)
 	}
 
 	query += " RETURNING id"
@@ -44,7 +45,7 @@ func (r *DialogPostgres) Exists(ctx context.Context, dialog model.Dialog) (bool,
 			sq.Eq{"user1_id": dialog.User2Id, "user2_id": dialog.User1Id}}).
 		ToSql()
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to check is dialog exists. err: %w", err)
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
@@ -54,7 +55,7 @@ func (r *DialogPostgres) Exists(ctx context.Context, dialog model.Dialog) (bool,
 	}
 
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to check is dialog exists. err: %w", err)
 	}
 
 	return true, nil
@@ -68,12 +69,13 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 			sq.Eq{"user2_id": userId}}).
 		ToSql()
 	if err != nil {
-		return []model.Dialog{}, err
+		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
+
 	if err != nil {
-		return []model.Dialog{}, err
+		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 	defer rows.Close()
 	var dialogs []model.Dialog
@@ -81,12 +83,12 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 		var dialog model.Dialog
 		err = scanDialog(rows, &dialog)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return dialogs, nil
+			return dialogs, fmt.Errorf("dialogs doesn't exists for userId %d", userId)
 		}
 		dialogs = append(dialogs, dialog)
 	}
 	if err = rows.Err(); err != nil {
-		return dialogs, err
+		return dialogs, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 
 	return dialogs, nil

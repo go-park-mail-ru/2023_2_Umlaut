@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -26,7 +27,7 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 		ToSql()
 
 	if err != nil {
-		return model.Like{}, err
+		return model.Like{}, fmt.Errorf("failed to create like. err: %w", err)
 	}
 
 	query += " RETURNING *"
@@ -43,7 +44,7 @@ func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error
 		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
 		ToSql()
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to check is like exists. err: %w", err)
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
@@ -53,7 +54,7 @@ func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error
 	}
 
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to check is like exists. err: %w", err)
 	}
 
 	return true, nil
