@@ -22,6 +22,17 @@ definitions:
       status:
         type: integer
     type: object
+  handler.ClientResponseDto-array_model_User:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+      status:
+        type: integer
+    type: object
   handler.ClientResponseDto-handler_idResponse:
     properties:
       message:
@@ -183,6 +194,28 @@ paths:
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user for feed
+      tags:
+      - feed
+  /api/v1/feed/users:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_model_User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get users for feed
       tags:
       - feed
   /api/v1/like:

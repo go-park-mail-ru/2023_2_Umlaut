@@ -15,10 +15,17 @@ func NewLikeService(repoLike repository.Like) *LikeService {
 	return &LikeService{repoLike: repoLike}
 }
 
-func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {	
-	_, err := s.repoLike.CreateLike(ctx, like)
+func (s *LikeService) CreateLike(ctx context.Context, like model.Like) (bool, error) {
+	exists, err := s.repoLike.Exists(ctx, like)
+	if err != nil {
+		return false, err
+	}
+	if exists {
+		return true, nil
+	}
+	_, err = s.repoLike.CreateLike(ctx, like)
 
-	return err
+	return false, err
 }
 
 func (s *LikeService) IsUserLiked(ctx context.Context, like model.Like) (bool, error) {

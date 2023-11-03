@@ -144,6 +144,44 @@ func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePat
 	return updatedImgPath, err
 }
 
+func (r *UserPostgres) GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error) {
+	var exp sq.And
+	exp = append(exp, sq.NotEq{"id": user.Id})
+	for _, id := range usedUsersId {
+		exp = append(exp, sq.NotEq{"id": id})
+	}
+
+	queryBuilder := psql.Select("*").From(userTable).Where(exp)
+	if user.PreferGender != nil {
+		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
+	}
+
+	query, args, err := queryBuilder.OrderBy("RANDOM()").Limit(5).ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
+	}
+	defer rows.Close()
+	var users []model.User
+	for rows.Next() {
+		var user model.User
+		err = scanUser(rows, &user)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return users, fmt.Errorf("there are no suitable users for userId %d", user.Id)
+		}
+		users = append(users, user)
+	}
+	if err = rows.Err(); err != nil {
+		return users, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
+	}
+
+	return users, nil
+}
+
 func scanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,

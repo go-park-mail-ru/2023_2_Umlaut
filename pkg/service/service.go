@@ -20,6 +20,8 @@ type Authorization interface {
 
 type Feed interface {
 	GetNextUser(ctx context.Context, userId int) (model.User, error)
+	GetNextUsers(ctx context.Context, userId int) ([]model.User, error)
+
 }
 
 type User interface {
@@ -32,7 +34,7 @@ type User interface {
 }
 
 type Like interface {
-	CreateLike(ctx context.Context, like model.Like) error
+	CreateLike(ctx context.Context, like model.Like) (bool, error)
 	IsUserLiked(ctx context.Context, like model.Like) (bool, error)
 }
 
@@ -58,7 +60,7 @@ type Service struct {
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repo.User, repo.Store),
-		Feed:          NewFeedService(repo.User, repo.Store),
+		Feed:          NewFeedService(repo.User, repo.Store, repo.Dialog),
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
 		Like:          NewLikeService(repo.Like),
 		Dialog:        NewDialogService(repo.Dialog),
