@@ -11,6 +11,17 @@ definitions:
       status:
         type: integer
     type: object
+  handler.ClientResponseDto-array_model_Tag:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
+      status:
+        type: integer
+    type: object
   handler.ClientResponseDto-handler_idResponse:
     properties:
       message:
@@ -79,6 +90,13 @@ definitions:
     properties:
       liked_to_user_id:
         type: integer
+    type: object
+  model.Tag:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   model.User:
     properties:
@@ -201,6 +219,29 @@ paths:
       summary: create user like
       tags:
       - like
+  /api/v1/tags:
+    get:
+      consumes:
+      - application/json
+      operationId: tag
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_model_Tag'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get all tags
+      tags:
+      - tag
   /api/v1/user:
     get:
       consumes:

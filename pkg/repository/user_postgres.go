@@ -49,7 +49,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanUser(row, &user)
+	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("User with mail: %s not found", mail)
@@ -68,7 +68,7 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanUser(row, &user)
+	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("User with id: %d not found", id)
@@ -91,7 +91,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanUser(row, &nextUser)
+	err = scanUser(row, &nextUser)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("User for: %s not found", user.Mail)
@@ -122,7 +122,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 	query += " RETURNING *"
 	var updatedUser model.User
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanUser(row, &updatedUser)
+	err = scanUser(row, &updatedUser)
 
 	return updatedUser, err
 }
@@ -144,7 +144,7 @@ func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePat
 	return updatedImgPath, err
 }
 
-func ScanUser(row pgx.Row, user *model.User) error {
+func scanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,
 		&user.Name,

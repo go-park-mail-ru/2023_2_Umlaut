@@ -41,12 +41,18 @@ type Dialog interface {
 	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
 }
 
+type Tag interface {
+	GetAllTags(ctx context.Context) ([]model.Tag, error)
+	GetUserTags(ctx context.Context, userId int) ([]model.Tag, error)
+}
+
 type Service struct {
 	Authorization
 	Feed
 	User
 	Like
 	Dialog
+	Tag
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -56,5 +62,6 @@ func NewService(repo *repository.Repository) *Service {
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
 		Like:          NewLikeService(repo.Like),
 		Dialog:        NewDialogService(repo.Dialog),
+		Tag:           NewTagService(repo.Tag),
 	}
 }

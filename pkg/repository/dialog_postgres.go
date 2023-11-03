@@ -48,7 +48,7 @@ func (r *DialogPostgres) Exists(ctx context.Context, dialog model.Dialog) (bool,
 	}
 
 	row := r.db.QueryRow(ctx, query, args...)
-	err = ScanDialog(row, &dialog)
+	err = scanDialog(row, &dialog)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
 	}
@@ -64,7 +64,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	query, args, err := psql.Select("*").
 		From(dialogTable).
 		Where(sq.Or{
-			sq.Eq{"user1_id": userId}, 
+			sq.Eq{"user1_id": userId},
 			sq.Eq{"user2_id": userId}}).
 		ToSql()
 	if err != nil {
@@ -79,7 +79,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	var dialogs []model.Dialog
 	for rows.Next() {
 		var dialog model.Dialog
-		err = ScanDialog(rows, &dialog)
+		err = scanDialog(rows, &dialog)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return dialogs, nil
 		}
@@ -87,12 +87,12 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	}
 	if err = rows.Err(); err != nil {
 		return dialogs, err
-    }
+	}
 
 	return dialogs, nil
 }
 
-func ScanDialog(row pgx.Row, dialog *model.Dialog) error {
+func scanDialog(row pgx.Row, dialog *model.Dialog) error {
 	err := row.Scan(
 		&dialog.Id,
 		&dialog.User1Id,
