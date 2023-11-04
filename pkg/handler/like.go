@@ -25,13 +25,19 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 
 	userId := r.Context().Value(keyUserID).(int)
 	like.LikedByUserId = userId
-	exists, err := h.services.CreateLike(r.Context(), like)
+	exists, err := h.services.IsLikeExists(r.Context(), like)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if exists {
 		NewSuccessClientResponseDto(h.ctx, w, "")
+		return
+	}
+
+	err = h.services.CreateLike(r.Context(), like)
+	if err != nil {
+		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

@@ -34,8 +34,9 @@ type User interface {
 }
 
 type Like interface {
-	CreateLike(ctx context.Context, like model.Like) (bool, error)
+	CreateLike(ctx context.Context, like model.Like) error 
 	IsUserLiked(ctx context.Context, like model.Like) (bool, error)
+	IsLikeExists(ctx context.Context, like model.Like) (bool, error)
 }
 
 type Dialog interface {

@@ -20,6 +20,12 @@ func NewDialogPostgres(db *pgxpool.Pool) *DialogPostgres {
 }
 
 func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) (int, error) {
+	if dialog.User1Id > dialog.User2Id {
+		tmp := dialog.User1Id
+		dialog.User1Id = dialog.User2Id
+		dialog.User2Id = tmp
+	}
+	
 	var id int
 	query, args, err := psql.Insert(dialogTable).
 		Columns("user1_id", "user2_id").
