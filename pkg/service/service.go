@@ -27,7 +27,7 @@ type Feed interface {
 type User interface {
 	GetCurrentUser(ctx context.Context, userId int) (model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
-	UpdateUserPhoto(ctx context.Context, userId int, imagePath string) error
+	UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) error
 	CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error)
 	GetFile(ctx context.Context, userId int, fileName string) ([]byte, string, error)
 	DeleteFile(ctx context.Context, userId int, fileName string) error

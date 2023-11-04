@@ -19,7 +19,7 @@ type User interface {
 	GetNextUser(ctx context.Context, user model.User) (model.User, error)
 	GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
-	UpdateUserPhoto(ctx context.Context, userId int, imagePath string) (string, error)
+	UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error)
 }
 
 type Like interface {
