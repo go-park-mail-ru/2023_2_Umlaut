@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,32 +22,6 @@ func (r *TagPostgres) GetAllTags(ctx context.Context) ([]model.Tag, error) {
 	var tags []model.Tag
 
 	query, args, err := psql.Select("*").From(tagTable).ToSql()
-	if err != nil {
-		return tags, err
-	}
-
-	rows, err := r.db.Query(ctx, query, args...)
-	if err != nil {
-		return tags, fmt.Errorf("query error in GetAllTags: %v", err)
-	}
-	defer rows.Close()
-
-	err = scanTags(rows, &tags)
-	if err != nil {
-		return tags, err
-	}
-
-	return tags, err
-}
-
-func (r *TagPostgres) GetUserTags(ctx context.Context, userId int) ([]model.Tag, error) {
-	var tags []model.Tag
-
-	query, args, err := psql.Select("id", "name").
-		From(tagTable).
-		Join(fmt.Sprintf("%s on %s.id = %s.tag_id", userTagTable, tagTable, userTagTable)).
-		Where(sq.Eq{"user_id": userId}).
-		ToSql()
 	if err != nil {
 		return tags, err
 	}

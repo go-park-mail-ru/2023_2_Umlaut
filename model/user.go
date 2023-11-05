@@ -23,9 +23,9 @@ type User struct {
 	ImagePath    *string    `json:"image_path" db:"image_path"`
 	Education    *string    `json:"education" db:"education"`
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
-	Tags         *string    `json:"tags"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
 	Online       bool       `json:"online" db:"online"`
+	Tags         *[]string  `json:"tags" db:"tags"`
 }
 
 func (u *User) IsValid() bool {

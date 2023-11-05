@@ -31,7 +31,7 @@ func init() {
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host umlaut-bmstu.me:8000
+// @host localhost:8000
 // @BasePath /
 func main() {
 	logger, err := initLogger()

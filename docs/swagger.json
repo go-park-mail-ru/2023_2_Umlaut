@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "umlaut-bmstu.me:8000",
+    "host": "localhost:8000",
     "basePath": "/",
     "paths": {
         "/api/v1/dialogs": {
@@ -747,7 +747,10 @@
                     "type": "integer"
                 },
                 "tags": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "user_gender": {
                     "type": "integer"

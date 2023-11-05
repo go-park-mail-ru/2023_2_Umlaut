@@ -21,7 +21,6 @@ type Authorization interface {
 type Feed interface {
 	GetNextUser(ctx context.Context, userId int) (model.User, error)
 	GetNextUsers(ctx context.Context, userId int) ([]model.User, error)
-
 }
 
 type User interface {
@@ -34,7 +33,7 @@ type User interface {
 }
 
 type Like interface {
-	CreateLike(ctx context.Context, like model.Like) error 
+	CreateLike(ctx context.Context, like model.Like) error
 	IsUserLiked(ctx context.Context, like model.Like) (bool, error)
 	IsLikeExists(ctx context.Context, like model.Like) (bool, error)
 }
@@ -46,7 +45,6 @@ type Dialog interface {
 
 type Tag interface {
 	GetAllTags(ctx context.Context) ([]model.Tag, error)
-	GetUserTags(ctx context.Context, userId int) ([]model.Tag, error)
 }
 
 type Service struct {

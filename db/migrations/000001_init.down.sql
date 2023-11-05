@@ -6,3 +6,4 @@ DROP TABLE IF EXISTS "like";
 DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS "user";
 DROP TABLE IF EXISTS complaint_type;
+DROP TRIGGER IF EXISTS trigger_delete_tag_cascade ON tag;

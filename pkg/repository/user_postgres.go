@@ -52,7 +52,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, fmt.Errorf("User with mail: %s not found", mail)
+		return model.User{}, fmt.Errorf("user with mail: %s not found", mail)
 	}
 
 	return user, err
@@ -71,7 +71,7 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, fmt.Errorf("User with id: %d not found", id)
+		return model.User{}, fmt.Errorf("user with id: %d not found", id)
 	}
 
 	return user, err
@@ -94,7 +94,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	err = scanUser(row, &nextUser)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, fmt.Errorf("User for: %s not found", user.Mail)
+		return model.User{}, fmt.Errorf("user for: %s not found", user.Mail)
 	}
 
 	return nextUser, err
@@ -111,7 +111,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		Set("looking", user.Looking).
 		Set("education", user.Education).
 		Set("hobbies", user.Hobbies).
-		//Set("tags", user.Tags).
+		Set("tags", user.Tags).
 		Where(sq.Eq{"id": user.Id}).
 		ToSql()
 
@@ -196,9 +196,9 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.ImagePath,
 		&user.Education,
 		&user.Hobbies,
-		//&user.Tags,
 		&user.Birthday,
 		&user.Online,
+		&user.Tags,
 	)
 
 	user.CalculateAge()

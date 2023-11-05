@@ -17,7 +17,3 @@ func NewTagService(repoTag repository.Tag) *TagService {
 func (s *TagService) GetAllTags(ctx context.Context) ([]model.Tag, error) {
 	return s.repoTag.GetAllTags(ctx)
 }
-
-func (s *TagService) GetUserTags(ctx context.Context, userId int) ([]model.Tag, error) {
-	return s.repoTag.GetUserTags(ctx, userId)
-}
