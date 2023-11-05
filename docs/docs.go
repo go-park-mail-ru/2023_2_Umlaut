@@ -188,7 +188,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Tag"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_string"
                         }
                     },
                     "401": {
@@ -558,23 +558,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.ClientResponseDto-array_model_Tag": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Tag"
-                    }
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
         "handler.ClientResponseDto-array_model_User": {
             "type": "object",
             "properties": {
@@ -585,6 +568,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.User"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-array_string": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 },
                 "status": {
@@ -698,17 +698,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Tag": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "model.User": {
             "type": "object",
             "required": [
@@ -769,7 +758,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "umlaut-bmstu.me:8000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",

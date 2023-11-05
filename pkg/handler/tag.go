@@ -7,7 +7,7 @@ import "net/http"
 // @ID tag
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[[]model.Tag]
+// @Success 200 {object} ClientResponseDto[[]string]
 // @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/tags [get]
 func (h *Handler) getAllTags(w http.ResponseWriter, r *http.Request) {

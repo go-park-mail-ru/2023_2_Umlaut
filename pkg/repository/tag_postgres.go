@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -18,10 +17,10 @@ func NewTagPostgres(db *pgxpool.Pool) *TagPostgres {
 	return &TagPostgres{db: db}
 }
 
-func (r *TagPostgres) GetAllTags(ctx context.Context) ([]model.Tag, error) {
-	var tags []model.Tag
+func (r *TagPostgres) GetAllTags(ctx context.Context) ([]string, error) {
+	var tags []string
 
-	query, args, err := psql.Select("*").From(tagTable).ToSql()
+	query, args, err := psql.Select("name").From(tagTable).ToSql()
 	if err != nil {
 		return tags, err
 	}
@@ -40,16 +39,15 @@ func (r *TagPostgres) GetAllTags(ctx context.Context) ([]model.Tag, error) {
 	return tags, err
 }
 
-func scanTags(rows pgx.Rows, tags *[]model.Tag) error {
+func scanTags(rows pgx.Rows, tags *[]string) error {
 	var err error
 	for rows.Next() {
-		var id int
 		var name string
-		err = rows.Scan(&id, &name)
+		err = rows.Scan(&name)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
 		}
-		*tags = append(*tags, model.Tag{Id: id, Name: name})
+		*tags = append(*tags, name)
 	}
 	if err != nil {
 		return fmt.Errorf("scan error in GetAllTags: %v", err)

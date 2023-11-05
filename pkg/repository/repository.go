@@ -34,7 +34,7 @@ type Dialog interface {
 }
 
 type Tag interface {
-	GetAllTags(ctx context.Context) ([]model.Tag, error)
+	GetAllTags(ctx context.Context) ([]string, error)
 }
 
 type Store interface {

@@ -11,17 +11,6 @@ definitions:
       status:
         type: integer
     type: object
-  handler.ClientResponseDto-array_model_Tag:
-    properties:
-      message:
-        type: string
-      payload:
-        items:
-          $ref: '#/definitions/model.Tag'
-        type: array
-      status:
-        type: integer
-    type: object
   handler.ClientResponseDto-array_model_User:
     properties:
       message:
@@ -29,6 +18,17 @@ definitions:
       payload:
         items:
           $ref: '#/definitions/model.User'
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-array_string:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          type: string
         type: array
       status:
         type: integer
@@ -102,13 +102,6 @@ definitions:
       liked_to_user_id:
         type: integer
     type: object
-  model.Tag:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
   model.User:
     properties:
       age:
@@ -145,7 +138,7 @@ definitions:
     - mail
     - name
     type: object
-host: localhost:8000
+host: umlaut-bmstu.me:8000
 info:
   contact: {}
   description: API Server for Umlaut Application
@@ -265,7 +258,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto-array_model_Tag'
+            $ref: '#/definitions/handler.ClientResponseDto-array_string'
         "401":
           description: Unauthorized
           schema:
