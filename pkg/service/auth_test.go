@@ -14,15 +14,11 @@ import (
 func TestAuthService_CreateUser_InvalidFields(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	mockUserRepo := mock_repository.NewMockUser(ctrl)
 	mockStoreRepo := mock_repository.NewMockStore(ctrl)
-
 	authService := NewAuthService(mockUserRepo, mockStoreRepo)
-
 	ctx := context.Background()
 	testUser := model.User{}
-
 	mockUserRepo.EXPECT().CreateUser(ctx, gomock.Any()).Times(0)
 
 	userID, err := authService.CreateUser(ctx, testUser)
@@ -35,18 +31,14 @@ func TestAuthService_CreateUser_InvalidFields(t *testing.T) {
 func TestAuthService_GetUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	mockUserRepo := mock_repository.NewMockUser(ctrl)
 	mockStoreRepo := mock_repository.NewMockStore(ctrl)
-
 	authService := NewAuthService(mockUserRepo, mockStoreRepo)
-
 	ctx := context.Background()
 	testUser := model.User{
 		Mail:         "test@example.com",
 		PasswordHash: "password",
 	}
-
 	mockUserRepo.EXPECT().GetUser(ctx, "test@example.com").Return(testUser, nil)
 
 	retrievedUser, _ := authService.GetUser(ctx, "test@example.com", "password")
@@ -58,15 +50,11 @@ func TestAuthService_GetUser(t *testing.T) {
 func TestAuthService_GetUser_InvalidPassword(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	mockUserRepo := mock_repository.NewMockUser(ctrl)
 	mockStoreRepo := mock_repository.NewMockStore(ctrl)
-
 	authService := NewAuthService(mockUserRepo, mockStoreRepo)
-
 	ctx := context.Background()
 	testUser := model.User{}
-
 	mockUserRepo.EXPECT().GetUser(ctx, "test@example.com").Return(testUser, nil)
 
 	retrievedUser, err := authService.GetUser(ctx, "test@example.com", "wrong_password")
@@ -79,15 +67,11 @@ func TestAuthService_GetUser_InvalidPassword(t *testing.T) {
 func TestAuthService_GenerateCookie(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	mockUserRepo := mock_repository.NewMockUser(ctrl)
 	mockStoreRepo := mock_repository.NewMockStore(ctrl)
-
 	authService := NewAuthService(mockUserRepo, mockStoreRepo)
-
 	ctx := context.Background()
 	userID := 1
-
 	mockStoreRepo.EXPECT().SetSession(ctx, gomock.Any(), userID, 10*time.Hour).Return(nil)
 
 	_, err := authService.GenerateCookie(ctx, userID)
@@ -98,15 +82,11 @@ func TestAuthService_GenerateCookie(t *testing.T) {
 func TestAuthService_DeleteCookie(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	mockUserRepo := mock_repository.NewMockUser(ctrl)
 	mockStoreRepo := mock_repository.NewMockStore(ctrl)
-
 	authService := NewAuthService(mockUserRepo, mockStoreRepo)
-
 	ctx := context.Background()
 	session := "session_id"
-
 	mockStoreRepo.EXPECT().DeleteSession(ctx, "session_id").Return(nil)
 
 	err := authService.DeleteCookie(ctx, session)
@@ -117,16 +97,12 @@ func TestAuthService_DeleteCookie(t *testing.T) {
 func TestAuthService_GetSessionValue(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
 	mockUserRepo := mock_repository.NewMockUser(ctrl)
 	mockStoreRepo := mock_repository.NewMockStore(ctrl)
-
 	authService := NewAuthService(mockUserRepo, mockStoreRepo)
-
 	ctx := context.Background()
 	session := "session_id"
 	userID := 1
-
 	mockStoreRepo.EXPECT().GetSession(ctx, "session_id").Return(userID, nil)
 
 	retrievedUserID, err := authService.GetSessionValue(ctx, session)

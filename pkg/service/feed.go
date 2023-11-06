@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -18,10 +19,13 @@ func NewFeedService(repoUser repository.User, repoStore repository.Store, repoDi
 }
 
 func (s *FeedService) GetNextUser(ctx context.Context, userId int) (model.User, error) {
-	user, _ := s.repoUser.GetUserById(ctx, userId)
+	user, err := s.repoUser.GetUserById(ctx, userId)
+	if err != nil {
+		return model.User{}, fmt.Errorf("GetNextUser error: %v", err)
+	}
 	nextUser, err := s.repoUser.GetNextUser(ctx, user)
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("GetNextUser error: %v", err)
 	}
 
 	nextUser.Sanitize()

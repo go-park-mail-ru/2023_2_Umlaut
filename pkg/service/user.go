@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -24,7 +25,7 @@ func NewUserService(repoUser repository.User, repoStore repository.Store, repoMi
 func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
 	user, err := s.repoUser.GetUserById(ctx, userId)
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("GetCurrentUser error: %v", err)
 	}
 	user.Sanitize()
 
@@ -34,8 +35,7 @@ func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.Use
 func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
 	correctUser, err := s.repoUser.UpdateUser(ctx, user)
 	if err != nil {
-		//добавить текста к ошибкам fmt.Errorf(...)
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("UpdateUser error: %v", err)
 	}
 	correctUser.Sanitize()
 
@@ -45,8 +45,7 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 func (s *UserService) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) error {
 	_, err := s.repoUser.UpdateUserPhoto(ctx, userId, imagePath)
 	if err != nil {
-		//добавить текста к ошибкам fmt.Errorf(...)
-		return err
+		return fmt.Errorf("UpdateUserPhoto error: %v", err)
 	}
 	//TODO:: сделать добавление нескольких ссылок на фото в бд
 	return nil

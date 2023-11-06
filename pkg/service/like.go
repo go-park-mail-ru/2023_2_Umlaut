@@ -25,9 +25,7 @@ func (s *LikeService) IsUserLiked(ctx context.Context, like model.Like) (bool, e
 	like.LikedByUserId = like.LikedToUserId
 	like.LikedToUserId = tmp
 
-	exists, err := s.repoLike.Exists(ctx, like)
-
-	return exists, err
+	return s.repoLike.Exists(ctx, like)
 }
 
 func (s *LikeService) IsLikeExists(ctx context.Context, like model.Like) (bool, error) {
