@@ -12,6 +12,8 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock.go
+
 type User interface {
 	CreateUser(ctx context.Context, user model.User) (int, error)
 	GetUser(ctx context.Context, mail string) (model.User, error)

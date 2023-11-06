@@ -169,7 +169,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.services.UpdateUserPhoto(r.Context(), currentUser.Id, nil); err != nil {
+	if err = h.services.UpdateUserPhoto(r.Context(), currentUser.Id, nil); err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
