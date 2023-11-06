@@ -89,25 +89,6 @@ VALUES ('Спорт'),
        ('Искусство'),
        ('Наука');
 
-CREATE TABLE "user"
-(
-    id            SERIAL PRIMARY KEY,
-    name          TEXT        NOT NULL,
-    mail          TEXT UNIQUE NOT NULL,
-    password_hash TEXT        NOT NULL,
-    salt          TEXT        NOT NULL,
-    user_gender   SMALLINT CHECK (user_gender BETWEEN 0 AND 1),
-    prefer_gender SMALLINT CHECK (prefer_gender BETWEEN 0 AND 1),
-    description   TEXT,
-    looking       TEXT,
-    image_path    TEXT,
-    education     TEXT,
-    hobbies       TEXT,
-    birthday      DATE,
-    online        BOOLEAN     NOT NULL DEFAULT FALSE,
-    tags          TEXT[]               DEFAULT ARRAY []::TEXT[]
-);
-
 CREATE TABLE tag
 (
     id   SERIAL PRIMARY KEY,
