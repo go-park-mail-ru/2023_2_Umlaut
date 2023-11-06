@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
@@ -18,7 +19,12 @@ func TestHandler_feed(t *testing.T) {
 		Value: "value",
 	}
 	mockUser := model.User{Mail: "max@max.ru", PasswordHash: "passWord", Name: "Max"}
-	jsonData, _ := json.Marshal(mockUser)
+	response := ClientResponseDto[model.User]{
+		Status:  200,
+		Message: "success",
+		Payload: mockUser,
+	}
+	jsonData, _ := json.Marshal(response)
 
 	tests := []struct {
 		name                 string
@@ -31,19 +37,13 @@ func TestHandler_feed(t *testing.T) {
 			name:        "Ok",
 			inputCookie: mockCookie,
 			mockBehavior: func(r *mock_service.MockFeed) {
-				r.EXPECT().GetNextUser(gomock.Any(), mockCookie.Value).Return(mockUser, nil)
+				r.EXPECT().GetNextUser(gomock.Any(), 1).Return(mockUser, nil)
 			},
 			expectedStatusCode:   200,
 			expectedResponseBody: string(jsonData),
 		},
-		{
-			name:                 "No cookie",
-			inputCookie:          nil,
-			mockBehavior:         func(r *mock_service.MockFeed) {},
-			expectedStatusCode:   401,
-			expectedResponseBody: `{"message":"no session"}`,
-		},
 	}
+
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			c := gomock.NewController(t)
@@ -52,19 +52,20 @@ func TestHandler_feed(t *testing.T) {
 			repo := mock_service.NewMockFeed(c)
 			test.mockBehavior(repo)
 
+			ctx := context.WithValue(context.Background(), keyUserID, 1)
 			services := &service.Service{Feed: repo}
-			handler := Handler{services}
+			handler := Handler{services, &ctx}
 
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/feed", handler.feed)
+			mux.HandleFunc("/api/v1/feed", handler.feed)
 
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "/api/feed", nil)
+			req := httptest.NewRequest("GET", "/api/v1/feed", nil)
 			if test.inputCookie != nil {
 				req.AddCookie(test.inputCookie)
 			}
 
-			mux.ServeHTTP(w, req)
+			mux.ServeHTTP(w, req.WithContext(ctx))
 
 			assert.Equal(t, w.Code, test.expectedStatusCode)
 			assert.Equal(t, w.Body.String(), test.expectedResponseBody)

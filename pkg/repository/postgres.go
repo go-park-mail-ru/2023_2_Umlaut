@@ -8,11 +8,10 @@ import (
 )
 
 const (
-	userTable    = "\"user\""
-	likeTable    = "\"like\""
-	dialogTable  = "\"dialog\""
-	tagTable     = "\"tag\""
-	userTagTable = "\"user_tag\""
+	userTable   = "\"user\""
+	likeTable   = "\"like\""
+	dialogTable = "\"dialog\""
+	tagTable    = "\"tag\""
 )
 
 type PostgresConfig struct {

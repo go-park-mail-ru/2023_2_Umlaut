@@ -60,7 +60,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	}
 	if err = h.services.DeleteCookie(r.Context(), session.Value); err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "Invalid cookie deletion")
-
+		return
 	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	session.Path = "/"
