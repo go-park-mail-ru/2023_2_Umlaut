@@ -59,7 +59,7 @@ func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 		session, _ := r.Cookie("session_id")
 		jwtToken := NewJwtToken(h.ctx, secret)
 
-		CSRFToken := r.Header.Get("X-CSRF-Token")
+		CSRFToken := r.Header.Get("X-Csrf-Token")
 
 		valid, err := jwtToken.Check(session.Value, CSRFToken)
 		if err != nil || !valid {
