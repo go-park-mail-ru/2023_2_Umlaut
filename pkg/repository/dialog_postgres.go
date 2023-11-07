@@ -25,7 +25,7 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 		dialog.User1Id = dialog.User2Id
 		dialog.User2Id = tmp
 	}
-	
+
 	var id int
 	query, args, err := psql.Insert(dialogTable).
 		Columns("user1_id", "user2_id").
@@ -68,13 +68,23 @@ func (r *DialogPostgres) Exists(ctx context.Context, dialog model.Dialog) (bool,
 }
 
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
-	query, args, err := psql.Select("*").
-		From(dialogTable).
+	query, args, err := psql.Select(dialogTable + ".id", "user1_id", "user2_id", userTable + ".name").From(dialogTable).
+		InnerJoin(userTable + " ON " + 
+				dialogTable + ".user1_id =" + userTable + ".id OR " + 
+				dialogTable + ".user2_id =" + userTable + ".id"	).
 		Where(sq.Or{
-			sq.Eq{"user1_id": userId},
-			sq.Eq{"user2_id": userId}}).
+			sq.And{
+				sq.Eq{"user1_id": userId},
+				sq.NotEq{userTable + ".id": userId},
+			},
+			sq.And{
+				sq.Eq{"user2_id": userId},
+				sq.NotEq{userTable + ".id": userId},
+			},
+		}).
 		ToSql()
-	if err != nil {
+
+		if err != nil {
 		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 
@@ -91,6 +101,10 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 		if errors.Is(err, pgx.ErrNoRows) {
 			return dialogs, fmt.Errorf("dialogs doesn't exists for userId %d", userId)
 		}
+		if dialog.User2Id == userId {
+			dialog.User2Id = dialog.User1Id
+			dialog.User1Id = userId
+		}
 		dialogs = append(dialogs, dialog)
 	}
 	if err = rows.Err(); err != nil {
@@ -105,6 +119,7 @@ func scanDialog(row pgx.Row, dialog *model.Dialog) error {
 		&dialog.Id,
 		&dialog.User1Id,
 		&dialog.User2Id,
+		&dialog.Сompanion,
 	)
 	return err
 }

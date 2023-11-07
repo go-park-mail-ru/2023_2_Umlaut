@@ -679,6 +679,9 @@ const docTemplate = `{
         "model.Dialog": {
             "type": "object",
             "properties": {
+                "companion": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
