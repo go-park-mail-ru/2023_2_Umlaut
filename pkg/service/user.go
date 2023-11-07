@@ -33,9 +33,20 @@ func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.Use
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+	if user.PasswordHash != "" {
+		if !user.IsValid() {
+			return user, model.InvalidUser
+		}
+		user.Salt = generateSalt()
+		user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
+		err := s.repoUser.UpdateUserPassword(ctx, user)
+		if err != nil {
+			return model.User{}, err
+		}
+	}
 	correctUser, err := s.repoUser.UpdateUser(ctx, user)
 	if err != nil {
-		return model.User{}, fmt.Errorf("UpdateUser error: %v", err)
+		return model.User{}, err
 	}
 	correctUser.Sanitize()
 

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -59,6 +60,14 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	user.Id = r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.UpdateUser(r.Context(), user)
 	if err != nil {
+		if errors.Is(err, model.AlreadyExists) {
+			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "account with this email already exists")
+			return
+		}
+		if errors.Is(err, model.InvalidUser) {
+			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid password")
+			return
+		}
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}

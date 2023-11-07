@@ -27,8 +27,8 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, err
 	user.Salt = generateSalt()
 	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(ctx, user)
-	if err != nil {
-		return 0, errors.New("account with this email already exists")
+	if errors.Is(err, model.AlreadyExists) {
+		fmt.Println("account with this email already exists")
 	}
 	return id, err
 }

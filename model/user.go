@@ -13,7 +13,7 @@ type User struct {
 	Id           int        `json:"id" db:"id"`
 	Name         string     `json:"name" db:"name" binding:"required"`
 	Mail         string     `json:"mail" db:"mail" binding:"required"`
-	PasswordHash string     `json:"password,omitempty" db:"password_hash" binding:"required" swaggerignore:"true"`
+	PasswordHash string     `json:"password" db:"password_hash" binding:"required"`
 	Salt         string     `json:"-" db:"salt"`
 	UserGender   *int       `json:"user_gender" db:"user_gender"`
 	PreferGender *int       `json:"prefer_gender" db:"prefer_gender"`

@@ -128,6 +128,8 @@ definitions:
         type: string
       online:
         type: boolean
+      password:
+        type: string
       prefer_gender:
         type: integer
       tags:
@@ -139,8 +141,9 @@ definitions:
     required:
     - mail
     - name
+    - password
     type: object
-host: umlaut-bmstu.me:8000
+host: localhost:8000
 info:
   contact: {}
   description: API Server for Umlaut Application

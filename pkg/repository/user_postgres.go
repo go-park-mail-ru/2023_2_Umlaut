@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -35,7 +36,12 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 	query += " RETURNING id"
 	row := r.db.QueryRow(ctx, query, args...)
 	err = row.Scan(&id)
-
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return 0, model.AlreadyExists
+		}
+		return 0, err
+	}
 	return id, err
 }
 
@@ -124,7 +130,32 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
 
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return updatedUser, model.AlreadyExists
+		}
+	}
+
 	return updatedUser, err
+}
+
+func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) error {
+	query, args, err := psql.Update(userTable).
+		Set("password_hash", user.PasswordHash).
+		Set("salt", user.Salt).
+		Where(sq.Eq{"id": user.Id}).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
+	query += " RETURNING *"
+	var updatedUser model.User
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &updatedUser)
+
+	return err
 }
 
 func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error) {
