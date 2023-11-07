@@ -6,3 +6,7 @@ type Dialog struct {
 	User2Id int `json:"user2_id" db:"user2_id"`
 	Сompanion string `json:"companion"`
 }
+
+func (d *Dialog) Sanitize() {
+	d.Сompanion = policy.Sanitize(d.Сompanion)
+}
