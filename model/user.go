@@ -62,6 +62,14 @@ func (u *User) Sanitize() {
 	if u.Hobbies != nil {
 		*u.Hobbies = policy.Sanitize(*u.Hobbies)
 	}
+	if u.Tags != nil {
+		for i := 0; i < len(*u.Tags); i++ {
+			(*u.Tags)[i] = policy.Sanitize((*u.Tags)[i])
+		}
+	}
+	u.Name = policy.Sanitize(u.Name)
+	u.Mail = policy.Sanitize(u.Mail)
+
 
 	u.PasswordHash = ""
 }
