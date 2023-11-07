@@ -106,13 +106,7 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 		}
 	} //На время, пока только одна фотка в бд
 
-	fileName, err := h.services.CreateFile(r.Context(), id, file, head.Size)
-	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	err = h.services.UpdateUserPhoto(r.Context(), id, &fileName)
+	_, err = h.services.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
@@ -175,11 +169,6 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	if err = h.services.UpdateUserPhoto(r.Context(), currentUser.Id, nil); err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}

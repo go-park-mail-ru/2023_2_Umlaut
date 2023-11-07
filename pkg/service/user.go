@@ -53,15 +53,6 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 	return correctUser, nil
 }
 
-func (s *UserService) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) error {
-	_, err := s.repoUser.UpdateUserPhoto(ctx, userId, imagePath)
-	if err != nil {
-		return fmt.Errorf("UpdateUserPhoto error: %v", err)
-	}
-	//TODO:: сделать добавление нескольких ссылок на фото в бд
-	return nil
-}
-
 func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error) {
 	bucketName := getBucketName(userId)
 	fileName := generateImageName()
@@ -79,6 +70,15 @@ func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart
 
 	contentType := http.DetectContentType(buffer)
 	err := s.repoMinio.UploadFile(ctx, bucketName, fileName, contentType, file, size)
+	if err != nil {
+		return fileName, fmt.Errorf("CreateFile error: %v", err)
+	}
+
+	_, err = s.repoUser.UpdateUserPhoto(ctx, userId, &fileName)
+	if err != nil {
+		return fileName, fmt.Errorf("CreateFile error: %v", err)
+	}
+	//TODO:: сделать добавление нескольких ссылок на фото в бд
 
 	return fileName, err
 }
@@ -93,6 +93,14 @@ func (s *UserService) GetFile(ctx context.Context, userId int, fileName string) 
 func (s *UserService) DeleteFile(ctx context.Context, userId int, fileName string) error {
 	bucketName := getBucketName(userId)
 	err := s.repoMinio.DeleteFile(ctx, bucketName, fileName)
+	if err != nil {
+		return fmt.Errorf("DeleteFile error: %v", err)
+	}
+
+	_, err = s.repoUser.UpdateUserPhoto(ctx, userId, nil)
+	if err != nil {
+		return fmt.Errorf("DeleteFile error: %v", err)
+	}
 
 	return err
 }
