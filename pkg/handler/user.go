@@ -33,7 +33,8 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
 		return
 	}
-	w.Header().Set("X-CSRF-Token", token)
+	w.Header().Set("X-Csrf-Token", token)
+	w.Header().Set("Access-Control-Expose-Headers", "X-Csrf-Token")
 
 	NewSuccessClientResponseDto(h.ctx, w, currentUser)
 }
