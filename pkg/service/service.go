@@ -34,8 +34,6 @@ type User interface {
 
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) error
-	IsUserLiked(ctx context.Context, like model.Like) (bool, error)
-	IsLikeExists(ctx context.Context, like model.Like) (bool, error)
 }
 
 type Dialog interface {
@@ -61,7 +59,7 @@ func NewService(repo *repository.Repository) *Service {
 		Authorization: NewAuthService(repo.User, repo.Store),
 		Feed:          NewFeedService(repo.User, repo.Store, repo.Dialog),
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
-		Like:          NewLikeService(repo.Like),
+		Like:          NewLikeService(repo.Like, repo.Dialog),
 		Dialog:        NewDialogService(repo.Dialog),
 		Tag:           NewTagService(repo.Tag),
 	}

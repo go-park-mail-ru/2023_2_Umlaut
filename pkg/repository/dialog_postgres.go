@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -39,39 +40,19 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 	query += " RETURNING id"
 	row := r.db.QueryRow(ctx, query, args...)
 	err = row.Scan(&id)
-
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return 0, model.AlreadyExists
+		}
+	}
 	return id, err
 }
 
-func (r *DialogPostgres) Exists(ctx context.Context, dialog model.Dialog) (bool, error) {
-	query, args, err := psql.Select("*").
-		From(dialogTable).
-		Where(sq.Or{
-			sq.Eq{"user1_id": dialog.User1Id, "user2_id": dialog.User2Id},
-			sq.Eq{"user1_id": dialog.User2Id, "user2_id": dialog.User1Id}}).
-		ToSql()
-	if err != nil {
-		return false, fmt.Errorf("failed to check is dialog exists. err: %w", err)
-	}
-
-	row := r.db.QueryRow(ctx, query, args...)
-	err = scanDialog(row, &dialog)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return false, nil
-	}
-
-	if err != nil {
-		return false, fmt.Errorf("failed to check is dialog exists. err: %w", err)
-	}
-
-	return true, nil
-}
-
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
-	query, args, err := psql.Select(dialogTable + ".id", "user1_id", "user2_id", userTable + ".name").From(dialogTable).
-		InnerJoin(userTable + " ON " + 
-				dialogTable + ".user1_id =" + userTable + ".id OR " + 
-				dialogTable + ".user2_id =" + userTable + ".id"	).
+	query, args, err := psql.Select(dialogTable+".id", "user1_id", "user2_id", userTable+".name").From(dialogTable).
+		InnerJoin(userTable + " ON " +
+			dialogTable + ".user1_id =" + userTable + ".id OR " +
+			dialogTable + ".user2_id =" + userTable + ".id").
 		Where(sq.Or{
 			sq.And{
 				sq.Eq{"user1_id": userId},
@@ -84,7 +65,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 		}).
 		ToSql()
 
-		if err != nil {
+	if err != nil {
 		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 

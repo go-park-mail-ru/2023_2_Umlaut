@@ -2,32 +2,33 @@ package service
 
 import (
 	"context"
-
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 )
 
 type LikeService struct {
-	repoLike repository.Like
+	repoLike   repository.Like
+	repoDialog repository.Dialog
 }
 
-func NewLikeService(repoLike repository.Like) *LikeService {
-	return &LikeService{repoLike: repoLike}
+func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog) *LikeService {
+	return &LikeService{repoLike: repoLike, repoDialog: repoDialog}
 }
 
 func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {
-	_, err := s.repoLike.CreateLike(ctx, like)
+	mutual, err := s.repoLike.IsMutualLike(ctx, like)
+	if err != nil {
+		return err
+	}
+	if mutual {
+		dialog := model.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId}
+		_, errDialog := s.repoDialog.CreateDialog(ctx, dialog)
+		if errDialog != nil {
+			return errDialog
+		}
+		return model.MutualLike
+	}
+
+	_, err = s.repoLike.CreateLike(ctx, like)
 	return err
-}
-
-func (s *LikeService) IsUserLiked(ctx context.Context, like model.Like) (bool, error) {
-	tmp := like.LikedByUserId
-	like.LikedByUserId = like.LikedToUserId
-	like.LikedToUserId = tmp
-
-	return s.repoLike.Exists(ctx, like)
-}
-
-func (s *LikeService) IsLikeExists(ctx context.Context, like model.Like) (bool, error) {
-	return s.repoLike.Exists(ctx, like)
 }

@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "umlaut-bmstu.me:8000",
+    "host": "localhost:8000",
     "basePath": "/",
     "paths": {
         "/api/v1/dialogs": {
@@ -144,20 +144,8 @@
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }

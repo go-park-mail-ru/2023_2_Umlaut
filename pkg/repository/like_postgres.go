@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -21,6 +22,12 @@ func NewLikePostgres(db *pgxpool.Pool) *LikePostgres {
 }
 
 func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.Like, error) {
+	if like.LikedToUserId < like.LikedByUserId {
+		tmp := like.LikedToUserId
+		like.LikedToUserId = like.LikedByUserId
+		like.LikedByUserId = tmp
+	}
+
 	query, args, err := psql.Insert(likeTable).
 		Columns("liked_by_user_id", "liked_to_user_id").
 		Values(like.LikedByUserId, like.LikedToUserId).
@@ -34,11 +41,22 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 	var newLike model.Like
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanLike(row, &newLike)
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return newLike, model.AlreadyExists
+		}
+	}
 
 	return newLike, err
 }
 
-func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error) {
+func (r *LikePostgres) IsMutualLike(ctx context.Context, like model.Like) (bool, error) {
+	if like.LikedToUserId < like.LikedByUserId {
+		tmp := like.LikedToUserId
+		like.LikedToUserId = like.LikedByUserId
+		like.LikedByUserId = tmp
+	}
+
 	query, args, err := psql.Select("*").
 		From(likeTable).
 		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
@@ -53,11 +71,7 @@ func (r *LikePostgres) Exists(ctx context.Context, like model.Like) (bool, error
 		return false, nil
 	}
 
-	if err != nil {
-		return false, fmt.Errorf("failed to check is like exists. err: %w", err)
-	}
-
-	return true, nil
+	return true, err
 }
 
 func scanLike(row pgx.Row, like *model.Like) error {

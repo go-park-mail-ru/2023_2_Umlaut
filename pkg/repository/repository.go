@@ -27,13 +27,12 @@ type User interface {
 
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) (model.Like, error)
-	Exists(ctx context.Context, like model.Like) (bool, error)
+	IsMutualLike(ctx context.Context, like model.Like) (bool, error)
 }
 
 type Dialog interface {
 	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
 	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
-	Exists(ctx context.Context, dialog model.Dialog) (bool, error)
 }
 
 type Tag interface {
