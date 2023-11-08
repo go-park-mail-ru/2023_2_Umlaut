@@ -4,6 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/gorilla/mux"
 )
 
 // @Summary get user information
@@ -11,28 +16,161 @@ import (
 // @ID user
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.User
-// @Failure 400,404 {object} errorResponse
-// @Router /api/user [get]
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 404,500 {object} ClientResponseDto[string]
+// @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		newErrorResponse(w, http.StatusBadRequest, "Failed")
-	}
-
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	currentUser, err := h.services.GetCurrentUser(r.Context(), session.Value)
+	id := r.Context().Value(keyUserID).(int)
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(currentUser)
-	w.Header().Set("Content-Type", "application/json")
+	session, _ := r.Cookie("session_id")
+	jwtToken := NewJwtToken(&h.ctx, secret)
+	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
+		return
+	}
+	w.Header().Set("X-Csrf-Token", token)
+	w.Header().Set("Access-Control-Expose-Headers", "*")
+
+	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
+}
+
+// @Summary update user
+// @Tags user
+// @ID user
+// @Accept  json
+// @Produce  json
+// @Param input body model.User true "User data to update"
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user [post]
+func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var user model.User
+	if err := decoder.Decode(&user); err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	user.Id = r.Context().Value(keyUserID).(int)
+	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
+	if err != nil {
+		if errors.Is(err, model.AlreadyExists) {
+			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "account with this email already exists")
+			return
+		}
+		if errors.Is(err, model.InvalidUser) {
+			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid field for update")
+			return
+		}
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
+}
+
+// @Summary update user photo
+// @Tags user
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "file"
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user/photo [post]
+func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value(keyUserID).(int)
+	r.ParseMultipartForm(5 * 1024 * 1025)
+	file, head, err := r.FormFile("file")
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	defer file.Close()
+
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if currentUser.ImagePath != nil {
+		err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
+		if err != nil {
+			newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	} //На время, пока только одна фотка в бд
+
+	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	NewSuccessClientResponseDto(&h.ctx, w, "")
+}
+
+// @Summary get user photo
+// @Tags user
+// @Accept  json
+// @Param id path integer true "User ID"
+// @Success 200
+// @Failure 400,401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user/{id}/photo [get]
+func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid params")
+		return
+	}
+
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if currentUser.ImagePath == nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
+		return
+	}
+	buffer, contentType, err := h.services.User.GetFile(r.Context(), id, *currentUser.ImagePath)
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", contentType)
 	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	w.Write(buffer)
+}
+
+// @Summary delete user photo
+// @Tags user
+// @Accept  json
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
+// @Router /api/v1/user/photo [delete]
+func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value(keyUserID).(int)
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if currentUser.ImagePath == nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "This user has no photos")
+		return
+	}
+	err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	NewSuccessClientResponseDto(&h.ctx, w, "")
 }

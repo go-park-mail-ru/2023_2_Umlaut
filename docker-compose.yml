@@ -17,7 +17,7 @@ services:
     image: postgres:latest
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
-      - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=1474
     ports:
@@ -27,3 +27,20 @@ services:
     image: redis:latest
     ports:
       - 6379:6379
+
+  minio:
+   image: minio/minio:latest
+   command: server /data --address ":9000" --console-address ":9001"
+   ports:
+     - "9000:9000"
+     - "9001:9001"
+   environment:
+     MINIO_ROOT_USER: umlaut
+     MINIO_ROOT_PASSWORD: minio123
+   volumes:
+     - ./.database/minio-storage:/data
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+     interval: 30s
+     timeout: 20s
+     retries: 3

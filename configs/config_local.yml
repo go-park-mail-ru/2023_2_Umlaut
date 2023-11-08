@@ -1,0 +1,39 @@
+port: "8000"
+
+postgres:
+  username: "postgres"
+  host: "localhost"
+  port: "5433"
+  dbname: "postgres"
+  sslmode: "disable"
+  password: "1474"
+
+redis:
+  addr: "localhost:6379"
+  db: "0"
+
+minio:
+  user: "umlaut"
+  password: "minio123"
+  sslmode: false
+  endpoint: "localhost:9000"
+
+cors:
+  origins: [
+    "http://37.139.32.76:80",
+    "http://37.139.32.76",
+    "http://37.139.32.76:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://umlaut-bmstu.me",
+    "http://umlaut-bmstu.me:8000",
+    "http://localhost:8001"
+  ]
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "HEAD",
+    "OPTIONS"
+  ]

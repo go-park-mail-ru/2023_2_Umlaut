@@ -1,31 +1,56 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"context"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Handler struct {
 	services *service.Service
+	ctx      context.Context
 }
 
-func NewHandler(services *service.Service) *Handler {
-	return &Handler{services: services}
+func NewHandler(services *service.Service, ctx context.Context) *Handler {
+	return &Handler{services: services, ctx: ctx}
 }
 
 func (h *Handler) InitRoutes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+	r := mux.NewRouter()
+	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://umlaut-bmstu.me:8000/swagger/doc.json"),
+	))
 
-	mux.HandleFunc("/auth/login", h.signIn)
-	mux.HandleFunc("/auth/logout", h.logout)
-	mux.HandleFunc("/auth/sign-up", h.signUp)
+	authRouter := r.PathPrefix("/auth").Subrouter()
+	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
+	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
+	authRouter.HandleFunc("/logout", h.logout)
 
-	mux.HandleFunc("/api/feed", h.feed)
-	mux.HandleFunc("/api/user", h.user)
+	apiRouter := r.PathPrefix("/api/v1").Subrouter()
+	apiRouter.Use(
+		h.csrfMiddleware,
+		h.authMiddleware,
+	)
+	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
+	apiRouter.HandleFunc("/feed/users", h.getNextUsers).Methods("GET")
+	apiRouter.HandleFunc("/user", h.user).Methods("GET")
+	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user/photo", h.updateUserPhoto).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user/{id}/photo", h.getUserPhoto).Methods("GET")
+	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
+	apiRouter.HandleFunc("/like", h.createLike).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
+	apiRouter.HandleFunc("/tags", h.getAllTags).Methods("GET")
 
-	return mux
+	r.Use(
+		h.loggingMiddleware,
+		h.panicRecoveryMiddleware,
+		h.corsMiddleware,
+	)
+
+	return r
 }
