@@ -9,14 +9,15 @@ import (
 )
 
 func TestDialogPostgres_CreateDialog(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
+	
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewDialogPostgres(pool)
-
-	ctx := context.Background()
 
 	tests := []struct {
 		name        string

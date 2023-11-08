@@ -43,7 +43,7 @@ func main() {
 
 	ctx := context.WithValue(context.Background(), "logger", logger)
 
-	db, err := initPostgres()
+	db, err := initPostgres(ctx)
 	if err != nil {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
@@ -85,8 +85,8 @@ func initLogger() (*zap.Logger, error) {
 	return config.Build()
 }
 
-func initPostgres() (*pgxpool.Pool, error) {
-	return repository.NewPostgresDB(repository.PostgresConfig{
+func initPostgres(ctx context.Context) (*pgxpool.Pool, error) {
+	return repository.NewPostgresDB(ctx, repository.PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),
 		Username: viper.GetString("postgres.username"),

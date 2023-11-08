@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func initPostgres() (*pgxpool.Pool, error) {
-	return NewPostgresDB(PostgresConfig{
+func initPostgres(ctx context.Context) (*pgxpool.Pool, error) {
+	return NewPostgresDB(ctx, PostgresConfig{
 		Host:     "localhost",
 		Port:     "5431",
 		Username: "postgres",
@@ -21,14 +21,15 @@ func initPostgres() (*pgxpool.Pool, error) {
 }
 
 func TestUserPostgres_CreateUser(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewUserPostgres(pool)
 
-	ctx := context.Background()
 
 	tests := []struct {
 		name         string
@@ -77,14 +78,15 @@ func TestUserPostgres_CreateUser(t *testing.T) {
 }
 
 func TestUserPostgres_GetUser(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
+
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewUserPostgres(pool)
-
-	ctx := context.Background()
 
 	tests := []struct {
 		name         string
@@ -132,14 +134,16 @@ func TestUserPostgres_GetUser(t *testing.T) {
 }
 
 func TestUserPostgres_GetUserById(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
+	
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewUserPostgres(pool)
 
-	ctx := context.Background()
 
 	tests := []struct {
 		name         string
@@ -187,14 +191,15 @@ func TestUserPostgres_GetUserById(t *testing.T) {
 }
 
 func TestUserPostgres_UpdateUser(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
+	
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewUserPostgres(pool)
-
-	ctx := context.Background()
 
 	tests := []struct {
 		name        string
@@ -239,14 +244,16 @@ func TestUserPostgres_UpdateUser(t *testing.T) {
 }
 
 func TestUserPostgres_UpdateUserPhoto(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
+	
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewUserPostgres(pool)
 
-	ctx := context.Background()
 	image_path1 := "testimagepath1"
 
 	tests := []struct {
@@ -289,14 +296,15 @@ func TestUserPostgres_UpdateUserPhoto(t *testing.T) {
 }
 
 func TestUserPostgres_GetNextUsers(t *testing.T) {
-	pool, err := initPostgres()
+	ctx := context.Background()
+
+	pool, err := initPostgres(ctx)
+	
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 	}
 
 	repo := NewUserPostgres(pool)
-
-	ctx := context.Background()
 
 	tests := []struct {
 		name        string
