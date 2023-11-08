@@ -15,10 +15,10 @@ import (
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db *pgxpool.Conn
+	db *pgxpool.Pool
 }
 
-func NewUserPostgres(db *pgxpool.Conn) *UserPostgres {
+func NewUserPostgres(db *pgxpool.Pool) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 

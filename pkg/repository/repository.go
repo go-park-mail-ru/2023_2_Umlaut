@@ -60,7 +60,7 @@ type Repository struct {
 	FileServer FileServer
 }
 
-func NewRepository(db *pgxpool.Conn, redisClient *redis.Client, minioClient *minio.Client) *Repository {
+func NewRepository(db *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),

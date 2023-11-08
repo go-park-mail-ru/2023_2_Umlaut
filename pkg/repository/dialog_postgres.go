@@ -13,10 +13,10 @@ import (
 )
 
 type DialogPostgres struct {
-	db *pgxpool.Conn
+	db *pgxpool.Pool
 }
 
-func NewDialogPostgres(db *pgxpool.Conn) *DialogPostgres {
+func NewDialogPostgres(db *pgxpool.Pool) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 

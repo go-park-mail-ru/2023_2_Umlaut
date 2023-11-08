@@ -10,10 +10,10 @@ import (
 )
 
 type TagPostgres struct {
-	db *pgxpool.Conn
+	db *pgxpool.Pool
 }
 
-func NewTagPostgres(db *pgxpool.Conn) *TagPostgres {
+func NewTagPostgres(db *pgxpool.Pool) *TagPostgres {
 	return &TagPostgres{db: db}
 }
 

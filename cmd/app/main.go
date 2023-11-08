@@ -85,7 +85,7 @@ func initLogger() (*zap.Logger, error) {
 	return config.Build()
 }
 
-func initPostgres() (*pgxpool.Conn, error) {
+func initPostgres() (*pgxpool.Pool, error) {
 	return repository.NewPostgresDB(repository.PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),

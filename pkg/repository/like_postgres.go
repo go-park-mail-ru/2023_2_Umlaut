@@ -14,10 +14,10 @@ import (
 )
 
 type LikePostgres struct {
-	db *pgxpool.Conn
+	db *pgxpool.Pool
 }
 
-func NewLikePostgres(db *pgxpool.Conn) *LikePostgres {
+func NewLikePostgres(db *pgxpool.Pool) *LikePostgres {
 	return &LikePostgres{db: db}
 }
 

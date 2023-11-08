@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	"github.com/jackc/pgx/v5"
 )
 
 const (
@@ -24,8 +22,8 @@ type PostgresConfig struct {
 	SSLMode  string
 }
 
-func NewPostgresDB(cfg PostgresConfig) (*pgxpool.Conn, error) {
-	db, err := pgx.Connect(context.Background(), fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+func NewPostgresDB(cfg PostgresConfig) (*pgxpool.Pool, error) {
+	db, err := pgxpool.New(context.Background(), fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
 	//Пробросить контекст
 	if err != nil {
