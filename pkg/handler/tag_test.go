@@ -48,7 +48,7 @@ func TestHandler_getAllTags(t *testing.T) {
 
 			ctx := context.Background()
 			services := &service.Service{Tag: tagService}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/api/v1/tags", nil)

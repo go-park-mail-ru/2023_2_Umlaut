@@ -64,7 +64,7 @@ func TestHandler_feed(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, 1)
 			services := &service.Service{Feed: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/feed", handler.feed)
@@ -134,7 +134,7 @@ func TestHandler_getNextUsers(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, 1)
 			services := &service.Service{Feed: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/feed/users", handler.getNextUsers)

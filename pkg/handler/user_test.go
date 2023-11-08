@@ -63,7 +63,7 @@ func TestHandler_user(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, 1)
 			services := &service.Service{User: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user", handler.user)
@@ -177,7 +177,7 @@ func TestHandler_updateUser(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, 0)
 			services := &service.Service{User: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user", handler.updateUser)
@@ -228,7 +228,7 @@ func TestHandler_updateUserPhoto(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, 1)
 			services := &service.Service{User: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user/photo", handler.updateUserPhoto)
@@ -317,7 +317,7 @@ func TestHandler_deleteUserPhoto(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, mockUserID)
 			services := &service.Service{User: repoUser}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user/photo", handler.deleteUserPhoto)

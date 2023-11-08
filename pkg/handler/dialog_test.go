@@ -62,7 +62,7 @@ func TestHandler_getDialogs(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, mockUserID)
 			services := &service.Service{Dialog: repoDialog}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/dialogs", handler.getDialogs)

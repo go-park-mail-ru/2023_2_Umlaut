@@ -15,10 +15,10 @@ import (
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	nextUser, err := h.services.Feed.GetNextUser(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(h.ctx, w, nextUser)
+	NewSuccessClientResponseDto(&h.ctx, w, nextUser)
 }
 
 // @Summary get users for feed
@@ -31,9 +31,9 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getNextUsers(w http.ResponseWriter, r *http.Request) {
 	nextUsers, err := h.services.Feed.GetNextUsers(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(h.ctx, w, nextUsers)
+	NewSuccessClientResponseArrayDto(&h.ctx, w, nextUsers)
 }

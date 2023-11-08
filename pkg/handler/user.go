@@ -23,21 +23,21 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	session, _ := r.Cookie("session_id")
-	jwtToken := NewJwtToken(h.ctx, secret)
+	jwtToken := NewJwtToken(&h.ctx, secret)
 	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
 		return
 	}
 	w.Header().Set("X-Csrf-Token", token)
 	w.Header().Set("Access-Control-Expose-Headers", "*")
 
-	NewSuccessClientResponseDto(h.ctx, w, currentUser)
+	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
 }
 
 // @Summary update user
@@ -53,7 +53,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user model.User
 	if err := decoder.Decode(&user); err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
@@ -61,18 +61,18 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
 		if errors.Is(err, model.AlreadyExists) {
-			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "account with this email already exists")
+			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "account with this email already exists")
 			return
 		}
 		if errors.Is(err, model.InvalidUser) {
-			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid field for update")
+			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid field for update")
 			return
 		}
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseDto(h.ctx, w, currentUser)
+	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
 }
 
 // @Summary update user photo
@@ -88,30 +88,30 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	defer file.Close()
 
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if currentUser.ImagePath != nil {
 		err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 		if err != nil {
-			newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+			newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 			return
 		}
 	} //На время, пока только одна фотка в бд
 
 	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(h.ctx, w, "")
+	NewSuccessClientResponseDto(&h.ctx, w, "")
 }
 
 // @Summary get user photo
@@ -124,23 +124,23 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid params")
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid params")
 		return
 	}
 
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusNotFound, "This user has no photos")
+		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
 		return
 	}
 	buffer, contentType, err := h.services.User.GetFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusNotFound, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -159,18 +159,18 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "This user has no photos")
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "This user has no photos")
 		return
 	}
 	err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(h.ctx, w, "")
+	NewSuccessClientResponseDto(&h.ctx, w, "")
 }

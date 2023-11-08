@@ -84,7 +84,7 @@ func TestHandler_createLike(t *testing.T) {
 
 			ctx := context.WithValue(context.Background(), keyUserID, 1)
 			services := &service.Service{Like: repoLike, Dialog: repoDialog}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/like", handler.createLike)

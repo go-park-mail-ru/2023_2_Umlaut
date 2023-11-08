@@ -79,7 +79,7 @@ func TestHandler_signUp(t *testing.T) {
 
 			ctx := context.Background()
 			services := &service.Service{Authorization: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/auth/sign-up", handler.signUp)
@@ -159,7 +159,7 @@ func TestHandler_signIn(t *testing.T) {
 
 			ctx := context.Background()
 			services := &service.Service{Authorization: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/auth/login", handler.signIn)
@@ -227,7 +227,7 @@ func TestHandler_logout(t *testing.T) {
 
 			ctx := context.Background()
 			services := &service.Service{Authorization: repo}
-			handler := Handler{services, &ctx}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/auth/logout", handler.logout)
