@@ -28,7 +28,7 @@ services:
     environment:
       POSTGRES_PASSWORD: 1474
     ports:
-      - 5433:5432
+      - 5431:5432
     volumes:
       - ./.database/postgres/test-data:/var/lib/postgresql/data
       - ./db/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql

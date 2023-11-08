@@ -12,7 +12,7 @@ import (
 func initPostgres() (*pgx.Conn, error) {
 	return NewPostgresDB(PostgresConfig{
 		Host:     "localhost",
-		Port:     "5433",
+		Port:     "5431",
 		Username: "postgres",
 		DBName:   "postgres",
 		SSLMode:  "disable",
