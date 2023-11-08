@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -144,6 +145,8 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.ctx = context.WithValue(h.ctx, keyStatus, http.StatusOK)
+	h.ctx = context.WithValue(h.ctx, keyMessage, "success")
 	w.Header().Set("Content-Type", contentType)
 	w.WriteHeader(http.StatusOK)
 	w.Write(buffer)
