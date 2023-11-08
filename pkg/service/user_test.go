@@ -220,6 +220,14 @@ func TestUserService_DeleteFile(t *testing.T) {
 			},
 			expectedError: errors.New("DeleteFile error: some error"),
 		},
+		{
+			name: "Error in UpdateUserPhoto",
+			mockBehavior: func(r *mock_repository.MockFileServer, r1 *mock_repository.MockUser) {
+				r.EXPECT().DeleteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+				r1.EXPECT().UpdateUserPhoto(gomock.Any(), mockUserId, nil).Return(nil, errors.New("some error"))
+			},
+			expectedError: errors.New("DeleteFile error: some error"),
+		},
 	}
 
 	for _, test := range tests {

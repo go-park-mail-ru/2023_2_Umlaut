@@ -35,7 +35,7 @@ func TestHandler_signUp(t *testing.T) {
 				r.EXPECT().CreateUser(gomock.Any(), user).Return(1, nil)
 				r.EXPECT().GenerateCookie(gomock.Any(), 1).Return("", nil)
 			},
-			expectedStatusCode:   200,
+			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":200,"message":"success","payload":{"id":1}}`,
 		},
 		{
@@ -43,7 +43,7 @@ func TestHandler_signUp(t *testing.T) {
 			inputBody:            `{"mail": "user@mail.ru"}`,
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
-			expectedStatusCode:   400,
+			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"missing required fields","payload":""}`,
 		},
 		{
@@ -51,7 +51,7 @@ func TestHandler_signUp(t *testing.T) {
 			inputBody:            `{"mail": "user@mail.ru"`,
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
-			expectedStatusCode:   400,
+			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"invalid input body","payload":""}`,
 		},
 		{
@@ -65,8 +65,35 @@ func TestHandler_signUp(t *testing.T) {
 			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
 				r.EXPECT().CreateUser(gomock.Any(), user).Return(0, errors.New(""))
 			},
-			expectedStatusCode:   400,
+			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"","payload":""}`,
+		},
+		{
+			name:      "missing required fields",
+			inputBody: `{"mail": "user@mail.ru", "name": "", "password": "qwerty"}`,
+			inputUser: model.User{
+				Mail:         "user@mail.ru",
+				Name:         "",
+				PasswordHash: "qwerty",
+			},
+			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"status":400,"message":"missing required fields","payload":""}`,
+		},
+		{
+			name:      "GenerateCookie error",
+			inputBody: `{"mail": "user@mail.ru", "name": "Test Name", "password": "qwerty"}`,
+			inputUser: model.User{
+				Mail:         "user@mail.ru",
+				Name:         "Test Name",
+				PasswordHash: "qwerty",
+			},
+			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
+				r.EXPECT().CreateUser(gomock.Any(), user).Return(1, nil)
+				r.EXPECT().GenerateCookie(gomock.Any(), 1).Return("", errors.New("error"))
+			},
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedResponseBody: `{"status":500,"message":"error","payload":""}`,
 		},
 	}
 	for _, test := range tests {
@@ -147,6 +174,21 @@ func TestHandler_signIn(t *testing.T) {
 			},
 			expectedStatusCode:   401,
 			expectedResponseBody: `{"status":401,"message":"invalid mail or password","payload":""}`,
+		},
+		{
+			name:      "GenerateCookie error",
+			inputBody: `{"mail": "user@mail.ru", "name": "Test Name", "password": "qwerty"}`,
+			inputUser: model.User{
+				Mail:         "user@mail.ru",
+				Name:         "Test Name",
+				PasswordHash: "qwerty",
+			},
+			mockBehavior: func(r *mock_service.MockAuthorization, user model.User) {
+				r.EXPECT().GetUser(gomock.Any(), user.Mail, user.PasswordHash).Return(user, nil)
+				r.EXPECT().GenerateCookie(gomock.Any(), user.Id).Return("", errors.New("error"))
+			},
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedResponseBody: `{"status":500,"message":"error","payload":""}`,
 		},
 	}
 	for _, test := range tests {
