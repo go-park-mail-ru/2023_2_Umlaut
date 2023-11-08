@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func initPostgres() (*pgxpool.Conn, error) {
+func initPostgres() (*pgxpool.Pool, error) {
 	return NewPostgresDB(PostgresConfig{
 		Host:     "localhost",
 		Port:     "5431",
