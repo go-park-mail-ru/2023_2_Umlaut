@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -9,16 +10,45 @@ import (
 )
 
 func TestTagService_GetAllTags(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockTagRepo := mock_repository.NewMockTag(ctrl)
-	tagService := NewTagService(mockTagRepo)
-	testTags := []string{"Test", "test"}
-	ctx := context.Background()
-	mockTagRepo.EXPECT().GetAllTags(ctx).Return(testTags, nil)
+	mockTags := []string{"tag1", "tag2", "tag3"}
 
-	tags, err := tagService.GetAllTags(ctx)
+	tests := []struct {
+		name          string
+		mockBehavior  func(r *mock_repository.MockTag)
+		expectedList  []string
+		expectedError error
+	}{
+		{
+			name: "Success",
+			mockBehavior: func(r *mock_repository.MockTag) {
+				r.EXPECT().GetAllTags(gomock.Any()).Return(mockTags, nil)
+			},
+			expectedList:  mockTags,
+			expectedError: nil,
+		},
+		{
+			name: "Error Getting Tags",
+			mockBehavior: func(r *mock_repository.MockTag) {
+				r.EXPECT().GetAllTags(gomock.Any()).Return(nil, errors.New("get tags error"))
+			},
+			expectedList:  nil,
+			expectedError: errors.New("get tags error"),
+		},
+	}
 
-	assert.NoError(t, err)
-	assert.Equal(t, tags, testTags)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			c := gomock.NewController(t)
+			defer c.Finish()
+
+			repoTag := mock_repository.NewMockTag(c)
+			test.mockBehavior(repoTag)
+
+			service := &TagService{repoTag: repoTag}
+			tags, err := service.GetAllTags(context.Background())
+
+			assert.Equal(t, test.expectedList, tags)
+			assert.Equal(t, test.expectedError, err)
+		})
+	}
 }
