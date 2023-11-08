@@ -6,6 +6,7 @@ postgres:
   port: "5432"
   dbname: "postgres"
   sslmode: "disable"
+  password: "1474"
 
 redis:
   addr: "redis:6379"
@@ -15,7 +16,7 @@ minio:
   user: "umlaut"
   password: "minio123"
   sslmode: false
-  endpoint: "umlaut-bmstu.me"
+  endpoint: "umlaut-bmstu.me:9000"
 
 cors:
   origins: [

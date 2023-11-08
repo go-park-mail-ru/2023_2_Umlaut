@@ -5,10 +5,11 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"math/rand"
-	"time"
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
@@ -24,11 +25,11 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, err
 	if !user.IsValid() {
 		return 0, errors.New("invalid fields")
 	}
-	user.Salt = generateSalt()
+	user.Salt = generateUuid()
 	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(ctx, user)
-	if err != nil {
-		return 0, errors.New("account with this email already exists")
+	if errors.Is(err, model.AlreadyExists) {
+		fmt.Println("account with this email already exists")
 	}
 	return id, err
 }
@@ -47,7 +48,7 @@ func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model
 }
 
 func (s *AuthService) GenerateCookie(ctx context.Context, id int) (string, error) {
-	SID := generateCookie()
+	SID := generateUuid()
 	if err := s.repoStore.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
 		return SID, err
 	}
@@ -79,19 +80,6 @@ func generatePasswordHash(password, salt string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-func generateCookie() string {
-	return randStringRunes(32)
-}
-
-func generateSalt() string {
-	return randStringRunes(22)
-}
-
-func randStringRunes(n int) string {
-	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
+func generateUuid() string {
+	return uuid.NewString()
 }

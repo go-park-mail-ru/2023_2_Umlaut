@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -11,30 +9,31 @@ import (
 // @ID feed
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} model.User
-// @Failure 401,404 {object} errorResponse
-// @Router /api/feed [get]
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 500 {object} ClientResponseDto[string]
+// @Router /api/v1/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		newErrorResponse(w, http.StatusUnauthorized, "no session")
-		return
-	}
-
-	id, err := h.services.GetSessionValue(r.Context(), session.Value)
+	nextUser, err := h.services.Feed.GetNextUser(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorResponse(w, http.StatusUnauthorized, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	NewSuccessClientResponseDto(&h.ctx, w, nextUser)
+}
 
-	nextUser, err := h.services.GetNextUser(r.Context(), id)
+// @Summary get users for feed
+// @Tags feed
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[[]model.User]
+// @Failure 500 {object} ClientResponseDto[string]
+// @Router /api/v1/feed/users [get]
+func (h *Handler) getNextUsers(w http.ResponseWriter, r *http.Request) {
+	nextUsers, err := h.services.Feed.GetNextUsers(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorResponse(w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(nextUser)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	NewSuccessClientResponseArrayDto(&h.ctx, w, nextUsers)
 }

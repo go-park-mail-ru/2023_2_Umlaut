@@ -1,9 +1,69 @@
 basePath: /
 definitions:
-  handler.errorResponse:
+  handler.ClientResponseDto-array_model_Dialog:
     properties:
       message:
         type: string
+      payload:
+        items:
+          $ref: '#/definitions/model.Dialog'
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-array_model_User:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-array_string:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          type: string
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-handler_idResponse:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/handler.idResponse'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-model_User:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/model.User'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-string:
+    properties:
+      message:
+        type: string
+      payload:
+        type: string
+      status:
+        type: integer
+    type: object
+  handler.idResponse:
+    properties:
+      id:
+        type: integer
     type: object
   handler.signInInput:
     properties:
@@ -28,15 +88,37 @@ definitions:
     - name
     - password
     type: object
+  model.Dialog:
+    properties:
+      companion:
+        type: string
+      id:
+        type: integer
+      user1_id:
+        type: integer
+      user2_id:
+        type: integer
+    type: object
+  model.Like:
+    properties:
+      liked_to_user_id:
+        type: integer
+    type: object
   model.User:
     properties:
       age:
         type: integer
+      birthday:
+        type: string
       description:
         type: string
       education:
         type: string
       hobbies:
+        type: string
+      id:
+        type: integer
+      image_path:
         type: string
       looking:
         type: string
@@ -44,14 +126,18 @@ definitions:
         type: string
       name:
         type: string
+      online:
+        type: boolean
       password:
         type: string
       prefer_gender:
-        type: string
+        type: integer
       tags:
-        type: string
+        items:
+          type: string
+        type: array
       user_gender:
-        type: string
+        type: integer
     required:
     - mail
     - name
@@ -64,7 +150,30 @@ info:
   title: Umlaut API
   version: "1.0"
 paths:
-  /api/feed:
+  /api/v1/dialogs:
+    get:
+      consumes:
+      - application/json
+      operationId: dialog
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_model_Dialog'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get user dialogs
+      tags:
+      - dialog
+  /api/v1/feed:
     get:
       consumes:
       - application/json
@@ -75,19 +184,82 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
-        "401":
-          description: Unauthorized
+            $ref: '#/definitions/handler.ClientResponseDto-model_User'
+        "500":
+          description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.errorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user for feed
       tags:
       - feed
-  /api/user:
+  /api/v1/feed/users:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_model_User'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get users for feed
+      tags:
+      - feed
+  /api/v1/like:
+    post:
+      consumes:
+      - application/json
+      operationId: like
+      parameters:
+      - description: Like data to update
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Like'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: create user like
+      tags:
+      - like
+  /api/v1/tags:
+    get:
+      consumes:
+      - application/json
+      operationId: tag
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get all tags
+      tags:
+      - tag
+  /api/v1/user:
     get:
       consumes:
       - application/json
@@ -98,15 +270,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-model_User'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user information
       tags:
       - user
@@ -127,19 +299,70 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.User'
+            $ref: '#/definitions/handler.ClientResponseDto-model_User'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: update user
       tags:
       - user
-  /api/user/photo:
+  /api/v1/user/{id}/photo:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get user photo
+      tags:
+      - user
+  /api/v1/user/photo:
+    delete:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: delete user photo
+      tags:
+      - user
     post:
       consumes:
       - multipart/form-data
@@ -154,14 +377,20 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: update user photo
       tags:
       - user
@@ -182,14 +411,16 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: log in to account
       tags:
       - auth
@@ -203,14 +434,16 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: log out of account
       tags:
       - auth
@@ -232,15 +465,15 @@ paths:
         "200":
           description: OK
           schema:
-            type: integer
+            $ref: '#/definitions/handler.ClientResponseDto-handler_idResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.errorResponse'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: sign up account
       tags:
       - auth

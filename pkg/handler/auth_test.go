@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
@@ -35,7 +36,7 @@ func TestHandler_signUp(t *testing.T) {
 				r.EXPECT().GenerateCookie(gomock.Any(), 1).Return("", nil)
 			},
 			expectedStatusCode:   200,
-			expectedResponseBody: `{"id":1}`,
+			expectedResponseBody: `{"status":200,"message":"success","payload":{"id":1}}`,
 		},
 		{
 			name:                 "Wrong input",
@@ -43,7 +44,7 @@ func TestHandler_signUp(t *testing.T) {
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":"missing required fields"}`,
+			expectedResponseBody: `{"status":400,"message":"missing required fields","payload":""}`,
 		},
 		{
 			name:                 "Wrong json",
@@ -51,7 +52,7 @@ func TestHandler_signUp(t *testing.T) {
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":"invalid input body"}`,
+			expectedResponseBody: `{"status":400,"message":"invalid input body","payload":""}`,
 		},
 		{
 			name:      "Already exists email",
@@ -65,7 +66,7 @@ func TestHandler_signUp(t *testing.T) {
 				r.EXPECT().CreateUser(gomock.Any(), user).Return(0, errors.New(""))
 			},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":""}`,
+			expectedResponseBody: `{"status":400,"message":"","payload":""}`,
 		},
 	}
 	for _, test := range tests {
@@ -76,8 +77,9 @@ func TestHandler_signUp(t *testing.T) {
 			repo := mock_service.NewMockAuthorization(c)
 			test.mockBehavior(repo, test.inputUser)
 
+			ctx := context.Background()
 			services := &service.Service{Authorization: repo}
-			handler := Handler{services}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/auth/sign-up", handler.signUp)
@@ -114,7 +116,7 @@ func TestHandler_signIn(t *testing.T) {
 				r.EXPECT().GenerateCookie(gomock.Any(), user.Id).Return("", nil)
 			},
 			expectedStatusCode:   200,
-			expectedResponseBody: ``,
+			expectedResponseBody: `{"status":200,"message":"success","payload":""}`,
 		},
 		{
 			name:                 "Wrong input",
@@ -122,7 +124,7 @@ func TestHandler_signIn(t *testing.T) {
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":"missing required fields"}`,
+			expectedResponseBody: `{"status":400,"message":"missing required fields","payload":""}`,
 		},
 		{
 			name:                 "Wrong json",
@@ -130,7 +132,7 @@ func TestHandler_signIn(t *testing.T) {
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockAuthorization, user model.User) {},
 			expectedStatusCode:   400,
-			expectedResponseBody: `{"message":"invalid input body"}`,
+			expectedResponseBody: `{"status":400,"message":"invalid input body","payload":""}`,
 		},
 		{
 			name:      "invalid mail or password",
@@ -144,7 +146,7 @@ func TestHandler_signIn(t *testing.T) {
 				r.EXPECT().GetUser(gomock.Any(), user.Mail, user.PasswordHash).Return(user, errors.New("error"))
 			},
 			expectedStatusCode:   401,
-			expectedResponseBody: `{"message":"invalid mail or password"}`,
+			expectedResponseBody: `{"status":401,"message":"invalid mail or password","payload":""}`,
 		},
 	}
 	for _, test := range tests {
@@ -155,8 +157,9 @@ func TestHandler_signIn(t *testing.T) {
 			repo := mock_service.NewMockAuthorization(c)
 			test.mockBehavior(repo, test.inputUser)
 
+			ctx := context.Background()
 			services := &service.Service{Authorization: repo}
-			handler := Handler{services}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/auth/login", handler.signIn)
@@ -191,7 +194,7 @@ func TestHandler_logout(t *testing.T) {
 				r.EXPECT().DeleteCookie(gomock.Any(), cookie.Value).Return(nil)
 			},
 			expectedStatusCode:   200,
-			expectedResponseBody: ``,
+			expectedResponseBody: `{"status":200,"message":"success","payload":""}`,
 		},
 		{
 			name:        "invalid mail or password",
@@ -200,14 +203,14 @@ func TestHandler_logout(t *testing.T) {
 				r.EXPECT().DeleteCookie(gomock.Any(), cookie.Value).Return(errors.New("error"))
 			},
 			expectedStatusCode:   500,
-			expectedResponseBody: `{"message":"Invalid cookie deletion"}`,
+			expectedResponseBody: `{"status":500,"message":"Invalid cookie deletion","payload":""}`,
 		},
 		{
 			name:                 "No cookie",
 			inputCookie:          nil,
 			mockBehavior:         func(r *mock_service.MockAuthorization, cookie *http.Cookie) {},
 			expectedStatusCode:   401,
-			expectedResponseBody: `{"message":"no session"}`,
+			expectedResponseBody: `{"status":401,"message":"no session","payload":""}`,
 		},
 	}
 	for _, test := range tests {
@@ -222,8 +225,9 @@ func TestHandler_logout(t *testing.T) {
 			}
 			test.mockBehavior(repo, cookie)
 
+			ctx := context.Background()
 			services := &service.Service{Authorization: repo}
-			handler := Handler{services}
+			handler := Handler{services, ctx}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/auth/logout", handler.logout)

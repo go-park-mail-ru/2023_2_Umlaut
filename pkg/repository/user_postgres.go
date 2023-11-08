@@ -2,36 +2,64 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"strings"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/jackc/pgx/v5"
 )
 
+var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+
 type UserPostgres struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
-func NewUserPostgres(db *sql.DB) *UserPostgres {
+func NewUserPostgres(db *pgxpool.Pool) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
 func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, error) {
 	var id int
+	query, args, err := psql.Insert(userTable).
+		Columns("name", "mail", "password_hash", "salt").
+		Values(user.Name, user.Mail, user.PasswordHash, user.Salt).
+		ToSql()
 
-	query := fmt.Sprintf("INSERT INTO %s (name, mail, password_hash, salt) values ($1, $2, $3, $4) RETURNING id", usersTable)
-	row := r.db.QueryRowContext(ctx, query, user.Name, user.Mail, user.PasswordHash, user.Salt)
-	err := row.Scan(&id)
+	if err != nil {
+		return 0, err
+	}
 
+	query += " RETURNING id"
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return 0, model.AlreadyExists
+		}
+		return 0, err
+	}
 	return id, err
 }
 
 func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
 	var user model.User
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE mail=$1", usersTable)
-	row := r.db.QueryRowContext(ctx, query, mail)
-	err := ScanUser(row, &user)
+	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
+
+	if err != nil {
+		return user, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &user)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, fmt.Errorf("user with mail: %s not found", mail)
+	}
 
 	return user, err
 }
@@ -39,59 +67,153 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, error) {
 	var user model.User
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1", usersTable)
-	row := r.db.QueryRowContext(ctx, query, id)
-	err := ScanUser(row, &user)
+	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"id": id}).ToSql()
+
+	if err != nil {
+		return user, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &user)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, fmt.Errorf("user with id: %d not found", id)
+	}
 
 	return user, err
 }
 
 func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
 	var nextUser model.User
-	var query string
-	var err error
+	queryBuilder := psql.Select("*").From(userTable).Where(sq.NotEq{"id": user.Id})
 	if user.PreferGender != nil {
-		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 and user_gender = $2 ORDER BY RANDOM() LIMIT 1", usersTable)
-		row := r.db.QueryRowContext(ctx, query, user.Id, user.PreferGender)
-		err = ScanUser(row, &nextUser)
-	} else {
-		query = fmt.Sprintf("SELECT * FROM %s WHERE id != $1 ORDER BY RANDOM() LIMIT 1", usersTable)
-		row := r.db.QueryRowContext(ctx, query, user.Id)
-		err = ScanUser(row, &nextUser)
+		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
+	}
+	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
+
+	query, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return nextUser, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &nextUser)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, fmt.Errorf("user for: %s not found", user.Mail)
 	}
 
 	return nextUser, err
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
-	query := fmt.Sprintf(`
-		UPDATE %s
-		SET name = $2, mail = $3, user_gender = $4, prefer_gender = $5, description = $6, age = $7, looking = $8, education = $9, hobbies = $10, tags = $11
-		WHERE id = $1
-		RETURNING *`, usersTable)
+	query, args, err := psql.Update(userTable).
+		Set("name", user.Name).
+		Set("mail", user.Mail).
+		Set("user_gender", user.UserGender).
+		Set("prefer_gender", user.PreferGender).
+		Set("description", user.Description).
+		Set("birthday", user.Birthday).
+		Set("looking", user.Looking).
+		Set("education", user.Education).
+		Set("hobbies", user.Hobbies).
+		Set("tags", user.Tags).
+		Where(sq.Eq{"id": user.Id}).
+		ToSql()
 
+	if err != nil {
+		return model.User{}, err
+	}
+
+	query += " RETURNING *"
 	var updatedUser model.User
-	row := r.db.QueryRowContext(
-		ctx,
-		query,
-		user.Id,
-		user.Name,
-		user.Mail,
-		user.UserGender,
-		user.PreferGender,
-		user.Description,
-		user.Age,
-		user.Looking,
-		user.Education,
-		user.Hobbies,
-		user.Tags,
-	)
-	err := ScanUser(row, &updatedUser)
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &updatedUser)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return updatedUser, model.AlreadyExists
+		}
+	}
 
 	return updatedUser, err
 }
 
-func ScanUser(row *sql.Row, user *model.User) error {
+func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) error {
+	query, args, err := psql.Update(userTable).
+		Set("password_hash", user.PasswordHash).
+		Set("salt", user.Salt).
+		Where(sq.Eq{"id": user.Id}).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+
+	query += " RETURNING *"
+	var updatedUser model.User
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &updatedUser)
+
+	return err
+}
+
+func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error) {
+	query, args, err := psql.Update(userTable).
+		Set("image_path", imagePath).
+		Where(sq.Eq{"id": userId}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	query += " RETURNING image_path"
+	var updatedImgPath *string
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&updatedImgPath)
+
+	return updatedImgPath, err
+}
+
+func (r *UserPostgres) GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error) {
+	var exp sq.And
+	exp = append(exp, sq.NotEq{"id": user.Id})
+	for _, id := range usedUsersId {
+		exp = append(exp, sq.NotEq{"id": id})
+	}
+
+	queryBuilder := psql.Select("*").From(userTable).Where(exp)
+	if user.PreferGender != nil {
+		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
+	}
+
+	query, args, err := queryBuilder.OrderBy("RANDOM()").Limit(5).ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
+	}
+	defer rows.Close()
+	var users []model.User
+	for rows.Next() {
+		var user model.User
+		err = scanUser(rows, &user)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return users, fmt.Errorf("there are no suitable users for userId %d", user.Id)
+		}
+		users = append(users, user)
+	}
+	if err = rows.Err(); err != nil {
+		return users, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
+	}
+
+	return users, nil
+}
+
+func scanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,
 		&user.Name,
@@ -101,11 +223,15 @@ func ScanUser(row *sql.Row, user *model.User) error {
 		&user.UserGender,
 		&user.PreferGender,
 		&user.Description,
-		&user.Age,
 		&user.Looking,
+		&user.ImagePath,
 		&user.Education,
 		&user.Hobbies,
+		&user.Birthday,
+		&user.Online,
 		&user.Tags,
 	)
+
+	user.CalculateAge()
 	return err
 }

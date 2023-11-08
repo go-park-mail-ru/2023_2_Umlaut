@@ -6,6 +6,7 @@ package mock_service
 
 import (
 	context "context"
+	multipart "mime/multipart"
 	reflect "reflect"
 
 	model "github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -147,6 +148,21 @@ func (mr *MockFeedMockRecorder) GetNextUser(ctx, userId interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextUser", reflect.TypeOf((*MockFeed)(nil).GetNextUser), ctx, userId)
 }
 
+// GetNextUsers mocks base method.
+func (m *MockFeed) GetNextUsers(ctx context.Context, userId int) ([]model.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNextUsers", ctx, userId)
+	ret0, _ := ret[0].([]model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNextUsers indicates an expected call of GetNextUsers.
+func (mr *MockFeedMockRecorder) GetNextUsers(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextUsers", reflect.TypeOf((*MockFeed)(nil).GetNextUsers), ctx, userId)
+}
+
 // MockUser is a mock of User interface.
 type MockUser struct {
 	ctrl     *gomock.Controller
@@ -170,6 +186,35 @@ func (m *MockUser) EXPECT() *MockUserMockRecorder {
 	return m.recorder
 }
 
+// CreateFile mocks base method.
+func (m *MockUser) CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFile", ctx, userId, file, size)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateFile indicates an expected call of CreateFile.
+func (mr *MockUserMockRecorder) CreateFile(ctx, userId, file, size interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFile", reflect.TypeOf((*MockUser)(nil).CreateFile), ctx, userId, file, size)
+}
+
+// DeleteFile mocks base method.
+func (m *MockUser) DeleteFile(ctx context.Context, userId int, fileName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFile", ctx, userId, fileName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFile indicates an expected call of DeleteFile.
+func (mr *MockUserMockRecorder) DeleteFile(ctx, userId, fileName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockUser)(nil).DeleteFile), ctx, userId, fileName)
+}
+
 // GetCurrentUser mocks base method.
 func (m *MockUser) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
 	m.ctrl.T.Helper()
@@ -183,4 +228,163 @@ func (m *MockUser) GetCurrentUser(ctx context.Context, userId int) (model.User, 
 func (mr *MockUserMockRecorder) GetCurrentUser(ctx, userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentUser", reflect.TypeOf((*MockUser)(nil).GetCurrentUser), ctx, userId)
+}
+
+// GetFile mocks base method.
+func (m *MockUser) GetFile(ctx context.Context, userId int, fileName string) ([]byte, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFile", ctx, userId, fileName)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetFile indicates an expected call of GetFile.
+func (mr *MockUserMockRecorder) GetFile(ctx, userId, fileName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockUser)(nil).GetFile), ctx, userId, fileName)
+}
+
+// UpdateUser mocks base method.
+func (m *MockUser) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", ctx, user)
+	ret0, _ := ret[0].(model.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateUser indicates an expected call of UpdateUser.
+func (mr *MockUserMockRecorder) UpdateUser(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUser)(nil).UpdateUser), ctx, user)
+}
+
+// MockLike is a mock of Like interface.
+type MockLike struct {
+	ctrl     *gomock.Controller
+	recorder *MockLikeMockRecorder
+}
+
+// MockLikeMockRecorder is the mock recorder for MockLike.
+type MockLikeMockRecorder struct {
+	mock *MockLike
+}
+
+// NewMockLike creates a new mock instance.
+func NewMockLike(ctrl *gomock.Controller) *MockLike {
+	mock := &MockLike{ctrl: ctrl}
+	mock.recorder = &MockLikeMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockLike) EXPECT() *MockLikeMockRecorder {
+	return m.recorder
+}
+
+// CreateLike mocks base method.
+func (m *MockLike) CreateLike(ctx context.Context, like model.Like) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateLike", ctx, like)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateLike indicates an expected call of CreateLike.
+func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockLike)(nil).CreateLike), ctx, like)
+}
+
+// MockDialog is a mock of Dialog interface.
+type MockDialog struct {
+	ctrl     *gomock.Controller
+	recorder *MockDialogMockRecorder
+}
+
+// MockDialogMockRecorder is the mock recorder for MockDialog.
+type MockDialogMockRecorder struct {
+	mock *MockDialog
+}
+
+// NewMockDialog creates a new mock instance.
+func NewMockDialog(ctrl *gomock.Controller) *MockDialog {
+	mock := &MockDialog{ctrl: ctrl}
+	mock.recorder = &MockDialogMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockDialog) EXPECT() *MockDialogMockRecorder {
+	return m.recorder
+}
+
+// CreateDialog mocks base method.
+func (m *MockDialog) CreateDialog(ctx context.Context, dialog model.Dialog) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDialog", ctx, dialog)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDialog indicates an expected call of CreateDialog.
+func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockDialog)(nil).CreateDialog), ctx, dialog)
+}
+
+// GetDialogs mocks base method.
+func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDialogs", ctx, userId)
+	ret0, _ := ret[0].([]model.Dialog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDialogs indicates an expected call of GetDialogs.
+func (mr *MockDialogMockRecorder) GetDialogs(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogs", reflect.TypeOf((*MockDialog)(nil).GetDialogs), ctx, userId)
+}
+
+// MockTag is a mock of Tag interface.
+type MockTag struct {
+	ctrl     *gomock.Controller
+	recorder *MockTagMockRecorder
+}
+
+// MockTagMockRecorder is the mock recorder for MockTag.
+type MockTagMockRecorder struct {
+	mock *MockTag
+}
+
+// NewMockTag creates a new mock instance.
+func NewMockTag(ctrl *gomock.Controller) *MockTag {
+	mock := &MockTag{ctrl: ctrl}
+	mock.recorder = &MockTagMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTag) EXPECT() *MockTagMockRecorder {
+	return m.recorder
+}
+
+// GetAllTags mocks base method.
+func (m *MockTag) GetAllTags(ctx context.Context) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllTags", ctx)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllTags indicates an expected call of GetAllTags.
+func (mr *MockTagMockRecorder) GetAllTags(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTags", reflect.TypeOf((*MockTag)(nil).GetAllTags), ctx)
 }

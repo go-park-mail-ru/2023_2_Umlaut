@@ -17,7 +17,7 @@ services:
     image: postgres:latest
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
-      - ./migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=1474
     ports:
@@ -30,7 +30,7 @@ services:
 
   minio:
    image: minio/minio:latest
-   command: server --console-address ":9001" /data/
+   command: server /data --address ":9000" --console-address ":9001"
    ports:
      - "9000:9000"
      - "9001:9001"
