@@ -9,8 +9,8 @@ package repository
 // 	"github.com/stretchr/testify/assert"
 // )
 
-// func initPostgres() (*pgxpool.Pool, error) {
-// 	return NewPostgresDB(PostgresConfig{
+// func initPostgres(ctx context.Context) (*pgxpool.Pool, error) {
+// 	return NewPostgresDB(ctx, PostgresConfig{
 // 		Host:     "localhost",
 // 		Port:     "5431",
 // 		Username: "postgres",
@@ -21,14 +21,14 @@ package repository
 // }
 
 // func TestUserPostgres_CreateUser(t *testing.T) {
-// 	pool, err := initPostgres()
+// 	ctx := context.Background()
+
+// 	pool, err := initPostgres(ctx)
 // 	if err != nil {
 // 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 // 	}
 
 // 	repo := NewUserPostgres(pool)
-
-// 	ctx := context.Background()
 
 // 	tests := []struct {
 // 		name         string
@@ -77,14 +77,15 @@ package repository
 // }
 
 // func TestUserPostgres_GetUser(t *testing.T) {
-// 	pool, err := initPostgres()
+// 	ctx := context.Background()
+
+// 	pool, err := initPostgres(ctx)
+
 // 	if err != nil {
 // 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 // 	}
 
 // 	repo := NewUserPostgres(pool)
-
-// 	ctx := context.Background()
 
 // 	tests := []struct {
 // 		name         string
@@ -132,14 +133,15 @@ package repository
 // }
 
 // func TestUserPostgres_GetUserById(t *testing.T) {
-// 	pool, err := initPostgres()
+// 	ctx := context.Background()
+
+// 	pool, err := initPostgres(ctx)
+
 // 	if err != nil {
 // 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 // 	}
 
 // 	repo := NewUserPostgres(pool)
-
-// 	ctx := context.Background()
 
 // 	tests := []struct {
 // 		name         string
@@ -187,14 +189,15 @@ package repository
 // }
 
 // func TestUserPostgres_UpdateUser(t *testing.T) {
-// 	pool, err := initPostgres()
+// 	ctx := context.Background()
+
+// 	pool, err := initPostgres(ctx)
+
 // 	if err != nil {
 // 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 // 	}
 
 // 	repo := NewUserPostgres(pool)
-
-// 	ctx := context.Background()
 
 // 	tests := []struct {
 // 		name        string
@@ -239,14 +242,16 @@ package repository
 // }
 
 // func TestUserPostgres_UpdateUserPhoto(t *testing.T) {
-// 	pool, err := initPostgres()
+// 	ctx := context.Background()
+
+// 	pool, err := initPostgres(ctx)
+
 // 	if err != nil {
 // 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 // 	}
 
 // 	repo := NewUserPostgres(pool)
 
-// 	ctx := context.Background()
 // 	image_path1 := "testimagepath1"
 
 // 	tests := []struct {
@@ -289,14 +294,15 @@ package repository
 // }
 
 // func TestUserPostgres_GetNextUsers(t *testing.T) {
-// 	pool, err := initPostgres()
+// 	ctx := context.Background()
+
+// 	pool, err := initPostgres(ctx)
+
 // 	if err != nil {
 // 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
 // 	}
 
 // 	repo := NewUserPostgres(pool)
-
-// 	ctx := context.Background()
 
 // 	tests := []struct {
 // 		name        string
