@@ -6,18 +6,17 @@ import (
 	"testing"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
 func initPostgres() (*pgx.Conn, error) {
 	return NewPostgresDB(PostgresConfig{
-		Host:     viper.GetString("postgres.host"),
-		Port:     viper.GetString("postgres.port"),
-		Username: viper.GetString("postgres.username"),
-		DBName:   viper.GetString("postgres.dbname"),
-		SSLMode:  viper.GetString("postgres.sslmode"),
-		Password: viper.GetString("postgres.password"), //os.Getenv("DB_PASSWORD"),
+		Host:     "localhost",
+		Port:     "5433",
+		Username: "postgres",
+		DBName:   "postgres",
+		SSLMode:  "disable",
+		Password: "1474",
 	})
 }
 
