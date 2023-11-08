@@ -8,15 +8,15 @@ package repository
 // 	"github.com/stretchr/testify/assert"
 // )
 
-func TestDialogPostgres_CreateDialog(t *testing.T) {
-	pool, err := initPostgres()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
-	}
+// func TestDialogPostgres_CreateDialog(t *testing.T) {
+// 	pool, err := initPostgres()
+// 	if err != nil {
+// 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
+// 	}
 
-	repo := NewDialogPostgres(pool)
+// 	repo := NewDialogPostgres(pool)
 
-	ctx := context.Background()
+// 	ctx := context.Background()
 
 // 	tests := []struct {
 // 		name        string
