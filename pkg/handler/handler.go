@@ -22,7 +22,7 @@ func NewHandler(services *service.Service, ctx context.Context) *Handler {
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8000/swagger/doc.json"),
+		httpSwagger.URL("http://umlaut-bmstu.me:8000/swagger/doc.json"),
 	))
 
 	authRouter := r.PathPrefix("/auth").Subrouter()
