@@ -53,7 +53,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
-			next.ServeHTTP(w, r.WithContext(h.ctx))
+			next.ServeHTTP(w, r)
 			return
 		}
 		session, _ := r.Cookie("session_id")
@@ -67,7 +67,7 @@ func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		next.ServeHTTP(w, r.WithContext(h.ctx))
+		next.ServeHTTP(w, r)
 	})
 }
 
