@@ -9,16 +9,15 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db *pgxpool.Pool
+	db *pgx.Conn
 }
 
-func NewUserPostgres(db *pgxpool.Pool) *UserPostgres {
+func NewUserPostgres(db *pgx.Conn) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 

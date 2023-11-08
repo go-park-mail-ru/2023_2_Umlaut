@@ -26,7 +26,7 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(keyUserID).(int)
 	like.LikedByUserId = userId
 
-	err := h.services.CreateLike(r.Context(), like)
+	err := h.services.Like.CreateLike(r.Context(), like)
 	if err != nil {
 		if errors.Is(err, model.AlreadyExists) {
 			newErrorClientResponseDto(h.ctx, w, http.StatusOK, "already liked")

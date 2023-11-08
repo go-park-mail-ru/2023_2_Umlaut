@@ -9,14 +9,13 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DialogPostgres struct {
-	db *pgxpool.Pool
+	db *pgx.Conn
 }
 
-func NewDialogPostgres(db *pgxpool.Pool) *DialogPostgres {
+func NewDialogPostgres(db *pgx.Conn) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 

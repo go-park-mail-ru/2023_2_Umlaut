@@ -21,7 +21,7 @@ import (
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
-	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
@@ -58,7 +58,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.Id = r.Context().Value(keyUserID).(int)
-	currentUser, err := h.services.UpdateUser(r.Context(), user)
+	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
 		if errors.Is(err, model.AlreadyExists) {
 			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "account with this email already exists")
@@ -93,20 +93,20 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if currentUser.ImagePath != nil {
-		err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
+		err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 		if err != nil {
 			newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 			return
 		}
 	} //На время, пока только одна фотка в бд
 
-	_, err = h.services.CreateFile(r.Context(), id, file, head.Size)
+	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
@@ -128,7 +128,7 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
@@ -138,7 +138,7 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusNotFound, "This user has no photos")
 		return
 	}
-	buffer, contentType, err := h.services.GetFile(r.Context(), id, *currentUser.ImagePath)
+	buffer, contentType, err := h.services.User.GetFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusNotFound, err.Error())
 		return
@@ -157,7 +157,7 @@ func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
-	currentUser, err := h.services.GetCurrentUser(r.Context(), id)
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
@@ -167,7 +167,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "This user has no photos")
 		return
 	}
-	err = h.services.DeleteFile(r.Context(), id, *currentUser.ImagePath)
+	err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return

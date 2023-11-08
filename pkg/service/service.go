@@ -45,12 +45,12 @@ type Tag interface {
 }
 
 type Service struct {
-	Authorization
-	Feed
-	User
-	Like
-	Dialog
-	Tag
+	Authorization Authorization
+	Feed          Feed
+	User          User
+	Like          Like
+	Dialog        Dialog
+	Tag           Tag
 }
 
 func NewService(repo *repository.Repository) *Service {

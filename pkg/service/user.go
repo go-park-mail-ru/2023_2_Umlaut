@@ -37,7 +37,7 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 		if !user.IsValid() {
 			return user, model.InvalidUser
 		}
-		user.Salt = generateSalt()
+		user.Salt = generateUuid()
 		user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 		err := s.repoUser.UpdateUserPassword(ctx, user)
 		if err != nil {

@@ -30,12 +30,12 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.services.GetUser(r.Context(), input.Mail, input.Password)
+	user, err := h.services.Authorization.GetUser(r.Context(), input.Mail, input.Password)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "invalid mail or password")
 		return
 	}
-	SID, err := h.services.GenerateCookie(r.Context(), user.Id)
+	SID, err := h.services.Authorization.GenerateCookie(r.Context(), user.Id)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
@@ -58,7 +58,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "no session")
 		return
 	}
-	if err = h.services.DeleteCookie(r.Context(), session.Value); err != nil {
+	if err = h.services.Authorization.DeleteCookie(r.Context(), session.Value); err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, "Invalid cookie deletion")
 		return
 	}
@@ -93,13 +93,13 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 
 	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
 
-	id, err := h.services.CreateUser(r.Context(), user)
+	id, err := h.services.Authorization.CreateUser(r.Context(), user)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	SID, err := h.services.GenerateCookie(r.Context(), id)
+	SID, err := h.services.Authorization.GenerateCookie(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return

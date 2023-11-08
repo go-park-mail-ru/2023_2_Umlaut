@@ -39,7 +39,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		id, err := h.services.GetSessionValue(r.Context(), session.Value)
+		id, err := h.services.Authorization.GetSessionValue(r.Context(), session.Value)
 		if err != nil {
 			newErrorClientResponseDto(h.ctx, w, http.StatusUnauthorized, "Need auth")
 			return
@@ -103,6 +103,7 @@ func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.Handler {
 				logger.Error("Panic",
 					zap.String("Method", r.Method),
 					zap.String("RequestURI", r.RequestURI),
+					zap.String("Error", err.(string)),
 					zap.String("Message", string(debug.Stack())),
 				)
 				newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))

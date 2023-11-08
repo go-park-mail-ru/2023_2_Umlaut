@@ -5,7 +5,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/minio/minio-go/v7"
@@ -53,15 +53,15 @@ type FileServer interface {
 }
 
 type Repository struct {
-	User
-	Like
-	Dialog
-	Tag
-	Store
-	FileServer
+	User       User
+	Like       Like
+	Dialog     Dialog
+	Tag        Tag
+	Store      Store
+	FileServer FileServer
 }
 
-func NewRepository(db *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
+func NewRepository(db *pgx.Conn, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),

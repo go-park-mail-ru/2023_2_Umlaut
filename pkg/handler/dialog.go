@@ -15,7 +15,7 @@ import (
 func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(keyUserID).(int)
 
-	dialogs, err := h.services.GetDialogs(r.Context(), userId)
+	dialogs, err := h.services.Dialog.GetDialogs(r.Context(), userId)
 	if err != nil {
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())
 		return

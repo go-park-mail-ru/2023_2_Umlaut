@@ -143,7 +143,7 @@ definitions:
     - name
     - password
     type: object
-host: umlaut-bmstu.me:8000
+host: localhost:8000
 info:
   contact: {}
   description: API Server for Umlaut Application
