@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8000",
+    "host": "umlaut-bmstu.me:8000",
     "basePath": "/",
     "paths": {
         "/api/v1/dialogs": {
@@ -64,14 +64,8 @@
                             "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -96,12 +90,6 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-array_model_User"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "500": {
@@ -208,14 +196,14 @@
                             "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }

@@ -17,7 +17,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.User]
-// @Failure 404, 500 {object} ClientResponseDto[string]
+// @Failure 404,500 {object} ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)

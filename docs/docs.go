@@ -70,14 +70,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -102,12 +96,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-array_model_User"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "500": {
@@ -214,14 +202,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -753,7 +741,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "umlaut-bmstu.me:8000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",
