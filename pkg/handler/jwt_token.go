@@ -52,5 +52,5 @@ func (tk *JwtToken) Check(SID string, inputToken string) (bool, error) {
 	if payload.Valid() != nil {
 		return false, fmt.Errorf("invalid jwt token: %v", err)
 	}
-	return payload.SessionID == SID && payload.UserID == (*tk.Ctx).Value(keyUserID).(int), nil
+	return payload.SessionID == SID, nil
 }

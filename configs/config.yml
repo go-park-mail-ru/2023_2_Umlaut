@@ -36,3 +36,6 @@ cors:
     "HEAD",
     "OPTIONS"
   ]
+  headers: [
+    "X-Csrf-Token"
+  ]

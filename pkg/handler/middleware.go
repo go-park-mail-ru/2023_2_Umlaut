@@ -3,13 +3,14 @@ package handler
 import (
 	"context"
 	"errors"
-	"github.com/rs/cors"
-	"github.com/spf13/viper"
-	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/rs/cors"
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 type ctxKey string
@@ -25,6 +26,7 @@ func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins:   viper.GetStringSlice("cors.origins"),
 		AllowedMethods:   viper.GetStringSlice("cors.methods"),
+		AllowedHeaders:   viper.GetStringSlice("cors.headers"),
 		AllowCredentials: true,
 	})
 
