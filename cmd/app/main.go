@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"strconv"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/jackc/pgx/v5"
 	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
@@ -48,7 +48,6 @@ func main() {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
 	}
-	defer db.Close(ctx)
 
 	sessionStore, err := initRedis()
 	if err != nil {
@@ -86,7 +85,7 @@ func initLogger() (*zap.Logger, error) {
 	return config.Build()
 }
 
-func initPostgres() (*pgx.Conn, error) {
+func initPostgres() (*pgxpool.Conn, error) {
 	return repository.NewPostgresDB(repository.PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),

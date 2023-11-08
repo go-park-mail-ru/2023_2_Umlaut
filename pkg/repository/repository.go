@@ -2,10 +2,9 @@ package repository
 
 import (
 	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"io"
 	"time"
-
-	"github.com/jackc/pgx/v5"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/minio/minio-go/v7"
@@ -61,7 +60,7 @@ type Repository struct {
 	FileServer FileServer
 }
 
-func NewRepository(db *pgx.Conn, redisClient *redis.Client, minioClient *minio.Client) *Repository {
+func NewRepository(db *pgxpool.Conn, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -12,10 +13,10 @@ import (
 )
 
 type DialogPostgres struct {
-	db *pgx.Conn
+	db *pgxpool.Conn
 }
 
-func NewDialogPostgres(db *pgx.Conn) *DialogPostgres {
+func NewDialogPostgres(db *pgxpool.Conn) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 

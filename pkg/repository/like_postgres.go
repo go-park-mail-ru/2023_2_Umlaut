@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,10 +14,10 @@ import (
 )
 
 type LikePostgres struct {
-	db *pgx.Conn
+	db *pgxpool.Conn
 }
 
-func NewLikePostgres(db *pgx.Conn) *LikePostgres {
+func NewLikePostgres(db *pgxpool.Conn) *LikePostgres {
 	return &LikePostgres{db: db}
 }
 

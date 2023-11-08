@@ -9,7 +9,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.0
-	github.com/jackc/pgx/v5 v5.4.3
+	github.com/jackc/pgx/v5 v5.5.0
 	github.com/minio/minio-go/v7 v7.0.63
 	github.com/redis/go-redis/v9 v9.2.0
 	github.com/rs/cors v1.10.0

@@ -2,14 +2,14 @@ package repository
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"testing"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/stretchr/testify/assert"
 )
 
-func initPostgres() (*pgx.Conn, error) {
+func initPostgres() (*pgxpool.Conn, error) {
 	return NewPostgresDB(PostgresConfig{
 		Host:     "localhost",
 		Port:     "5431",

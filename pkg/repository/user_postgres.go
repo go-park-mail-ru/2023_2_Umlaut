@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -14,10 +15,10 @@ import (
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db *pgx.Conn
+	db *pgxpool.Conn
 }
 
-func NewUserPostgres(db *pgx.Conn) *UserPostgres {
+func NewUserPostgres(db *pgxpool.Conn) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
