@@ -35,7 +35,7 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("X-Csrf-Token", token)
-	w.Header().Set("Access-Control-Expose-Headers", "X-Csrf-Token")
+	w.Header().Set("Access-Control-Expose-Headers", "*")
 
 	NewSuccessClientResponseDto(h.ctx, w, currentUser)
 }
