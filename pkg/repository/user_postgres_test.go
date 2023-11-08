@@ -2,15 +2,15 @@ package repository
 
 import (
 	"context"
+	"github.com/jackc/pgx/v5"
 	"testing"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
-func initPostgres() (*pgxpool.Pool, error) {
+func initPostgres() (*pgx.Conn, error) {
 	return NewPostgresDB(PostgresConfig{
 		Host:     viper.GetString("postgres.host"),
 		Port:     viper.GetString("postgres.port"),

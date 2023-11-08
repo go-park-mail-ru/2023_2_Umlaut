@@ -70,6 +70,6 @@ func (u *User) Sanitize() {
 	u.Name = policy.Sanitize(u.Name)
 	u.Mail = policy.Sanitize(u.Mail)
 
-
 	u.PasswordHash = ""
+	u.Salt = ""
 }

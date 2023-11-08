@@ -10,7 +10,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.User]
-// @Failure 401,404 {object} ClientResponseDto[string]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	nextUser, err := h.services.Feed.GetNextUser(r.Context(), r.Context().Value(keyUserID).(int))
@@ -26,7 +26,7 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[[]model.User]
-// @Failure 401,500 {object} ClientResponseDto[string]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed/users [get]
 func (h *Handler) getNextUsers(w http.ResponseWriter, r *http.Request) {
 	nextUsers, err := h.services.Feed.GetNextUsers(r.Context(), r.Context().Value(keyUserID).(int))

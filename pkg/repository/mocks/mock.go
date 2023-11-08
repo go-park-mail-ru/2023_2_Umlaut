@@ -127,6 +127,20 @@ func (mr *MockUserMockRecorder) UpdateUser(ctx, user interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUser)(nil).UpdateUser), ctx, user)
 }
 
+// UpdateUserPassword mocks base method.
+func (m *MockUser) UpdateUserPassword(ctx context.Context, user model.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserPassword", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserPassword indicates an expected call of UpdateUserPassword.
+func (mr *MockUserMockRecorder) UpdateUserPassword(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPassword", reflect.TypeOf((*MockUser)(nil).UpdateUserPassword), ctx, user)
+}
+
 // UpdateUserPhoto mocks base method.
 func (m *MockUser) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error) {
 	m.ctrl.T.Helper()
@@ -180,19 +194,19 @@ func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockLike)(nil).CreateLike), ctx, like)
 }
 
-// Exists mocks base method.
-func (m *MockLike) Exists(ctx context.Context, like model.Like) (bool, error) {
+// IsMutualLike mocks base method.
+func (m *MockLike) IsMutualLike(ctx context.Context, like model.Like) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Exists", ctx, like)
+	ret := m.ctrl.Call(m, "IsMutualLike", ctx, like)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Exists indicates an expected call of Exists.
-func (mr *MockLikeMockRecorder) Exists(ctx, like interface{}) *gomock.Call {
+// IsMutualLike indicates an expected call of IsMutualLike.
+func (mr *MockLikeMockRecorder) IsMutualLike(ctx, like interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockLike)(nil).Exists), ctx, like)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsMutualLike", reflect.TypeOf((*MockLike)(nil).IsMutualLike), ctx, like)
 }
 
 // MockDialog is a mock of Dialog interface.
@@ -231,21 +245,6 @@ func (m *MockDialog) CreateDialog(ctx context.Context, dialog model.Dialog) (int
 func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockDialog)(nil).CreateDialog), ctx, dialog)
-}
-
-// Exists mocks base method.
-func (m *MockDialog) Exists(ctx context.Context, dialog model.Dialog) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Exists", ctx, dialog)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Exists indicates an expected call of Exists.
-func (mr *MockDialogMockRecorder) Exists(ctx, dialog interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockDialog)(nil).Exists), ctx, dialog)
 }
 
 // GetDialogs mocks base method.

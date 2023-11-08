@@ -17,7 +17,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.User]
-// @Failure 401,404 {object} ClientResponseDto[string]
+// @Failure 404, 500 {object} ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
@@ -65,7 +65,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if errors.Is(err, model.InvalidUser) {
-			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid password")
+			newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid field for update")
 			return
 		}
 		newErrorClientResponseDto(h.ctx, w, http.StatusInternalServerError, err.Error())

@@ -20,7 +20,7 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var like model.Like
 	if err := decoder.Decode(&like); err != nil {
-		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, err.Error())
+		newErrorClientResponseDto(h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	userId := r.Context().Value(keyUserID).(int)

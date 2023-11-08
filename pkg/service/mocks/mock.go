@@ -261,20 +261,6 @@ func (mr *MockUserMockRecorder) UpdateUser(ctx, user interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUser)(nil).UpdateUser), ctx, user)
 }
 
-// UpdateUserPhoto mocks base method.
-func (m *MockUser) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUserPhoto", ctx, userId, imagePath)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateUserPhoto indicates an expected call of UpdateUserPhoto.
-func (mr *MockUserMockRecorder) UpdateUserPhoto(ctx, userId, imagePath interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPhoto", reflect.TypeOf((*MockUser)(nil).UpdateUserPhoto), ctx, userId, imagePath)
-}
-
 // MockLike is a mock of Like interface.
 type MockLike struct {
 	ctrl     *gomock.Controller
@@ -310,36 +296,6 @@ func (m *MockLike) CreateLike(ctx context.Context, like model.Like) error {
 func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockLike)(nil).CreateLike), ctx, like)
-}
-
-// IsLikeExists mocks base method.
-func (m *MockLike) IsLikeExists(ctx context.Context, like model.Like) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsLikeExists", ctx, like)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsLikeExists indicates an expected call of IsLikeExists.
-func (mr *MockLikeMockRecorder) IsLikeExists(ctx, like interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsLikeExists", reflect.TypeOf((*MockLike)(nil).IsLikeExists), ctx, like)
-}
-
-// IsUserLiked mocks base method.
-func (m *MockLike) IsUserLiked(ctx context.Context, like model.Like) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsUserLiked", ctx, like)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// IsUserLiked indicates an expected call of IsUserLiked.
-func (mr *MockLikeMockRecorder) IsUserLiked(ctx, like interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserLiked", reflect.TypeOf((*MockLike)(nil).IsUserLiked), ctx, like)
 }
 
 // MockDialog is a mock of Dialog interface.

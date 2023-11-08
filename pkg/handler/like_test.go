@@ -21,49 +21,52 @@ func TestHandler_createLike(t *testing.T) {
 		LikedToUserId: 2,
 	}
 	likeJSON, _ := json.Marshal(mockLike)
-
 	tests := []struct {
 		name                 string
-		requestBody          []byte
+		requestBody          string
 		mockBehavior         func(r *mock_service.MockLike, m *mock_service.MockDialog)
 		expectedStatusCode   int
 		expectedResponseBody string
 	}{
 		{
-			name:        "Like Exists",
-			requestBody: likeJSON,
+			name:        "Like Create",
+			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().IsLikeExists(gomock.Any(), mockLike).Return(true, nil)
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(nil)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":200,"message":"success","payload":""}`,
 		},
 		{
-			name:        "Error in IsLikeExists",
-			requestBody: likeJSON,
+			name:        "already liked",
+			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().IsLikeExists(gomock.Any(), mockLike).Return(false, errors.New("some error"))
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.AlreadyExists)
 			},
-			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":200,"message":"already liked","payload":""}`,
 		},
 		{
-			name:        "Error in CreateLike",
-			requestBody: likeJSON,
+			name:        "Mutual like",
+			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().IsLikeExists(gomock.Any(), mockLike).Return(false, nil)
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.MutualLike)
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":200,"message":"Mutual like","payload":""}`,
+		},
+		{
+			name:                 "invalid input body",
+			requestBody:          `{"liked_by_user_id","liked_to_user_id":2}`,
+			mockBehavior:         func(r *mock_service.MockLike, m *mock_service.MockDialog) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"status":400,"message":"invalid input body","payload":""}`,
+		},
+		{
+			name:        "Error",
+			requestBody: string(likeJSON),
+			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
 				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(errors.New("some error"))
-			},
-			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
-		},
-		{
-			name:        "Error in IsUserLiked",
-			requestBody: likeJSON,
-			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().IsLikeExists(gomock.Any(), mockLike).Return(false, nil)
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(nil)
-				r.EXPECT().IsUserLiked(gomock.Any(), mockLike).Return(false, errors.New("some error"))
 			},
 			expectedStatusCode:   http.StatusInternalServerError,
 			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
@@ -87,7 +90,7 @@ func TestHandler_createLike(t *testing.T) {
 			mux.HandleFunc("/api/v1/like", handler.createLike)
 
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("POST", "/api/v1/like", bytes.NewReader(test.requestBody))
+			req := httptest.NewRequest("POST", "/api/v1/like", bytes.NewBufferString(test.requestBody))
 			mux.ServeHTTP(w, req.WithContext(ctx))
 
 			assert.Equal(t, w.Code, test.expectedStatusCode)
