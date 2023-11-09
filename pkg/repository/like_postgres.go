@@ -51,11 +51,9 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 }
 
 func (r *LikePostgres) IsMutualLike(ctx context.Context, like model.Like) (bool, error) {
-	if like.LikedToUserId < like.LikedByUserId {
-		tmp := like.LikedToUserId
-		like.LikedToUserId = like.LikedByUserId
-		like.LikedByUserId = tmp
-	}
+	tmp := like.LikedToUserId
+	like.LikedToUserId = like.LikedByUserId
+	like.LikedByUserId = tmp
 
 	query, args, err := psql.Select("*").
 		From(likeTable).

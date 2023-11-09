@@ -67,6 +67,7 @@ func (u *User) Sanitize() {
 			(*u.Tags)[i] = policy.Sanitize((*u.Tags)[i])
 		}
 	}
+	//поправить метод
 	u.Name = policy.Sanitize(u.Name)
 	u.Mail = policy.Sanitize(u.Mail)
 
