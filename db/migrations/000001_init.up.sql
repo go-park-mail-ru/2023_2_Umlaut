@@ -24,22 +24,29 @@ CREATE TABLE tag
 
 CREATE TABLE user_tag
 (
+    id      SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    tag_id  INT NOT NULL REFERENCES tag (id) ON DELETE CASCADE
+    tag_id  INT NOT NULL REFERENCES tag (id) ON DELETE CASCADE,
+    UNIQUE (user_id, tag_id)
 );
 
 CREATE TABLE "like"
 (
-    liked_by_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    liked_to_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    committed_at     TIMESTAMP NOT NULL DEFAULT NOW()
+    id                 SERIAL PRIMARY KEY,
+    liked_from_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    liked_to_user_id   INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    committed_at       TIMESTAMP NOT NULL DEFAULT NOW(),
+    CHECK (liked_from_user_id != liked_to_user_id),
+    UNIQUE (liked_from_user_id, liked_to_user_id)
 );
 
 CREATE TABLE dialog
 (
     id       SERIAL PRIMARY KEY,
     user1_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL
+    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    CHECK (user1_id != user2_id),
+    UNIQUE (user1_id, user2_id)
 );
 
 CREATE TABLE message
@@ -64,5 +71,6 @@ CREATE TABLE complaint
     reported_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     complaint_type_id INT       NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
     report_status     SMALLINT  NOT NULL CHECK (report_status BETWEEN 0 AND 5),
-    complaint_time    TIMESTAMP NOT NULL DEFAULT NOW()
+    complaint_time    TIMESTAMP NOT NULL DEFAULT NOW(),
+    CHECK (reporter_user_id != reported_user_id)
 );

@@ -2,7 +2,65 @@
 
 [ER диаграмма в draw.io](Umlaut.drawio)
 
-[Mermaid описание](https://mermaid.live/edit#pako:eNqVlNFuozAQRX_F8nPTD8gbLd4UlQDCbqVKkZATZhOrgCPbqK0S_n3tQEMgaTfhBeveM55hPHiHVzIHPMWgfMHXipeLCtnnhZIU7feTidyhx3iehF4QMTRFAc1SksQpI-m1oN-CR3PC3hJyKeTJo5nzRjzatYJ7RGVQ8pwFfi_pkheF01PYSmWo4abWvW1ECdrwcovY96o1m5P6f89g4NOgiJdwIemLBjWDKgd1wUwU_D23D9v5oFdKbI2Q1cgJpXwX1Xqkkrxe8Qv0k1wuBeiRGpR8DQk3m17PuQH0IJTZ5Pyrl5dSFiiubLkwaMvotG5q0PcWKfFJxAIvRM3-_n6_a3vdnnNvnsFX5JpzUYykhGv9IVU-kikvzPl5d8Pn23TxzA1r9BqHr4Rmf4KUsswx19CUPMaRf4J3yCBgMieUejNiAy3NbE9p1kmDoJ8_uznljttd0ybQ2g4Cs-sbf4juC8Lg2dXtXn728PZDYwYUi0-og_OfQo_l2JGbB_a6yDw2KIh5M9TIQ6ZugNwrszLtgdsGFN_hElTJRW5vvkPoApsNWB9P7TLn6n2BF5XjeG0k_apWeGpUDXe43ro_qbsrW7H5B0cZgh8)
+Mermaid описание
+```mermaid
+erDiagram
+    USER ||--o{ COMPLAINT : IS_REPORTER
+    USER ||--o{ COMPLAINT : IS_REPORTED
+    COMPLAINT-TYPE ||--o{ COMPLAINT : HAS_TYPE
+    COMPLAINT {
+        int PK_ID
+        smallint ReportStatus
+        timestamp Timestamp
+    }
+    USER {
+        int PK_ID
+        text Name
+        smallint UserGender
+        smallint PreferGender
+        text Description
+        text Looking
+        text Education
+        text Hobbies
+        text ImagePath
+        date Birthday
+        bool Online
+    }
+    COMPLAINT-TYPE {
+        int PK_ID
+        text Name
+    }
+    CREDENTIAL }|..|{ USER : HAS_CREDENTIAL
+    CREDENTIAL {
+        int PK_ID
+        text Mail
+        text Password
+        text Salt
+    }
+    USER ||--o{ DIALOG : INVOLVES_FIRST_USER
+    USER ||--o{ DIALOG : INVOLVES_SECOND_USER
+    DIALOG ||--o{ DIALOG-MESSAGE : CONTAINS_MESSAGE
+    DIALOG {
+        int PK_ID
+    }
+    DIALOG-MESSAGE {
+        int PK_ID
+        text MessageText
+        timestamp Timestamp
+    }
+    USER ||--o{ LIKE : LIKED_FROM_USER 
+    USER ||--o{ LIKE : LIKED_TO_USER
+    LIKE {
+        int PK_ID
+        timestamp COMMITED_AT
+    }
+    TAG }o--o{ USER : USER_TAGS
+    TAG {
+        int PK_ID
+        text Name
+    }
+```
+
 ## Описание таблиц
 
 1. **Таблица "COMPLAINT" (Жалобы):**
@@ -55,7 +113,7 @@
 
 **Relation "LIKE" (Лайки):**
 
-{PK ID} -> {Timestamp, FK_LikedByUserID, FK_LikedToUserID}
+{PK ID} -> {Timestamp, FK_LikedFromUserID, FK_LikedToUserID}
 
 **Relation "Tag" (Теги):**
 
