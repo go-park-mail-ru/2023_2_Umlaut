@@ -58,10 +58,8 @@ CREATE TABLE dialog
     user1_id    INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     user2_id    INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     created_at  TIMESTAMPTZ DEFAULT NOW(),
-    user_min_id INT GENERATED ALWAYS AS (LEAST(user1_id, user2_id)) STORED,
-    user_max_id INT GENERATED ALWAYS AS (GREATEST(user1_id, user2_id)) STORED,
-    UNIQUE (user_min_id, user_max_id),
-    CHECK (user1_id != user2_id)
+    UNIQUE (user1_id, user2_id),
+    CONSTRAINT check_pair_order CHECK (user1_id < user2_id)
 );
 
 CREATE TABLE message
