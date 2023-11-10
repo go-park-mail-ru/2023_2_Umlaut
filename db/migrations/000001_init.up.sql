@@ -13,8 +13,22 @@ CREATE TABLE "user"
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
-    online        BOOLEAN     NOT NULL DEFAULT FALSE
+    online        BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at    TIMESTAMPTZ          DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ          DEFAULT NOW()
 );
+
+CREATE OR REPLACE FUNCTION update_updated_at()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER user_updated_at_trigger
+    BEFORE UPDATE ON "user"
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 CREATE TABLE tag
 (
@@ -24,29 +38,30 @@ CREATE TABLE tag
 
 CREATE TABLE user_tag
 (
-    id      SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     tag_id  INT NOT NULL REFERENCES tag (id) ON DELETE CASCADE,
-    UNIQUE (user_id, tag_id)
+    PRIMARY KEY (user_id, tag_id)
 );
 
 CREATE TABLE "like"
 (
-    id                 SERIAL PRIMARY KEY,
-    liked_from_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    liked_to_user_id   INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    committed_at       TIMESTAMP NOT NULL DEFAULT NOW(),
+    liked_from_user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    liked_to_user_id   INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    created_at         TIMESTAMPTZ DEFAULT NOW(),
     CHECK (liked_from_user_id != liked_to_user_id),
-    UNIQUE (liked_from_user_id, liked_to_user_id)
+    PRIMARY KEY (liked_from_user_id, liked_to_user_id)
 );
 
 CREATE TABLE dialog
 (
-    id       SERIAL PRIMARY KEY,
-    user1_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    CHECK (user1_id != user2_id),
-    UNIQUE (user1_id, user2_id)
+    id          SERIAL PRIMARY KEY,
+    user1_id    INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    user2_id    INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    user_min_id INT GENERATED ALWAYS AS (LEAST(user1_id, user2_id)) STORED,
+    user_max_id INT GENERATED ALWAYS AS (GREATEST(user1_id, user2_id)) STORED,
+    UNIQUE (user_min_id, user_max_id),
+    CHECK (user1_id != user2_id)
 );
 
 CREATE TABLE message
@@ -67,10 +82,10 @@ CREATE TABLE complaint_type
 CREATE TABLE complaint
 (
     id                SERIAL PRIMARY KEY,
-    reporter_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    reported_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type_id INT       NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
-    report_status     SMALLINT  NOT NULL CHECK (report_status BETWEEN 0 AND 5),
-    complaint_time    TIMESTAMP NOT NULL DEFAULT NOW(),
+    reporter_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    reported_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    complaint_type_id INT      NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
+    report_status     SMALLINT NOT NULL CHECK (report_status BETWEEN 0 AND 5),
+    created_at        TIMESTAMPTZ DEFAULT NOW(),
     CHECK (reporter_user_id != reported_user_id)
 );
