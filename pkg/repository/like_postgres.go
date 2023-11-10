@@ -22,12 +22,6 @@ func NewLikePostgres(db *pgxpool.Pool) *LikePostgres {
 }
 
 func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.Like, error) {
-	if like.LikedToUserId < like.LikedByUserId {
-		tmp := like.LikedToUserId
-		like.LikedToUserId = like.LikedByUserId
-		like.LikedByUserId = tmp
-	}
-
 	query, args, err := psql.Insert(likeTable).
 		Columns("liked_by_user_id", "liked_to_user_id").
 		Values(like.LikedByUserId, like.LikedToUserId).
