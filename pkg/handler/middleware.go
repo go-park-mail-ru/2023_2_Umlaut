@@ -82,7 +82,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		if !ok {
 			log.Println("Logger not found in context")
 		}
-
+		//логировать конкретный запрос (юзер, тд, поход во всякие ендпоинты)
 		logger.Info("Request handled",
 			zap.String("Method", r.Method),
 			zap.String("RequestURI", r.RequestURI),

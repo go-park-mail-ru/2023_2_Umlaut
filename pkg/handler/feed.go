@@ -34,6 +34,10 @@ func (h *Handler) getNextUsers(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	if nextUsers == nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "out of users")
+		return
+	}
 
 	NewSuccessClientResponseArrayDto(&h.ctx, w, nextUsers)
 }
