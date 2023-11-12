@@ -16,7 +16,7 @@ import (
 // @Param input body signInInput true "Sign-in input parameters"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,404 {object} ClientResponseDto[string]
-// @Router /auth/login [post]
+// @Router /api/auth/login [post]
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signInInput
@@ -51,7 +51,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,404 {object} ClientResponseDto[string]
-// @Router /auth/logout [get]
+// @Router /api/auth/logout [get]
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
@@ -77,7 +77,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @Param input body signUpInput true "Sign-up input user"
 // @Success 200 {object} ClientResponseDto[idResponse]
 // @Failure 400,404 {object} ClientResponseDto[string]
-// @Router /auth/sign-up [post]
+// @Router /api/auth/sign-up [post]
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signUpInput

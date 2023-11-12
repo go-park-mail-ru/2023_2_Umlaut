@@ -150,6 +150,89 @@ info:
   title: Umlaut API
   version: "1.0"
 paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      operationId: login
+      parameters:
+      - description: Sign-in input parameters
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: log in to account
+      tags:
+      - auth
+  /api/auth/logout:
+    get:
+      consumes:
+      - application/json
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: log out of account
+      tags:
+      - auth
+  /api/auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      operationId: create-account
+      parameters:
+      - description: Sign-up input user
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-handler_idResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: sign up account
+      tags:
+      - auth
   /api/v1/dialogs:
     get:
       consumes:
@@ -394,87 +477,4 @@ paths:
       summary: update user photo
       tags:
       - user
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      operationId: login
-      parameters:
-      - description: Sign-in input parameters
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/handler.signInInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: log in to account
-      tags:
-      - auth
-  /auth/logout:
-    get:
-      consumes:
-      - application/json
-      operationId: logout
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: log out of account
-      tags:
-      - auth
-  /auth/sign-up:
-    post:
-      consumes:
-      - application/json
-      operationId: create-account
-      parameters:
-      - description: Sign-up input user
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/handler.signUpInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-handler_idResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: sign up account
-      tags:
-      - auth
 swagger: "2.0"
