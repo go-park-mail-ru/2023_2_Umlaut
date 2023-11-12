@@ -26,14 +26,7 @@ cors:
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "http://umlaut-bmstu.me",
-    "http://umlaut-bmstu.me:8000",
-    "https://37.139.32.76:80",
-    "https://37.139.32.76",
-    "https://37.139.32.76:8000",
-    "https://localhost:8000",
-    "https://127.0.0.1:8000",
-    "https://umlaut-bmstu.me",
-    "https://umlaut-bmstu.me:8000"
+    "http://umlaut-bmstu.me:8000"
   ]
   methods: [
     "GET",
