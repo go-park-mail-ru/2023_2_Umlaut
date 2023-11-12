@@ -9,7 +9,7 @@
     "host": "umlaut-bmstu.me:8000",
     "basePath": "/",
     "paths": {
-        "/api/auth/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -55,7 +55,7 @@
                 }
             }
         },
-        "/api/auth/logout": {
+        "/api/v1/auth/logout": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -90,7 +90,7 @@
                 }
             }
         },
-        "/api/auth/sign-up": {
+        "/api/v1/auth/sign-up": {
             "post": {
                 "consumes": [
                     "application/json"

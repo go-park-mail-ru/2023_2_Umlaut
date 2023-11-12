@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/auth/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -61,7 +61,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/auth/logout": {
+        "/api/v1/auth/logout": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -96,7 +96,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/auth/sign-up": {
+        "/api/v1/auth/sign-up": {
             "post": {
                 "consumes": [
                     "application/json"

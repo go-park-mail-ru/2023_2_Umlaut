@@ -150,7 +150,7 @@ info:
   title: Umlaut API
   version: "1.0"
 paths:
-  /api/auth/login:
+  /api/v1/auth/login:
     post:
       consumes:
       - application/json
@@ -180,7 +180,7 @@ paths:
       summary: log in to account
       tags:
       - auth
-  /api/auth/logout:
+  /api/v1/auth/logout:
     get:
       consumes:
       - application/json
@@ -203,7 +203,7 @@ paths:
       summary: log out of account
       tags:
       - auth
-  /api/auth/sign-up:
+  /api/v1/auth/sign-up:
     post:
       consumes:
       - application/json

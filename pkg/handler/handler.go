@@ -22,10 +22,10 @@ func NewHandler(services *service.Service, ctx context.Context) *Handler {
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://umlaut-bmstu.me:8000/swagger/doc.json"),
+		httpSwagger.URL("https://umlaut-bmstu.me:8000/swagger/doc.json"),
 	))
 
-	authRouter := r.PathPrefix("/api/auth").Subrouter()
+	authRouter := r.PathPrefix("/api/v1/auth").Subrouter()
 	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/logout", h.logout)
