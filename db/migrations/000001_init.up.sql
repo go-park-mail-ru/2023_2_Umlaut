@@ -9,7 +9,7 @@ CREATE TABLE "user"
     prefer_gender SMALLINT CHECK (prefer_gender BETWEEN 0 AND 1),
     description   TEXT,
     looking       TEXT,
-    image_path    TEXT,
+    image_paths   TEXT[]               DEFAULT ARRAY []::TEXT[],
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
@@ -87,7 +87,7 @@ VALUES ('Спорт'),
        ('Искусство'),
        ('Наука');
 
-INSERT INTO "user" (name, mail, password_hash, salt, user_gender, prefer_gender, description, looking, image_path,
+INSERT INTO "user" (name, mail, password_hash, salt, user_gender, prefer_gender, description, looking, image_paths,
                     education, hobbies, birthday, tags)
 VALUES ('Фёдор', 'fedor@mail.ru',
         '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b',

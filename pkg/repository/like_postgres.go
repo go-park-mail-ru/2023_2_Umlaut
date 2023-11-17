@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -37,7 +39,7 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 	err = scanLike(row, &newLike)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return newLike, model.AlreadyExists
+			return newLike, static.ErrAlreadyExists
 		}
 	}
 

@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 )
 
 type LikeService struct {
@@ -30,7 +32,7 @@ func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {
 		if err != nil {
 			return err
 		}
-		return model.MutualLike
+		return static.ErrMutualLike
 	}
 
 	return err

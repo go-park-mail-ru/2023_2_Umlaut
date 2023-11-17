@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/google/uuid"
 )
 
@@ -28,7 +29,7 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, err
 	user.Salt = generateUuid()
 	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(ctx, user)
-	if errors.Is(err, model.AlreadyExists) {
+	if errors.Is(err, static.ErrAlreadyExists) {
 		fmt.Println("account with this email already exists")
 	}
 	return id, err

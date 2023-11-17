@@ -10,6 +10,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -43,7 +44,7 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, model.AlreadyExists
+			return 0, static.ErrAlreadyExists
 		}
 	}
 	return id, err

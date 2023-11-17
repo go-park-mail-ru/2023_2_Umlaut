@@ -1,9 +1,12 @@
 package model
 
 import (
+	"fmt"
 	"net/mail"
+	"strings"
 	"time"
 
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -20,7 +23,7 @@ type User struct {
 	Description  *string    `json:"description" db:"description"`
 	Age          *int       `json:"age"`
 	Looking      *string    `json:"looking" db:"looking"`
-	ImagePath    *string    `json:"image_path" db:"image_path"`
+	ImagePaths   *[]string  `json:"image_paths" db:"image_paths"`
 	Education    *string    `json:"education" db:"education"`
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
@@ -53,9 +56,6 @@ func (u *User) Sanitize() {
 	if u.Looking != nil {
 		*u.Looking = policy.Sanitize(*u.Looking)
 	}
-	if u.ImagePath != nil {
-		*u.ImagePath = policy.Sanitize(*u.ImagePath)
-	}
 	if u.Education != nil {
 		*u.Education = policy.Sanitize(*u.Education)
 	}
@@ -73,4 +73,30 @@ func (u *User) Sanitize() {
 
 	u.PasswordHash = ""
 	u.Salt = ""
+}
+
+func (u *User) LinkUnenrichment() {
+	if u.ImagePaths == nil {
+		return
+	}
+	var result []string
+	for _, link := range *u.ImagePaths {
+		i := strings.LastIndex(link, "/")
+		if i == -1 {
+			result = append(result, link)
+		}
+		result = append(result, link[i + 1:])
+	}
+	u.ImagePaths = &result
+}
+
+func (u *User) LinkEnrichment() {
+	if u.ImagePaths == nil {
+		return
+	}
+	var result []string
+	for _, fileName := range *u.ImagePaths {
+		result = append(result, fmt.Sprintf("%s/photos/%s%d/%s", static.Host, "user-id-", u.Id, fileName))
+	}
+	u.ImagePaths = &result
 }
