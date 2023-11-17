@@ -21,7 +21,7 @@ import (
 
 func init() {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
+	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)

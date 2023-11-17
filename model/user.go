@@ -84,6 +84,7 @@ func (u *User) LinkUnenrichment() {
 		i := strings.LastIndex(link, "/")
 		if i == -1 {
 			result = append(result, link)
+			continue
 		}
 		result = append(result, link[i + 1:])
 	}
