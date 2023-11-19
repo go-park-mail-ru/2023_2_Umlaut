@@ -202,17 +202,17 @@ func (mr *MockUserMockRecorder) CreateFile(ctx, userId, file, size interface{}) 
 }
 
 // DeleteFile mocks base method.
-func (m *MockUser) DeleteFile(ctx context.Context, userId int, fileName string) error {
+func (m *MockUser) DeleteFile(ctx context.Context, userId int, link string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteFile", ctx, userId, fileName)
+	ret := m.ctrl.Call(m, "DeleteFile", ctx, userId, link)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteFile indicates an expected call of DeleteFile.
-func (mr *MockUserMockRecorder) DeleteFile(ctx, userId, fileName interface{}) *gomock.Call {
+func (mr *MockUserMockRecorder) DeleteFile(ctx, userId, link interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockUser)(nil).DeleteFile), ctx, userId, fileName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockUser)(nil).DeleteFile), ctx, userId, link)
 }
 
 // GetCurrentUser mocks base method.
@@ -228,22 +228,6 @@ func (m *MockUser) GetCurrentUser(ctx context.Context, userId int) (model.User, 
 func (mr *MockUserMockRecorder) GetCurrentUser(ctx, userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentUser", reflect.TypeOf((*MockUser)(nil).GetCurrentUser), ctx, userId)
-}
-
-// GetFile mocks base method.
-func (m *MockUser) GetFile(ctx context.Context, userId int, fileName string) ([]byte, string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFile", ctx, userId, fileName)
-	ret0, _ := ret[0].([]byte)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// GetFile indicates an expected call of GetFile.
-func (mr *MockUserMockRecorder) GetFile(ctx, userId, fileName interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockUser)(nil).GetFile), ctx, userId, fileName)
 }
 
 // UpdateUser mocks base method.
@@ -334,6 +318,21 @@ func (m *MockDialog) CreateDialog(ctx context.Context, dialog model.Dialog) (int
 func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockDialog)(nil).CreateDialog), ctx, dialog)
+}
+
+// GetDialogMessages mocks base method.
+func (m *MockDialog) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, dialogId)
+	ret0, _ := ret[0].([]model.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDialogMessages indicates an expected call of GetDialogMessages.
+func (mr *MockDialogMockRecorder) GetDialogMessages(ctx, dialogId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockDialog)(nil).GetDialogMessages), ctx, dialogId)
 }
 
 // GetDialogs mocks base method.

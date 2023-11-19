@@ -118,7 +118,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
 
 	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
-	if err == static.ErrNoFiles {
+	if errors.Is(err, static.ErrNoFiles) {
 		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
 		return
 	}
