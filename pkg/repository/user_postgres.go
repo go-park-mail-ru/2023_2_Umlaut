@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -38,7 +40,7 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, model.AlreadyExists
+			return 0, static.ErrAlreadyExists
 		}
 		return 0, err
 	}
@@ -107,6 +109,8 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+	user.LinkUnenrichment()
+
 	query, args, err := psql.Update(userTable).
 		Set("name", user.Name).
 		Set("mail", user.Mail).
@@ -115,6 +119,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		Set("description", user.Description).
 		Set("birthday", user.Birthday).
 		Set("looking", user.Looking).
+		Set("image_paths", user.ImagePaths).
 		Set("education", user.Education).
 		Set("hobbies", user.Hobbies).
 		Set("tags", user.Tags).
@@ -132,7 +137,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return updatedUser, model.AlreadyExists
+			return updatedUser, static.ErrAlreadyExists
 		}
 	}
 
@@ -156,23 +161,6 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) 
 	err = scanUser(row, &updatedUser)
 
 	return err
-}
-
-func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error) {
-	query, args, err := psql.Update(userTable).
-		Set("image_path", imagePath).
-		Where(sq.Eq{"id": userId}).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	query += " RETURNING image_path"
-	var updatedImgPath *string
-	row := r.db.QueryRow(ctx, query, args...)
-	err = row.Scan(&updatedImgPath)
-
-	return updatedImgPath, err
 }
 
 func (r *UserPostgres) GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error) {
@@ -224,7 +212,7 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.PreferGender,
 		&user.Description,
 		&user.Looking,
-		&user.ImagePath,
+		&user.ImagePaths,
 		&user.Education,
 		&user.Hobbies,
 		&user.Birthday,
@@ -232,6 +220,7 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Tags,
 	)
 
+	user.LinkEnrichment()
 	user.CalculateAge()
 	return err
 }

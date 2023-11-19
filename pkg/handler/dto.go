@@ -17,6 +17,10 @@ type signUpInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type deleteLink struct {
+	Link string `json:"link"`
+}
+
 type idResponse struct {
 	Id int `json:"id"`
 }

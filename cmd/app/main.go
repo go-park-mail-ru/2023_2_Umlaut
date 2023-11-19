@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"strconv"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut"
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"

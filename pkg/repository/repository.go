@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"io"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/minio/minio-go/v7"
@@ -21,7 +22,6 @@ type User interface {
 	GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 	UpdateUserPassword(ctx context.Context, user model.User) error
-	UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error)
 }
 
 type Like interface {
@@ -47,7 +47,6 @@ type Store interface {
 
 type FileServer interface {
 	UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error
-	GetFile(ctx context.Context, bucketName, fileName string) ([]byte, string, error)
 	DeleteFile(ctx context.Context, bucketName, fileName string) error
 	CreateBucket(ctx context.Context, bucketName string) error
 }

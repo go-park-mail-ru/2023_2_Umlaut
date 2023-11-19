@@ -3,8 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 )
 
 // @Summary create user like
@@ -28,11 +30,11 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 
 	err := h.services.Like.CreateLike(r.Context(), like)
 	if err != nil {
-		if errors.Is(err, model.AlreadyExists) {
+		if errors.Is(err, static.ErrAlreadyExists) {
 			newErrorClientResponseDto(&h.ctx, w, http.StatusOK, "already liked")
 			return
 		}
-		if errors.Is(err, model.MutualLike) {
+		if errors.Is(err, static.ErrMutualLike) {
 			newErrorClientResponseDto(&h.ctx, w, http.StatusOK, "Mutual like")
 			return
 		}

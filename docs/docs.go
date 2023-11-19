@@ -444,55 +444,23 @@ const docTemplate = `{
                     "user"
                 ],
                 "summary": "delete user photo",
+                "parameters": [
+                    {
+                        "description": "link for deleting file",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.deleteLink"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/user/{id}/photo": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "get user photo",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -610,6 +578,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.deleteLink": {
+            "type": "object",
+            "properties": {
+                "link": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.idResponse": {
             "type": "object",
             "properties": {
@@ -703,8 +679,11 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "image_path": {
-                    "type": "string"
+                "image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "looking": {
                     "type": "string"

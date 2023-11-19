@@ -1,15 +1,13 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/gorilla/mux"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 )
 
 // @Summary get user information
@@ -61,11 +59,11 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	user.Id = r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
-		if errors.Is(err, model.AlreadyExists) {
+		if errors.Is(err, static.ErrAlreadyExists) {
 			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "account with this email already exists")
 			return
 		}
-		if errors.Is(err, model.InvalidUser) {
+		if errors.Is(err, static.ErrInvalidUser) {
 			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid field for update")
 			return
 		}
@@ -94,19 +92,6 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	if currentUser.ImagePath != nil {
-		err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
-		if err != nil {
-			newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-			return
-		}
-	} //На время, пока только одна фотка в бд
-
 	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
 		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
@@ -115,62 +100,28 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	NewSuccessClientResponseDto(&h.ctx, w, "")
 }
 
-// @Summary get user photo
-// @Tags user
-// @Accept  json
-// @Param id path integer true "User ID"
-// @Success 200
-// @Failure 400,401,404 {object} ClientResponseDto[string]
-// @Router /api/v1/user/{id}/photo [get]
-func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid params")
-		return
-	}
-
-	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
-		return
-	}
-	buffer, contentType, err := h.services.User.GetFile(r.Context(), id, *currentUser.ImagePath)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, err.Error())
-		return
-	}
-
-	h.ctx = context.WithValue(h.ctx, keyStatus, http.StatusOK)
-	h.ctx = context.WithValue(h.ctx, keyMessage, "success")
-	w.Header().Set("Content-Type", contentType)
-	w.WriteHeader(http.StatusOK)
-	w.Write(buffer)
-}
-
 // @Summary delete user photo
 // @Tags user
 // @Accept  json
+// @Param input body deleteLink true "link for deleting file"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(keyUserID).(int)
-	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+	decoder := json.NewDecoder(r.Body)
+	var link deleteLink
+	if err := decoder.Decode(&link); err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "This user has no photos")
+	id := r.Context().Value(keyUserID).(int)
+
+	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
+	if err == static.ErrNoFiles {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
 		return
 	}
-	err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
 	if err != nil {
 		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return

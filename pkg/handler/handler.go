@@ -2,10 +2,12 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -22,7 +24,7 @@ func NewHandler(services *service.Service, ctx context.Context) *Handler {
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://umlaut-bmstu.me:8000/swagger/doc.json"),
+		httpSwagger.URL(fmt.Sprintf("%s:8000/swagger/doc.json", static.Host)),
 	))
 
 	authRouter := r.PathPrefix("/api/v1/auth").Subrouter()
@@ -40,7 +42,6 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/user", h.user).Methods("GET")
 	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/user/photo", h.updateUserPhoto).Methods("POST", "OPTIONS")
-	apiRouter.HandleFunc("/user/{id}/photo", h.getUserPhoto).Methods("GET")
 	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
 	apiRouter.HandleFunc("/like", h.createLike).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/dialog", h.getDialogs).Methods("GET")

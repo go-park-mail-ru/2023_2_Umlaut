@@ -60,6 +60,11 @@ definitions:
       status:
         type: integer
     type: object
+  handler.deleteLink:
+    properties:
+      link:
+        type: string
+    type: object
   handler.idResponse:
     properties:
       id:
@@ -118,8 +123,10 @@ definitions:
         type: string
       id:
         type: integer
-      image_path:
-        type: string
+      image_paths:
+        items:
+          type: string
+        type: array
       looking:
         type: string
       mail:
@@ -394,38 +401,17 @@ paths:
       summary: update user
       tags:
       - user
-  /api/v1/user/{id}/photo:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: get user photo
-      tags:
-      - user
   /api/v1/user/photo:
     delete:
       consumes:
       - application/json
+      parameters:
+      - description: link for deleting file
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.deleteLink'
       responses:
         "200":
           description: OK
