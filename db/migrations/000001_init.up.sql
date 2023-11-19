@@ -36,12 +36,12 @@ CREATE TABLE "like"
 
 CREATE TABLE dialog
 (
-    id              SERIAL PRIMARY KEY,
-    user1_id        INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    user2_id        INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL,
-    UNIQUE (user1_id, user2_id, last_message_id, last_message_id),
-    created_at      TIMESTAMPTZ                                    DEFAULT NOW(),
+    id         SERIAL PRIMARY KEY,
+    user1_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    user2_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+--     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL,
+    UNIQUE (user1_id, user2_id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT check_pair_order CHECK (user1_id < user2_id)
 );
 
@@ -53,6 +53,9 @@ CREATE TABLE message
     message_text TEXT NOT NULL,
     created_at   TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE dialog
+    ADD last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL;
 
 CREATE TABLE complaint_type
 (
@@ -107,11 +110,13 @@ EXECUTE FUNCTION update_last_message_id();
 CREATE OR REPLACE FUNCTION delete_invalid_tag()
     RETURNS TRIGGER AS
 $$
+DECLARE
+    new_tag text;
 BEGIN
-    FOR new_tag IN NEW.tags
+    FOREACH new_tag IN ARRAY NEW.tags
         LOOP
             IF new_tag NOT IN (SELECT name FROM tag) THEN
-                NEW.tsgs = array_remove(NEW.tsgs, new_tag);
+                NEW.tags = array_remove(NEW.tags, new_tag);
             END IF;
         END LOOP;
     RETURN NEW;
@@ -189,7 +194,7 @@ VALUES ('Фёдор', 'fedor@mail.ru',
         'cRbBjQPeCvjPxGcIYmtqPW', 0, 1, 'Студент 1 курса МГУ', 'Новые знакомства', NULL, 'Неполное высшее',
         'Волейбол, компьютерные игры', '2003-01-01', ARRAY ['Путешествия', 'Наука']);
 
-INSERT INTO dialog (user1_id, user2_id, last_message_id)
+INSERT INTO dialog (user1_id, user2_id)
 VALUES (3, 4),
        (3, 5),
        (3, 6),
