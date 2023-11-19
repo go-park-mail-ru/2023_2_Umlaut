@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -10,15 +9,16 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"go.uber.org/zap"
 )
 
 type Handler struct {
 	services *service.Service
-	ctx      context.Context
+	logger   *zap.Logger
 }
 
-func NewHandler(services *service.Service, ctx context.Context) *Handler {
-	return &Handler{services: services, ctx: ctx}
+func NewHandler(services *service.Service, logger *zap.Logger) *Handler {
+	return &Handler{services: services, logger: logger}
 }
 
 func (h *Handler) InitRoutes() http.Handler {

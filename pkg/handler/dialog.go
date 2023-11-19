@@ -17,16 +17,16 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 
 	dialogs, err := h.services.Dialog.GetDialogs(r.Context(), userId)
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(&h.ctx, w, dialogs)
+	NewSuccessClientResponseArrayDto(r.Context(), w, dialogs)
 }
 
 // @Summary get dialog message
 // @Tags dialog
-// @ID dialog
+// @ID dialogMsg
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[[]model.Dialog]
@@ -37,9 +37,9 @@ func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
 
 	dialogs, err := h.services.Dialog.GetDialogs(r.Context(), userId)
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(&h.ctx, w, dialogs)
+	NewSuccessClientResponseArrayDto(r.Context(), w, dialogs)
 }

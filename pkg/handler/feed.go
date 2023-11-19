@@ -15,10 +15,10 @@ import (
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	nextUser, err := h.services.Feed.GetNextUser(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(&h.ctx, w, nextUser)
+	NewSuccessClientResponseDto(r.Context(), w, nextUser)
 }
 
 // @Summary get users for feed
@@ -31,13 +31,13 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getNextUsers(w http.ResponseWriter, r *http.Request) {
 	nextUsers, err := h.services.Feed.GetNextUsers(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if nextUsers == nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "out of users")
+		newErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "out of users")
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(&h.ctx, w, nextUsers)
+	NewSuccessClientResponseArrayDto(r.Context(), w, nextUsers)
 }

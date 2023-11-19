@@ -1,5 +1,5 @@
 package static
 
 var (
-	Host = "http://umlaut-bmstu.me"
+	Host = "http://localhost"
 )

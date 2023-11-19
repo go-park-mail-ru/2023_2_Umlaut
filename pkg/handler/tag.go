@@ -13,9 +13,9 @@ import "net/http"
 func (h *Handler) getAllTags(w http.ResponseWriter, r *http.Request) {
 	tags, err := h.services.Tag.GetAllTags(r.Context())
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(&h.ctx, w, tags)
+	NewSuccessClientResponseArrayDto(r.Context(), w, tags)
 }

@@ -22,21 +22,21 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(keyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	session, _ := r.Cookie("session_id")
-	jwtToken := NewJwtToken(&h.ctx, secret)
+	jwtToken := NewJwtToken(secret)
 	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "csrf token creation error")
 		return
 	}
 	w.Header().Set("X-Csrf-Token", token)
 	w.Header().Set("Access-Control-Expose-Headers", "X-Csrf-Token")
 
-	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
+	NewSuccessClientResponseDto(r.Context(), w, currentUser)
 }
 
 // @Summary update user
@@ -52,7 +52,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user model.User
 	if err := decoder.Decode(&user); err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
@@ -60,18 +60,18 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
 		if errors.Is(err, static.ErrAlreadyExists) {
-			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "account with this email already exists")
+			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "account with this email already exists")
 			return
 		}
 		if errors.Is(err, static.ErrInvalidUser) {
-			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid field for update")
+			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid field for update")
 			return
 		}
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
+	NewSuccessClientResponseDto(r.Context(), w, currentUser)
 }
 
 // @Summary update user photo
@@ -87,17 +87,17 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	defer file.Close()
 
 	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(&h.ctx, w, "")
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }
 
 // @Summary delete user photo
@@ -111,7 +111,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var link deleteLink
 	if err := decoder.Decode(&link); err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
@@ -119,12 +119,12 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 
 	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
 	if err == static.ErrNoFiles {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
+		newErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "This user has no photos")
 		return
 	}
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(&h.ctx, w, "")
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }
