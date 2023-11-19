@@ -142,7 +142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/dialogs": {
+        "/api/v1/dialog": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -153,7 +153,7 @@ const docTemplate = `{
                 "tags": [
                     "dialog"
                 ],
-                "summary": "get user dialogs",
+                "summary": "get dialog message",
                 "operationId": "dialog",
                 "responses": {
                     "200": {
@@ -274,7 +274,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/tags": {
+        "/api/v1/tag": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -637,6 +637,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "last_message": {
+                    "$ref": "#/definitions/model.Message"
+                },
                 "user1_id": {
                     "type": "integer"
                 },
@@ -650,6 +653,26 @@ const docTemplate = `{
             "properties": {
                 "liked_to_user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Message": {
+            "type": "object",
+            "properties": {
+                "dialog_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "message_text": {
+                    "type": "string"
+                },
+                "sender_id": {
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "type": "string"
                 }
             }
         },
