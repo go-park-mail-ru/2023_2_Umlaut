@@ -14,7 +14,9 @@ CREATE TABLE "user"
     hobbies       TEXT,
     birthday      DATE,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
-    tags          TEXT[]               DEFAULT ARRAY []::TEXT[]
+    tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
+    created_at    TIMESTAMPTZ          DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ          DEFAULT NOW()
 );
 
 CREATE TABLE tag
@@ -23,6 +25,54 @@ CREATE TABLE tag
     name TEXT UNIQUE NOT NULL
 );
 
+CREATE TABLE "like"
+(
+    liked_by_user_id INT         NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    liked_to_user_id INT         NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    created_at       TIMESTAMPTZ          DEFAULT NOW(),
+    committed_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (liked_by_user_id, liked_to_user_id)
+);
+
+CREATE TABLE dialog
+(
+    id              SERIAL PRIMARY KEY,
+    user1_id        INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    user2_id        INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL,
+    UNIQUE (user1_id, user2_id, last_message_id, last_message_id),
+    created_at      TIMESTAMPTZ                                    DEFAULT NOW(),
+    CONSTRAINT check_pair_order CHECK (user1_id < user2_id)
+);
+
+CREATE TABLE message
+(
+    id           SERIAL PRIMARY KEY,
+    dialog_id    INT  NOT NULL REFERENCES dialog (id) ON DELETE CASCADE,
+    sender_id    INT  NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    message_text TEXT NOT NULL,
+    created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE complaint_type
+(
+    id        SERIAL PRIMARY KEY,
+    type_name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE complaint
+(
+    id                SERIAL PRIMARY KEY,
+    reporter_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    reported_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    complaint_type_id INT      NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
+    report_status     SMALLINT NOT NULL CHECK (report_status BETWEEN 0 AND 5),
+    created_at        TIMESTAMPTZ DEFAULT NOW(),
+    CHECK (reporter_user_id != reported_user_id)
+);
+
+
+-- triggers
 CREATE OR REPLACE FUNCTION delete_tag_cascade()
     RETURNS TRIGGER AS
 $$
@@ -38,47 +88,60 @@ CREATE TRIGGER trigger_delete_tag_cascade
     FOR EACH ROW
 EXECUTE FUNCTION delete_tag_cascade();
 
-CREATE TABLE "like"
-(
-    liked_by_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    liked_to_user_id INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    committed_at     TIMESTAMP NOT NULL DEFAULT NOW(),
-    UNIQUE (liked_by_user_id, liked_to_user_id)
-);
+CREATE OR REPLACE FUNCTION update_last_message_id()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE dialog SET last_message_id = NEW.id WHERE id = NEW.dialog_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE TABLE dialog
-(
-    id       SERIAL PRIMARY KEY,
-    user1_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    user2_id INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    UNIQUE (user1_id, user2_id)
-);
+CREATE TRIGGER trigger_update_last_message_id
+    AFTER INSERT
+    ON message
+    FOR EACH ROW
+EXECUTE FUNCTION update_last_message_id();
 
-CREATE TABLE message
-(
-    id           SERIAL PRIMARY KEY,
-    dialog_id    INT       NOT NULL REFERENCES dialog (id) ON DELETE CASCADE,
-    sender_id    INT       NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    message_text TEXT      NOT NULL,
-    message_time TIMESTAMP NOT NULL
-);
 
-CREATE TABLE complaint_type
-(
-    id        SERIAL PRIMARY KEY,
-    type_name TEXT UNIQUE NOT NULL
-);
+CREATE OR REPLACE FUNCTION delete_invalid_tag()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    FOR new_tag IN NEW.tags
+        LOOP
+            IF new_tag NOT IN (SELECT name FROM tag) THEN
+                NEW.tsgs = array_remove(NEW.tsgs, new_tag);
+            END IF;
+        END LOOP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-CREATE TABLE complaint
-(
-    id                SERIAL PRIMARY KEY,
-    reporter_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    reported_user_id  INT       NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type_id INT       NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
-    report_status     SMALLINT  NOT NULL CHECK (report_status BETWEEN 0 AND 5),
-    complaint_time    TIMESTAMP NOT NULL DEFAULT NOW()
-);
+CREATE TRIGGER trigger_delete_invalid_tag
+    BEFORE INSERT or UPDATE
+    ON "user"
+    FOR EACH ROW
+EXECUTE FUNCTION delete_invalid_tag();
 
+
+CREATE OR REPLACE FUNCTION update_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER user_updated_at_trigger
+    BEFORE UPDATE
+    ON "user"
+    FOR EACH ROW
+EXECUTE FUNCTION update_updated_at();
+
+
+-- fill db
 INSERT INTO tag (name)
 VALUES ('Спорт'),
        ('Музыка'),
@@ -126,3 +189,15 @@ VALUES ('Фёдор', 'fedor@mail.ru',
         'cRbBjQPeCvjPxGcIYmtqPW', 0, 1, 'Студент 1 курса МГУ', 'Новые знакомства', NULL, 'Неполное высшее',
         'Волейбол, компьютерные игры', '2003-01-01', ARRAY ['Путешествия', 'Наука']);
 
+INSERT INTO dialog (user1_id, user2_id, last_message_id)
+VALUES (3, 4),
+       (3, 5),
+       (3, 6),
+       (3, 7),
+       (3, 8),
+       (3, 9);
+
+INSERT INTO message (dialog_id, sender_id, message_text)
+VALUES (2, 3, 'Hello'),
+       (2, 4, 'Hello last'),
+       (3, 5, 'Hello last 1');
