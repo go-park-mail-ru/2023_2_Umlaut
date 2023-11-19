@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8000",
+    "host": "umlaut-bmstu.me:8000",
     "basePath": "/",
     "paths": {
         "/api/v1/auth/login": {
@@ -673,6 +673,12 @@
                 },
                 "user2_id": {
                     "type": "integer"
+                },
+                "сompanion_image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

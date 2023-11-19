@@ -105,6 +105,10 @@ definitions:
         type: integer
       user2_id:
         type: integer
+      сompanion_image_paths:
+        items:
+          type: string
+        type: array
     type: object
   model.Like:
     properties:
@@ -165,7 +169,7 @@ definitions:
     - name
     - password
     type: object
-host: localhost:8000
+host: umlaut-bmstu.me:8000
 info:
   contact: {}
   description: API Server for Umlaut Application

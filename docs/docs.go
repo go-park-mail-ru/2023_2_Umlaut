@@ -679,6 +679,12 @@ const docTemplate = `{
                 },
                 "user2_id": {
                     "type": "integer"
+                },
+                "сompanion_image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -777,7 +783,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "umlaut-bmstu.me:8000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",
