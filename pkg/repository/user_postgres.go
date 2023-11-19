@@ -50,7 +50,7 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
 	var user model.User
 
-	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
+	query, args, err := psql.Select(static.UserDbField).From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -69,7 +69,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, error) {
 	var user model.User
 
-	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"id": id}).ToSql()
+	query, args, err := psql.Select(static.UserDbField).From(userTable).Where(sq.Eq{"id": id}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -87,7 +87,7 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 
 func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
 	var nextUser model.User
-	queryBuilder := psql.Select("*").From(userTable).Where(sq.NotEq{"id": user.Id})
+	queryBuilder := psql.Select(static.UserDbField).From(userTable).Where(sq.NotEq{"id": user.Id})
 	if user.PreferGender != nil {
 		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
 	}
@@ -130,7 +130,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		return model.User{}, err
 	}
 
-	query += " RETURNING *"
+	query += fmt.Sprintf(" RETURNING %s", static.UserDbField)
 	var updatedUser model.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
@@ -155,7 +155,7 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) 
 		return err
 	}
 
-	query += " RETURNING *"
+	query += fmt.Sprintf(" RETURNING %s", static.UserDbField)
 	var updatedUser model.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
@@ -170,7 +170,7 @@ func (r *UserPostgres) GetNextUsers(ctx context.Context, user model.User, usedUs
 		exp = append(exp, sq.NotEq{"id": id})
 	}
 
-	queryBuilder := psql.Select("*").From(userTable).Where(exp)
+	queryBuilder := psql.Select(static.UserDbField).From(userTable).Where(exp)
 	if user.PreferGender != nil {
 		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
 	}

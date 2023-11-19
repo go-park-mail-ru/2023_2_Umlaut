@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -24,10 +25,11 @@ func TestLikeService_CreateLike(t *testing.T) {
 		{
 			name: "Mutual Like",
 			mockBehavior: func(r *mock_repository.MockLike, d *mock_repository.MockDialog) {
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(mockLike, nil)
 				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(true, nil)
 				d.EXPECT().CreateDialog(gomock.Any(), gomock.Any()).Return(0, nil)
 			},
-			expectedError: model.MutualLike,
+			expectedError: static.ErrMutualLike,
 		},
 		{
 			name: "Non-Mutual Like",
@@ -40,6 +42,7 @@ func TestLikeService_CreateLike(t *testing.T) {
 		{
 			name: "Error in IsMutualLike",
 			mockBehavior: func(r *mock_repository.MockLike, d *mock_repository.MockDialog) {
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(mockLike, nil)
 				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(false, errors.New("some error"))
 			},
 			expectedError: errors.New("some error"),
@@ -47,6 +50,7 @@ func TestLikeService_CreateLike(t *testing.T) {
 		{
 			name: "Error in CreateDialog",
 			mockBehavior: func(r *mock_repository.MockLike, d *mock_repository.MockDialog) {
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(mockLike, nil)
 				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(true, nil)
 				d.EXPECT().CreateDialog(gomock.Any(), gomock.Any()).Return(0, errors.New("some error"))
 			},
@@ -55,7 +59,6 @@ func TestLikeService_CreateLike(t *testing.T) {
 		{
 			name: "Error in CreateLike",
 			mockBehavior: func(r *mock_repository.MockLike, d *mock_repository.MockDialog) {
-				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(false, nil)
 				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(mockLike, errors.New("some error"))
 			},
 			expectedError: errors.New("some error"),

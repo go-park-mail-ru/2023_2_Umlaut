@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,7 +12,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -33,7 +33,7 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 		return model.Like{}, fmt.Errorf("failed to create like. err: %w", err)
 	}
 
-	query += " RETURNING *"
+	query += fmt.Sprintf(" RETURNING %s", static.LikeDbField)
 	var newLike model.Like
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanLike(row, &newLike)
@@ -51,7 +51,7 @@ func (r *LikePostgres) IsMutualLike(ctx context.Context, like model.Like) (bool,
 	like.LikedToUserId = like.LikedByUserId
 	like.LikedByUserId = tmp
 
-	query, args, err := psql.Select("*").
+	query, args, err := psql.Select(static.LikeDbField).
 		From(likeTable).
 		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
 		ToSql()
@@ -72,7 +72,6 @@ func scanLike(row pgx.Row, like *model.Like) error {
 	err := row.Scan(
 		&like.LikedByUserId,
 		&like.LikedToUserId,
-		&like.CommittedAt,
 	)
 	return err
 }

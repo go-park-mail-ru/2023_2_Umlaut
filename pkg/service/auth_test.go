@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -42,10 +43,10 @@ func TestAuthService_CreateUser(t *testing.T) {
 		{
 			name: "Already Exists",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(0, model.AlreadyExists)
+				r.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(0, static.ErrAlreadyExists)
 			},
 			expectedID:    0,
-			expectedError: model.AlreadyExists,
+			expectedError: static.ErrAlreadyExists,
 		},
 	}
 

@@ -142,7 +142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/dialog": {
+        "/api/v1/dialogs": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -153,8 +153,8 @@ const docTemplate = `{
                 "tags": [
                     "dialog"
                 ],
-                "summary": "get dialog message",
-                "operationId": "dialogMsg",
+                "summary": "get user dialogs",
+                "operationId": "dialog",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -177,7 +177,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/dialogs": {
+        "/api/v1/dialogs/{id}/message": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -188,13 +188,21 @@ const docTemplate = `{
                 "tags": [
                     "dialog"
                 ],
-                "summary": "get user dialogs",
-                "operationId": "dialog",
+                "summary": "get dialog message",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Dialog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Dialog"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Message"
                         }
                     },
                     "401": {
@@ -537,6 +545,23 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.ClientResponseDto-array_model_Message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Message"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-array_model_User": {
             "type": "object",
             "properties": {
@@ -680,6 +705,12 @@ const docTemplate = `{
                 },
                 "user2_id": {
                     "type": "integer"
+                },
+                "сompanion_image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -694,6 +725,9 @@ const docTemplate = `{
         "model.Message": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "dialog_id": {
                     "type": "integer"
                 },
@@ -705,9 +739,6 @@ const docTemplate = `{
                 },
                 "sender_id": {
                     "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
                 }
             }
         },

@@ -52,11 +52,14 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
 	query, args, err := psql.
-		Select("d.id", "d.user1_id", "d.user2_id", "u.name", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.timestamp").
+		Select("d.id", "d.user1_id", "d.user2_id", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.created_at").
 		From(dialogTable + " d").
-		InnerJoin(fmt.Sprintf("%s u ON d.user1_id = u.id OR d.user2_id = u.id", userTable)).
-		InnerJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
-		Where(sq.Or{sq.Eq{"user1_id": userId}, sq.Eq{"user2_id": userId}}).
+		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
+		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
+		Where(sq.And{
+			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
+			sq.NotEq{"u.id": userId},
+		}).
 		ToSql()
 
 	if err != nil {
@@ -79,10 +82,10 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 
 func (r *DialogPostgres) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
 	queryBuilder := psql.
-		Select("*").
+		Select(static.MessageDbField).
 		From(messageTable).
 		Where(sq.Eq{"dialog_id": dialogId}).
-		OrderBy("timestamp desc")
+		OrderBy("created_at desc")
 	query, args, err := queryBuilder.ToSql()
 
 	if err != nil {
@@ -108,18 +111,28 @@ func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
 	var err error
 	for rows.Next() {
 		var dialog model.Dialog
-		//var lastMessage model.Message
+		var lastMessage model.Message
 		err = rows.Scan(
 			&dialog.Id,
 			&dialog.User1Id,
 			&dialog.User2Id,
 			&dialog.Сompanion,
-			&dialog.LastMessage,
+			&dialog.СompanionImagePaths,
+			&lastMessage.Id,
+			&lastMessage.SenderId,
+			&lastMessage.DialogId,
+			&lastMessage.Text,
+			&lastMessage.CreatedAt,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		//TODO: check scan last msg
+		if lastMessage.Id == nil {
+			dialog.LastMessage = nil
+		} else {
+			dialog.LastMessage = &lastMessage
+		}
 		dialogs = append(dialogs, dialog)
 	}
 	if err != nil {
@@ -141,8 +154,8 @@ func scanMessages(rows pgx.Rows) ([]model.Message, error) {
 			&message.Id,
 			&message.SenderId,
 			&message.DialogId,
-			&message.MessageText,
-			&message.TimeStamp,
+			&message.Text,
+			&message.CreatedAt,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
