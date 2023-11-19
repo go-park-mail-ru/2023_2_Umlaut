@@ -180,7 +180,7 @@ definitions:
     - name
     - password
     type: object
-host: localhost:8000
+host: umlaut-bmstu.me:8000
 info:
   contact: {}
   description: API Server for Umlaut Application
@@ -274,7 +274,7 @@ paths:
     get:
       consumes:
       - application/json
-      operationId: dialogMsg
+      operationId: dialog
       produces:
       - application/json
       responses:
@@ -319,29 +319,6 @@ paths:
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get dialog message
-      tags:
-      - dialog
-  /api/v1/dialogs:
-    get:
-      consumes:
-      - application/json
-      operationId: dialog
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-array_model_Dialog'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: get user dialogs
       tags:
       - dialog
   /api/v1/feed:

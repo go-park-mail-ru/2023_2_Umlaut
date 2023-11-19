@@ -21,7 +21,7 @@ import (
 
 func init() {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
+	viper.SetConfigName("config")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -32,7 +32,7 @@ func init() {
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host localhost:8000
+// @host umlaut-bmstu.me:8000
 // @BasePath /
 func main() {
 	logger, err := initLogger()
