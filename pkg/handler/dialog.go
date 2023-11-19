@@ -26,7 +26,6 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 
 // @Summary get dialog message
 // @Tags dialog
-// @ID dialog
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[[]model.Dialog]

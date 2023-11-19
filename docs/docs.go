@@ -154,6 +154,40 @@ const docTemplate = `{
                     "dialog"
                 ],
                 "summary": "get dialog message",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Dialog"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dialogs": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dialog"
+                ],
+                "summary": "get user dialogs",
                 "operationId": "dialog",
                 "responses": {
                     "200": {
@@ -659,6 +693,9 @@ const docTemplate = `{
         "model.Message": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "dialog_id": {
                     "type": "integer"
                 },
@@ -670,9 +707,6 @@ const docTemplate = `{
                 },
                 "sender_id": {
                     "type": "integer"
-                },
-                "timestamp": {
-                    "type": "string"
                 }
             }
         },

@@ -113,6 +113,8 @@ definitions:
     type: object
   model.Message:
     properties:
+      created_at:
+        type: string
       dialog_id:
         type: integer
       id:
@@ -121,8 +123,6 @@ definitions:
         type: string
       sender_id:
         type: integer
-      timestamp:
-        type: string
     type: object
   model.User:
     properties:
@@ -259,7 +259,6 @@ paths:
     get:
       consumes:
       - application/json
-      operationId: dialog
       produces:
       - application/json
       responses:
@@ -276,6 +275,29 @@ paths:
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get dialog message
+      tags:
+      - dialog
+  /api/v1/dialogs:
+    get:
+      consumes:
+      - application/json
+      operationId: dialog
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_model_Dialog'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get user dialogs
       tags:
       - dialog
   /api/v1/feed:
