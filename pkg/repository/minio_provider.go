@@ -3,9 +3,11 @@ package repository
 import (
 	"context"
 	"io"
+	"strings"
 
 	"fmt"
 
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -17,7 +19,7 @@ func NewMinioProvider(client *minio.Client) *MinioProvider {
 	return &MinioProvider{client: client}
 }
 
-func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error {
+func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) (string, error) {
 	_, err := m.client.PutObject(
 		ctx,
 		bucketName,
@@ -27,12 +29,19 @@ func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, co
 		minio.PutObjectOptions{ContentType: contentType},
 	)
 	if err != nil {
-		return fmt.Errorf("failed to upload file. err: %w", err)
+		return "", fmt.Errorf("failed to upload file. err: %w", err)
 	}
-	return nil
+	fileName = fmt.Sprintf("%s/photos/%s/%s", static.Host, bucketName, fileName)
+	return fileName, nil
 }
 
-func (m *MinioProvider) DeleteFile(ctx context.Context, bucketName, fileName string) error {
+func (m *MinioProvider) DeleteFile(ctx context.Context, bucketName, link string) error {
+	i := strings.LastIndex(link, "/")
+	if i == -1 {
+		return fmt.Errorf("failed to upload file. Uncorrect link");
+	}
+	fileName := link[i + 1:]
+
 	err := m.client.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete file. err: %w", err)

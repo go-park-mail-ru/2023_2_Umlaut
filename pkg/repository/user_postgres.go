@@ -109,8 +109,6 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
-	user.LinkUnenrichment()
-
 	query, args, err := psql.Update(userTable).
 		Set("name", user.Name).
 		Set("mail", user.Mail).
@@ -220,7 +218,6 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Tags,
 	)
 
-	user.LinkEnrichment()
 	user.CalculateAge()
 	return err
 }

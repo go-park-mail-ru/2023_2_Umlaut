@@ -1,12 +1,9 @@
 package model
 
 import (
-	"fmt"
 	"net/mail"
-	"strings"
 	"time"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -73,31 +70,4 @@ func (u *User) Sanitize() {
 
 	u.PasswordHash = ""
 	u.Salt = ""
-}
-
-func (u *User) LinkUnenrichment() {
-	if u.ImagePaths == nil {
-		return
-	}
-	var result []string
-	for _, link := range *u.ImagePaths {
-		i := strings.LastIndex(link, "/")
-		if i == -1 {
-			result = append(result, link)
-			continue
-		}
-		result = append(result, link[i + 1:])
-	}
-	u.ImagePaths = &result
-}
-
-func (u *User) LinkEnrichment() {
-	if u.ImagePaths == nil {
-		return
-	}
-	var result []string
-	for _, fileName := range *u.ImagePaths {
-		result = append(result, fmt.Sprintf("%s/photos/%s%d/%s", static.Host, "user-id-", u.Id, fileName))
-	}
-	u.ImagePaths = &result
 }

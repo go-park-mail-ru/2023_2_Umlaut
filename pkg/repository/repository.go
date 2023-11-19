@@ -46,8 +46,8 @@ type Store interface {
 }
 
 type FileServer interface {
-	UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error
-	DeleteFile(ctx context.Context, bucketName, fileName string) error
+	UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) (string, error)
+	DeleteFile(ctx context.Context, bucketName, link string) error
 	CreateBucket(ctx context.Context, bucketName string) error
 }
 

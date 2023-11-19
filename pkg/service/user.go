@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
-	"strings"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -71,7 +70,7 @@ func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart
 	}
 
 	contentType := http.DetectContentType(buffer)
-	err = s.repoMinio.UploadFile(ctx, bucketName, fileName, contentType, file, size)
+	link, err := s.repoMinio.UploadFile(ctx, bucketName, fileName, contentType, file, size)
 	if err != nil {
 		return fileName, fmt.Errorf("CreateFile error: %v", err)
 	}
@@ -80,16 +79,16 @@ func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart
 		return fileName, fmt.Errorf("CreateFile error: %v", err)
 	}
 	if currentUser.ImagePaths == nil {
-		currentUser.ImagePaths = &[]string{fileName}
+		currentUser.ImagePaths = &[]string{link}
 	} else {
-		*currentUser.ImagePaths = append(*currentUser.ImagePaths, fileName)
+		*currentUser.ImagePaths = append(*currentUser.ImagePaths, link)
 	}
 	_, err = s.repoUser.UpdateUser(ctx, currentUser)
 	if err != nil {
-		return fileName, fmt.Errorf("CreateFile error: %v", err)
+		return link, fmt.Errorf("CreateFile error: %v", err)
 	}
 
-	return fileName, err
+	return link, err
 }
 
 func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) error {
@@ -101,7 +100,7 @@ func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) e
 		return static.ErrNoFiles
 	}
 
-	err = s.repoMinio.DeleteFile(ctx, getBucketName(userId), getFileName(link))
+	err = s.repoMinio.DeleteFile(ctx, getBucketName(userId), link)
 	if err != nil {
 		return fmt.Errorf("DeleteFile error: %v", err)
 	}
@@ -129,14 +128,6 @@ func remove(data []string, value string) []string {
 		break
 	}
 	return data
-}
-
-func getFileName(link string) string {
-	i := strings.LastIndex(link, "/")
-	if i == -1 {
-		return link
-	}
-	return link[i+1:]
 }
 
 func getBucketName(userId int) string {

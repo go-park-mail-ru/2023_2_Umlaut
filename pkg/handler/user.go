@@ -92,12 +92,12 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
+	link, err := h.services.User.CreateFile(r.Context(), id, file, head.Size)
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(r.Context(), w, "")
+	NewSuccessClientResponseDto(r.Context(), w, link)
 }
 
 // @Summary delete user photo
