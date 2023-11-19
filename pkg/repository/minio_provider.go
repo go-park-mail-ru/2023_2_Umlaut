@@ -20,7 +20,7 @@ func NewMinioProvider(client *minio.Client) *MinioProvider {
 func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error {
 	_, err := m.client.PutObject(
 		ctx,
-		"user-id-1",
+		bucketName,
 		fileName,
 		file,
 		size,
@@ -33,7 +33,7 @@ func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, co
 }
 
 func (m *MinioProvider) DeleteFile(ctx context.Context, bucketName, fileName string) error {
-	err := m.client.RemoveObject(ctx, "user-id-1", fileName, minio.RemoveObjectOptions{})
+	err := m.client.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to delete file. err: %w", err)
 	}
