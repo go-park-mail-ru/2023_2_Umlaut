@@ -50,58 +50,110 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 }
 
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
-	query, args, err := psql.Select(dialogTable+".id", "user1_id", "user2_id", userTable+".name").From(dialogTable).
-		InnerJoin(userTable + " ON " +
-			dialogTable + ".user1_id =" + userTable + ".id OR " +
-			dialogTable + ".user2_id =" + userTable + ".id").
-		Where(sq.Or{
-			sq.And{
-				sq.Eq{"user1_id": userId},
-				sq.NotEq{userTable + ".id": userId},
-			},
-			sq.And{
-				sq.Eq{"user2_id": userId},
-				sq.NotEq{userTable + ".id": userId},
-			},
-		}).
+	query, args, err := psql.
+		Select("d.id", "d.user1_id", "d.user2_id", "u.name", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.timestamp").
+		From(dialogTable + " d").
+		InnerJoin(fmt.Sprintf("%s u ON d.user1_id = u.id OR d.user2_id = u.id", userTable)).
+		InnerJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
+		Where(sq.Or{sq.Eq{"user1_id": userId}, sq.Eq{"user2_id": userId}}).
 		ToSql()
 
 	if err != nil {
-		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
-
 	if err != nil {
-		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 	defer rows.Close()
-	var dialogs []model.Dialog
-	for rows.Next() {
-		var dialog model.Dialog
-		err = scanDialog(rows, &dialog)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return dialogs, fmt.Errorf("dialogs doesn't exists for userId %d", userId)
-		}
-		if dialog.User2Id == userId {
-			dialog.User2Id = dialog.User1Id
-			dialog.User1Id = userId
-		}
-		dialogs = append(dialogs, dialog)
-	}
-	if err = rows.Err(); err != nil {
-		return dialogs, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+
+	dialogs, err := scanDialogs(rows)
+	if err != nil {
+		return nil, err
 	}
 
 	return dialogs, nil
 }
 
-func scanDialog(row pgx.Row, dialog *model.Dialog) error {
-	err := row.Scan(
-		&dialog.Id,
-		&dialog.User1Id,
-		&dialog.User2Id,
-		&dialog.Сompanion,
-	)
-	return err
+func (r *DialogPostgres) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+	queryBuilder := psql.
+		Select("*").
+		From(messageTable).
+		Where(sq.Eq{"dialog_id": dialogId}).
+		OrderBy("timestamp desc")
+	query, args, err := queryBuilder.ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get message for dialogId %d. err: %w", dialogId, err)
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get message for dialogId %d. err: %w", dialogId, err)
+	}
+	defer rows.Close()
+
+	messages, err := scanMessages(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}
+
+func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
+	var dialogs []model.Dialog
+	var err error
+	for rows.Next() {
+		var dialog model.Dialog
+		//var lastMessage model.Message
+		err = rows.Scan(
+			&dialog.Id,
+			&dialog.User1Id,
+			&dialog.User2Id,
+			&dialog.Сompanion,
+			&dialog.LastMessage,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		//TODO: check scan last msg
+		dialogs = append(dialogs, dialog)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("scan error in GetDialogs: %v", err)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows error in GetDialogs: %v", rows.Err())
+	}
+
+	return dialogs, nil
+}
+
+func scanMessages(rows pgx.Rows) ([]model.Message, error) {
+	var messages []model.Message
+	var err error
+	for rows.Next() {
+		var message model.Message
+		err = rows.Scan(
+			&message.Id,
+			&message.SenderId,
+			&message.DialogId,
+			&message.MessageText,
+			&message.TimeStamp,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		messages = append(messages, message)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("scan error in GetDialogMessages: %v", err)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows error in GetDialogMessages: %v", rows.Err())
+	}
+
+	return messages, nil
 }

@@ -22,3 +22,7 @@ func (s *DialogService) CreateDialog(ctx context.Context, dialog model.Dialog) (
 func (s *DialogService) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
 	return s.repoDialog.GetDialogs(ctx, userId)
 }
+
+func (s *DialogService) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+	return s.repoDialog.GetDialogMessages(ctx, dialogId)
+}

@@ -9,7 +9,7 @@ import "net/http"
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[[]string]
 // @Failure 401,500 {object} ClientResponseDto[string]
-// @Router /api/v1/tags [get]
+// @Router /api/v1/tag [get]
 func (h *Handler) getAllTags(w http.ResponseWriter, r *http.Request) {
 	tags, err := h.services.Tag.GetAllTags(r.Context())
 	if err != nil {

@@ -18,20 +18,18 @@ func NewTagPostgres(db *pgxpool.Pool) *TagPostgres {
 }
 
 func (r *TagPostgres) GetAllTags(ctx context.Context) ([]string, error) {
-	var tags []string
-
 	query, args, err := psql.Select("name").From(tagTable).ToSql()
 	if err != nil {
-		return tags, err
+		return nil, err
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return tags, fmt.Errorf("query error in GetAllTags: %v", err)
+		return nil, fmt.Errorf("query error in GetAllTags: %v", err)
 	}
 	defer rows.Close()
 
-	err = scanTags(rows, &tags)
+	tags, err := scanTags(rows)
 	if err != nil {
 		return tags, err
 	}
@@ -39,22 +37,23 @@ func (r *TagPostgres) GetAllTags(ctx context.Context) ([]string, error) {
 	return tags, err
 }
 
-func scanTags(rows pgx.Rows, tags *[]string) error {
+func scanTags(rows pgx.Rows) ([]string, error) {
+	var tags []string
 	var err error
 	for rows.Next() {
 		var name string
 		err = rows.Scan(&name)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil
+			return nil, nil
 		}
-		*tags = append(*tags, name)
+		tags = append(tags, name)
 	}
 	if err != nil {
-		return fmt.Errorf("scan error in GetAllTags: %v", err)
+		return nil, fmt.Errorf("scan error in GetAllTags: %v", err)
 	}
 	if rows.Err() != nil {
-		return fmt.Errorf("rows error in GetAllTags: %v", rows.Err())
+		return nil, fmt.Errorf("rows error in GetAllTags: %v", rows.Err())
 	}
 
-	return nil
+	return tags, nil
 }
