@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 // @Summary get user dialogs
@@ -27,14 +29,19 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 // @Summary get dialog message
 // @Tags dialog
 // @Accept  json
+// @Param id path integer true "Dialog ID"
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[[]model.Dialog]
+// @Success 200 {object} ClientResponseDto[[]model.Message]
 // @Failure 401,500 {object} ClientResponseDto[string]
-// @Router /api/v1/dialog [get]
+// @Router /api/v1/dialogs/{id}/message [get]
 func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(keyUserID).(int)
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid params")
+		return
+	}
 
-	dialogs, err := h.services.Dialog.GetDialogs(r.Context(), userId)
+	dialogs, err := h.services.Dialog.GetDialogMessages(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
 		return

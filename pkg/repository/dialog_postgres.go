@@ -82,7 +82,7 @@ func (r *DialogPostgres) GetDialogMessages(ctx context.Context, dialogId int) ([
 		Select(static.MessageDbField).
 		From(messageTable).
 		Where(sq.Eq{"dialog_id": dialogId}).
-		OrderBy("timestamp desc")
+		OrderBy("created_at desc")
 	query, args, err := queryBuilder.ToSql()
 
 	if err != nil {

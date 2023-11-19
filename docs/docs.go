@@ -142,7 +142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/dialog": {
+        "/api/v1/dialogs": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -153,7 +153,8 @@ const docTemplate = `{
                 "tags": [
                     "dialog"
                 ],
-                "summary": "get dialog message",
+                "summary": "get user dialogs",
+                "operationId": "dialog",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -176,7 +177,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/dialogs": {
+        "/api/v1/dialogs/{id}/message": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -187,13 +188,21 @@ const docTemplate = `{
                 "tags": [
                     "dialog"
                 ],
-                "summary": "get user dialogs",
-                "operationId": "dialog",
+                "summary": "get dialog message",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Dialog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Dialog"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Message"
                         }
                     },
                     "401": {
@@ -529,6 +538,23 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Dialog"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-array_model_Message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Message"
                     }
                 },
                 "status": {
