@@ -56,7 +56,10 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 		From(dialogTable + " d").
 		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
 		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
-		Where(sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}}).
+		Where(sq.And{
+			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
+			sq.NotEq{"u.id": userId},
+		}).
 		ToSql()
 
 	if err != nil {
