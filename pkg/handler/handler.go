@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
+	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/mux"
@@ -13,12 +14,13 @@ import (
 )
 
 type Handler struct {
-	services *service.Service
-	logger   *zap.Logger
+	authMicroservice authProto.AuthorizationClient
+	services         *service.Service
+	logger           *zap.Logger
 }
 
-func NewHandler(services *service.Service, logger *zap.Logger) *Handler {
-	return &Handler{services: services, logger: logger}
+func NewHandler(services *service.Service, logger *zap.Logger, authMicroservice authProto.AuthorizationClient) *Handler {
+	return &Handler{services: services, logger: logger, authMicroservice: authMicroservice}
 }
 
 func (h *Handler) InitRoutes() http.Handler {
