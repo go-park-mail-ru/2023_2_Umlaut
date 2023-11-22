@@ -12,6 +12,17 @@ services:
     environment:
       - DB_PASSWORD=1474
 
+  authorization:
+    build:
+      context: .
+      dockerfile: ./cmd/auth/Dockerfile
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8001:8001"
+
   db:
     restart: always
     image: postgres:latest
