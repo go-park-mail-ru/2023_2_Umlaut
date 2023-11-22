@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"log"
 	"strconv"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -12,6 +13,15 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+func init() {
+	viper.AddConfigPath("configs")
+	viper.SetConfigName("config_local")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func InitLogger() (*zap.Logger, error) {
 	config := zap.Config{

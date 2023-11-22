@@ -11,24 +11,16 @@ import (
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func init() {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func initMicroservices() (authProto.AuthorizationClient, error) {
 	authConn, err := grpc.Dial(
-		"localhost"+":"+viper.GetString("auth_port"),
+		static.Adress+":"+viper.GetString("auth_port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

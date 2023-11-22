@@ -14,15 +14,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-func init() {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config_local")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func main() {
 	ctx := context.Background()
 

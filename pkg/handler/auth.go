@@ -31,23 +31,10 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		&proto.SignInInput{Mail: input.Mail, Password: input.Password},
 	)
-	status, ok := status.FromError(err)
-	if ok {
-		if status.Code() == codes.InvalidArgument {
-			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, status.Message())
-			return
-		}
-		if status.Code() == codes.Unauthenticated {
-			newErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, status.Message())
-			return
-		}
-		if status.Code() == codes.Internal {
-			newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, status.Message())
-			return
-		}
-	}
+
 	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
 
@@ -74,17 +61,11 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 		&proto.Cookie{Cookie: session.Value},
 	)
 
-	status, ok := status.FromError(err)
-	if ok {
-		if status.Code() == codes.Internal {
-			newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, status.Message())
-			return
-		}
-	}
 	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
-		return
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
+
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	session.Path = "/"
 
@@ -113,20 +94,9 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		&proto.SignUpInput{Mail: input.Mail, Password: input.Password, Name: input.Name},
 	)
 
-	status, ok := status.FromError(err)
-	if ok {
-		if status.Code() == codes.InvalidArgument {
-			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, status.Message())
-			return
-		}
-		if status.Code() == codes.Internal {
-			newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, status.Message())
-			return
-		}
-	}
 	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
-		return
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
 
 	http.SetCookie(w, createCookie(userId.Cookie.Cookie))
@@ -144,4 +114,23 @@ func createCookie(SID string) *http.Cookie {
 		//SameSite: http.SameSiteNoneMode,
 		//Secure:   true,
 	}
+}
+
+func parseError(err error) (int, string) {
+	status, ok := status.FromError(err)
+	if ok {
+		switch status.Code() {
+		case codes.InvalidArgument:
+			return http.StatusBadRequest, status.Message()
+		case codes.Unauthenticated:
+			return http.StatusUnauthorized, status.Message()
+		case codes.Internal:
+			return http.StatusInternalServerError, status.Message()
+		}
+	}
+	if err != nil {
+		return http.StatusInternalServerError, err.Error()
+	}
+
+	return 200, ""
 }
