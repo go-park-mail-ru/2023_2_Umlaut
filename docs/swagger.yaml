@@ -136,6 +136,8 @@ definitions:
         type: integer
       message_text:
         type: string
+      recipient_id:
+        type: integer
       sender_id:
         type: integer
     type: object

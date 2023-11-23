@@ -737,6 +737,9 @@ const docTemplate = `{
                 "message_text": {
                     "type": "string"
                 },
+                "recipient_id": {
+                    "type": "integer"
+                },
                 "sender_id": {
                     "type": "integer"
                 }

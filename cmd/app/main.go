@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler/ws"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"log"
 	"strconv"
 

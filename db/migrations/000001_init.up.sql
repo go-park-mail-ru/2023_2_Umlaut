@@ -38,7 +38,7 @@ CREATE TABLE dialog
     id         SERIAL PRIMARY KEY,
     user1_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     user2_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
---     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL,
+--     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL, не раскоментирывать!
     UNIQUE (user1_id, user2_id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT check_pair_order CHECK (user1_id < user2_id)

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler/ws"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
@@ -49,6 +49,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
+	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
 
 	r.Use(
 		h.loggingMiddleware,

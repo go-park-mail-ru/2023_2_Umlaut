@@ -1,10 +1,7 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler/ws"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"strconv"
 )
@@ -26,12 +23,10 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, dialog := range dialogs {
-		err = h.addDialogToHub(w, r, dialog, userId)
-		if err != nil {
-			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
-			return
-		}
+	err = h.addDialogsToUserHub(w, r, userId, dialogs)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	NewSuccessClientResponseArrayDto(r.Context(), w, dialogs)
@@ -59,47 +54,4 @@ func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	NewSuccessClientResponseArrayDto(r.Context(), w, messages)
-}
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-func (h *Handler) addDialogToHub(w http.ResponseWriter, r *http.Request, dialog model.Dialog, userId int) error {
-	h.hub.Dialogs[dialog.Id] = &ws.Dialog{
-		Id:                  dialog.Id,
-		User1Id:             dialog.User1Id,
-		User2Id:             dialog.User2Id,
-		Сompanion:           dialog.Сompanion,
-		СompanionImagePaths: dialog.СompanionImagePaths,
-		LastMessage:         dialog.LastMessage,
-		Clients:             make(map[int]*ws.Client),
-	}
-
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		return err
-	}
-	cl := &ws.Client{
-		Conn:     conn,
-		Message:  make(chan *model.Message, 10),
-		Id:       userId,
-		DialogId: dialog.Id,
-	}
-	text := "HELLO FROM WS"
-	m := &model.Message{
-		Text:     &text,
-		DialogId: &dialog.Id,
-		SenderId: &userId,
-	}
-	h.hub.Register <- cl
-	h.hub.Broadcast <- m
-
-	go cl.WriteMessage()
-	cl.ReadMessage(h.hub)
-	return nil
 }
