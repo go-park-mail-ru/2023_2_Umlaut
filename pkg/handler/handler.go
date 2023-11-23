@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler/ws"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
@@ -14,11 +15,12 @@ import (
 
 type Handler struct {
 	services *service.Service
+	hub      *ws.Hub
 	logger   *zap.Logger
 }
 
-func NewHandler(services *service.Service, logger *zap.Logger) *Handler {
-	return &Handler{services: services, logger: logger}
+func NewHandler(services *service.Service, hub *ws.Hub, logger *zap.Logger) *Handler {
+	return &Handler{services: services, hub: hub, logger: logger}
 }
 
 func (h *Handler) InitRoutes() http.Handler {

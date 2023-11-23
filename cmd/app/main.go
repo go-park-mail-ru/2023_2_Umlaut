@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler/ws"
 	"log"
 	"strconv"
 
@@ -21,7 +22,7 @@ import (
 
 func init() {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
+	viper.SetConfigName("config_local")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -32,7 +33,7 @@ func init() {
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host umlaut-bmstu.me:8000
+// @host localhost:8000
 // @BasePath /
 func main() {
 	logger, err := initLogger()
@@ -63,10 +64,12 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize Minio: %s", err.Error())))
 	}
 
+	hub := ws.NewHub()
 	repos := repository.NewRepository(db, sessionStore, fileClient)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services, logger)
+	handlers := handler.NewHandler(services, hub, logger)
 	srv := new(umlaut.Server)
+	go hub.Run()
 
 	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logger.Error("running http server",
