@@ -70,7 +70,6 @@ var upgrader = websocket.Upgrader{
 }
 
 func (h *Handler) addDialogToHub(w http.ResponseWriter, r *http.Request, dialog model.Dialog, userId int) error {
-	clients := make(map[int]*ws.Client)
 	h.hub.Dialogs[dialog.Id] = &ws.Dialog{
 		Id:                  dialog.Id,
 		User1Id:             dialog.User1Id,
@@ -78,7 +77,7 @@ func (h *Handler) addDialogToHub(w http.ResponseWriter, r *http.Request, dialog 
 		Сompanion:           dialog.Сompanion,
 		СompanionImagePaths: dialog.СompanionImagePaths,
 		LastMessage:         dialog.LastMessage,
-		Clients:             &clients,
+		Clients:             make(map[int]*ws.Client),
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
