@@ -20,7 +20,6 @@ type Authorization interface {
 
 type Feed interface {
 	GetNextUser(ctx context.Context, userId int) (model.User, error)
-	GetNextUsers(ctx context.Context, userId int) ([]model.User, error)
 }
 
 type User interface {

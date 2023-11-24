@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
+	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/mux"
@@ -15,12 +16,22 @@ import (
 
 type Handler struct {
 	authMicroservice authProto.AuthorizationClient
+	feedMicroservice feedProto.FeedClient
 	services         *service.Service
 	logger           *zap.Logger
 }
 
-func NewHandler(services *service.Service, logger *zap.Logger, authMicroservice authProto.AuthorizationClient) *Handler {
-	return &Handler{services: services, logger: logger, authMicroservice: authMicroservice}
+func NewHandler(
+	services *service.Service,
+	logger *zap.Logger,
+	authMicroservice authProto.AuthorizationClient,
+	feedMicroservice feedProto.FeedClient) *Handler {
+	return &Handler{
+		services:         services,
+		logger:           logger,
+		authMicroservice: authMicroservice,
+		feedMicroservice: feedMicroservice,
+	}
 }
 
 func (h *Handler) InitRoutes() http.Handler {
@@ -40,7 +51,6 @@ func (h *Handler) InitRoutes() http.Handler {
 		h.authMiddleware,
 	)
 	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
-	apiRouter.HandleFunc("/feed/users", h.getNextUsers).Methods("GET")
 	apiRouter.HandleFunc("/user", h.user).Methods("GET")
 	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/user/photo", h.updateUserPhoto).Methods("POST", "OPTIONS")

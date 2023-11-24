@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"net/http"
 )
 
@@ -13,31 +14,16 @@ import (
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
-	nextUser, err := h.services.Feed.GetNextUser(r.Context(), r.Context().Value(keyUserID).(int))
-	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	NewSuccessClientResponseDto(r.Context(), w, nextUser)
-}
+	id := r.Context().Value(keyUserID).(int)
+	user, err := h.feedMicroservice.Feed(
+		r.Context(),
+		&proto.UserIdFeed{Id: int32(id)},
+	)
 
-// @Summary get users for feed
-// @Tags feed
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} ClientResponseDto[[]model.User]
-// @Failure 500 {object} ClientResponseDto[string]
-// @Router /api/v1/feed/users [get]
-func (h *Handler) getNextUsers(w http.ResponseWriter, r *http.Request) {
-	nextUsers, err := h.services.Feed.GetNextUsers(r.Context(), r.Context().Value(keyUserID).(int))
 	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
-	if nextUsers == nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "out of users")
-		return
-	}
-
-	NewSuccessClientResponseArrayDto(r.Context(), w, nextUsers)
+	NewSuccessClientResponseDto(r.Context(), w, user)
 }

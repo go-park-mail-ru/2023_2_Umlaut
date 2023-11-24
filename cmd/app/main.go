@@ -9,6 +9,7 @@ import (
 	utils "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
+	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
@@ -18,16 +19,23 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func initMicroservices() (authProto.AuthorizationClient, error) {
+func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, error) {
 	authConn, err := grpc.Dial(
 		static.Adress+":"+viper.GetString("auth_port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+	feedConn, err := grpc.Dial(
+		static.Adress+":"+viper.GetString("feed_port"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return authProto.NewAuthorizationClient(authConn), nil
+	return authProto.NewAuthorizationClient(authConn), feedProto.NewFeedClient(feedConn), nil
 }
 
 // @title Umlaut API
@@ -65,7 +73,7 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize Minio: %s", err.Error())))
 	}
 
-	authClient, err := initMicroservices()
+	authClient, feedConn, err := initMicroservices()
 	if err != nil {
 		logger.Error("initialize Microservices",
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
@@ -73,7 +81,7 @@ func main() {
 
 	repos := repository.NewRepository(db, sessionStore, fileClient)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services, logger, authClient)
+	handlers := handler.NewHandler(services, logger, authClient, feedConn)
 	srv := new(umlaut.Server)
 
 	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {

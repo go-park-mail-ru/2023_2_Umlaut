@@ -1,5 +1,6 @@
 port: "8000"
 auth_port: "8001"
+feed_port: "8002"
 
 postgres:
   username: "postgres"
@@ -28,7 +29,8 @@ cors:
     "http://127.0.0.1:8000",
     "http://umlaut-bmstu.me",
     "http://umlaut-bmstu.me:8000",
-    "http://localhost:8001"
+    "http://localhost:8001",
+    "http://localhost:8002",
   ]
   methods: [
     "GET",

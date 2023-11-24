@@ -221,7 +221,7 @@ func (x *UserId) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserId.ProtoReflect.Descriptor instead.
+// Deprecated: Use UserIdfeed.ProtoReflect.Descriptor instead.
 func (*UserId) Descriptor() ([]byte, []int) {
 	return file_auth_proto_rawDescGZIP(), []int{3}
 }
@@ -328,15 +328,15 @@ var file_auth_proto_goTypes = []interface{}{
 	(*SignInInput)(nil), // 0: proto.SignInInput
 	(*SignUpInput)(nil), // 1: proto.SignUpInput
 	(*Cookie)(nil),      // 2: proto.Cookie
-	(*UserId)(nil),      // 3: proto.UserId
+	(*UserId)(nil),      // 3: proto.UserIdfeed
 	(*Empty)(nil),       // 4: proto.Empty
 }
 var file_auth_proto_depIdxs = []int32{
-	2, // 0: proto.UserId.Cookie:type_name -> proto.Cookie
+	2, // 0: proto.UserIdfeed.Cookie:type_name -> proto.Cookie
 	1, // 1: proto.Authorization.SignUp:input_type -> proto.SignUpInput
 	0, // 2: proto.Authorization.SignIn:input_type -> proto.SignInInput
 	2, // 3: proto.Authorization.LogOut:input_type -> proto.Cookie
-	3, // 4: proto.Authorization.SignUp:output_type -> proto.UserId
+	3, // 4: proto.Authorization.SignUp:output_type -> proto.UserIdfeed
 	2, // 5: proto.Authorization.SignIn:output_type -> proto.Cookie
 	4, // 6: proto.Authorization.LogOut:output_type -> proto.Empty
 	4, // [4:7] is the sub-list for method output_type
