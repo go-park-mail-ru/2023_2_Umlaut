@@ -1,5 +1,8 @@
 port: "8000"
-auth_port: "8001"
+
+authorization:
+  host: "localhost"
+  port: "8001"
 
 postgres:
   username: "postgres"
