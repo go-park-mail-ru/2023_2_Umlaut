@@ -12,7 +12,6 @@ import (
 	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -21,14 +20,14 @@ import (
 
 func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, error) {
 	authConn, err := grpc.Dial(
-		static.Adress+":"+viper.GetString("auth_port"),
+		viper.GetString("authorization.host")+":"+viper.GetString("authorization.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 	feedConn, err := grpc.Dial(
-		static.Adress+":"+viper.GetString("feed_port"),
+		viper.GetString("feed.host")+":"+viper.GetString("feed.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {

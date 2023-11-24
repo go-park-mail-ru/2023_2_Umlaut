@@ -1,27 +1,34 @@
 version: '3.8'
 
 services:
-  umlaut:
-    build: ./
-    command: ./wait-for-postgres.sh db ./umlaut
-    ports:
-      - 8000:8000
-    depends_on:
-      - db
-      - redis
-    environment:
-      - DB_PASSWORD=1474
-
   authorization:
     build:
-      context: .
+      context: ./
       dockerfile: ./cmd/auth/Dockerfile
+    command: ./wait-for-postgres.sh db ./auth
     restart: always
     depends_on:
       - db
       - redis
     ports:
       - "8001:8001"
+    environment:
+      - DB_PASSWORD=1474
+      
+  umlaut:
+    build:
+      context: ./
+      dockerfile: ./cmd/app/Dockerfile
+    command: ./wait-for-postgres.sh db ./umlaut
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+      - minio
+      - authorization
+    environment:
+      - DB_PASSWORD=1474
 
   db:
     restart: always

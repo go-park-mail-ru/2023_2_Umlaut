@@ -3,11 +3,14 @@ FROM golang:latest
 RUN go version
 ENV GOPATH=/
 
+RUN apt-get update
+RUN apt-get -y install postgresql-client
+
 COPY ./ ./
 
-RUN go mod download
-RUN go build -o  ./cmd/feed/main.go
+RUN chmod +x wait-for-postgres.sh
 
-RUN chmod +x ./auth
+RUN go mod download
+RUN go build -o feed ./cmd/feed/main.go
 
 CMD ["./feed"]

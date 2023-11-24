@@ -35,10 +35,10 @@ func main() {
 	)
 
 	feedServer := server.NewFeedServer(feedService)
-	viper.GetString("feed_port")
-	listen, err := net.Listen("tcp", ":"+viper.GetString("feed_port"))
+	viper.GetString("feed.port")
+	listen, err := net.Listen("tcp", ":"+viper.GetString("feed.port"))
 	if err != nil {
-		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("feed_port"), err.Error())
+		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("feed.port"), err.Error())
 	}
 
 	grpcServer := grpc.NewServer()
@@ -47,6 +47,6 @@ func main() {
 
 	err = grpcServer.Serve(listen)
 	if err != nil {
-		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("feed_port"), err.Error())
+		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("feed.port"), err.Error())
 	}
 }

@@ -1,6 +1,12 @@
 port: "8000"
-auth_port: "8001"
-feed_port: "8002"
+
+authorization:
+  host: "localhost"
+  port: "8001"
+
+feed:
+  host: "localhost"
+  port: "8002"
 
 postgres:
   username: "postgres"

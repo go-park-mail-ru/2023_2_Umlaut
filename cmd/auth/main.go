@@ -34,10 +34,10 @@ func main() {
 	)
 
 	server := server.NewAuthServer(authService)
-	viper.GetString("auth_port")
-	listen, err := net.Listen("tcp", ":" + viper.GetString("auth_port"))
+
+	listen, err := net.Listen("tcp", ":"+viper.GetString("authorization.port"))
 	if err != nil {
-		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("auth_port"), err.Error())
+		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("authorization.port"), err.Error())
 	}
 
 	grpcServer := grpc.NewServer()
@@ -46,6 +46,6 @@ func main() {
 
 	err = grpcServer.Serve(listen)
 	if err != nil {
-		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("auth_port"), err.Error())
+		log.Fatalf("Cannot listen port: %s. Err: %s", viper.GetString("authorization.port"), err.Error())
 	}
 }
