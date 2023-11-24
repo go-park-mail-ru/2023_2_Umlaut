@@ -14,7 +14,21 @@ services:
       - "8001:8001"
     environment:
       - DB_PASSWORD=1474
-      
+
+  feed:
+    build:
+      context: ./
+      dockerfile: ./cmd/feed/Dockerfile
+    command: ./wait-for-postgres.sh db ./feed
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8002:8002"
+    environment:
+      - DB_PASSWORD=1474
+
   umlaut:
     build:
       context: ./
@@ -47,22 +61,22 @@ services:
       - 6379:6379
 
   minio:
-   image: minio/minio:latest
-   command: server /data --address ":9000" --console-address ":9001"
-   ports:
-     - "9000:9000"
-     - "9001:9001"
-   environment:
-     MINIO_ROOT_USER: umlaut
-     MINIO_ROOT_PASSWORD: minio123
-     MINIO_HTTP_TRACE: /tmp/minio.log
-   volumes:
-     - ./.database/minio-storage:/data
-   healthcheck:
-     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-     interval: 30s
-     timeout: 20s
-     retries: 3
+    image: minio/minio:latest
+    command: server /data --address ":9000" --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: umlaut
+      MINIO_ROOT_PASSWORD: minio123
+      MINIO_HTTP_TRACE: /tmp/minio.log
+    volumes:
+      - ./.database/minio-storage:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
   
   nginx:
     image: nginx:latest
