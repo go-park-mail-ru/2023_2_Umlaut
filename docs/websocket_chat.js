@@ -1,4 +1,4 @@
-let socket = new WebSocket("ws://localhost:8000/api/ws/messenger");
+let socket = new WebSocket("ws://localhost:8000/api/v1/ws/messenger");
 
 socket.onopen = () => {
     console.log("Successfully Connected");
@@ -28,4 +28,11 @@ socket.onerror = error => {
 // }
 
 // примеры использования:
-socket.send('{"sender_id": "1", "recipient_id": "1", "dialog_id": "1", "message_text": "HELLO", }')
+socket.send(`{
+    "id": 1,
+    "sender_id": 101,
+    "recipient_id": 201,
+    "dialog_id": 123,
+    "message_text": "Привет, как дела?",
+    "created_at": "2023-11-24T12:00:00Z"
+}`)
