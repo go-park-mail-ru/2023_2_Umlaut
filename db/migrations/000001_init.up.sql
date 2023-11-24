@@ -147,12 +147,26 @@ EXECUTE FUNCTION update_updated_at();
 
 -- fill db
 INSERT INTO tag (name)
-VALUES ('Спорт'),
-       ('Музыка'),
+VALUES ('Романтика'),
        ('Путешествия'),
-       ('Еда'),
+       ('Фитнес'),
+       ('Кулинария'),
        ('Искусство'),
-       ('Наука');
+       ('Музыка'),
+       ('Фотография'),
+       ('Литература'),
+       ('Технологии'),
+       ('Экология'),
+       ('Кино и телевидение'),
+       ('Спорт'),
+       ('Психология'),
+       ('Домашние животные'),
+       ('Игры'),
+       ('Автомобили'),
+       ('Финансы и бизнес'),
+       ('Мода'),
+       ('Природа'),
+       ('Образование');
 
 INSERT INTO "user" (name, mail, password_hash, salt, user_gender, prefer_gender, description, looking, image_paths,
                     education, hobbies, birthday, tags)
