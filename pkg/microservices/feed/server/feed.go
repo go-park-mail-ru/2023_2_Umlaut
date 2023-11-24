@@ -20,7 +20,6 @@ func NewFeedServer(feed *service.FeedService) *FeedServer {
 }
 
 func (fs *FeedServer) Feed(ctx context.Context, userId *proto.UserIdFeed) (*proto.User, error) {
-	//return &proto.User{Id: 11}, nil
 	nextUser, err := fs.FeedService.GetNextUser(ctx, int(userId.Id))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -37,16 +36,41 @@ func (fs *FeedServer) Feed(ctx context.Context, userId *proto.UserIdFeed) (*prot
 		Mail:         nextUser.Mail,
 		PasswordHash: nextUser.PasswordHash,
 		Salt:         nextUser.Salt,
-		UserGender:   int32(*nextUser.UserGender),
-		PreferGender: int32(*nextUser.PreferGender),
-		Description:  *nextUser.Description,
-		Age:          int32(*nextUser.Age),
-		Looking:      *nextUser.Looking,
-		//ImagePaths:   *nextUser.ImagePaths,
-		Education: *nextUser.Education,
-		Hobbies:   *nextUser.Hobbies,
-		Birthday:  birthdayProto,
-		Online:    nextUser.Online,
-		//Tags:         *nextUser.Tags,
+		UserGender:   modifyInt(nextUser.UserGender),
+		PreferGender: modifyInt(nextUser.PreferGender),
+		Description:  modifyString(nextUser.Description),
+		Age:          modifyInt(nextUser.Age),
+		Looking:      modifyString(nextUser.Looking),
+		ImagePaths:   modifyArray(nextUser.ImagePaths),
+		Education:    modifyString(nextUser.Education),
+		Hobbies:      modifyString(nextUser.Hobbies),
+		Birthday:     birthdayProto,
+		Online:       nextUser.Online,
+		Tags:         modifyArray(nextUser.Tags),
 	}, nil
+}
+
+func modifyString(data *string) string {
+	if data == nil {
+		return ""
+	}
+	return *data
+}
+
+func modifyInt(data *int) int32 {
+	if data == nil {
+		return 0
+	}
+	return int32(*data)
+}
+
+func modifyArray(data *[]string) []string {
+	if data == nil {
+		return []string{}
+	}
+	var result []string
+	for _, path := range *data {
+		result = append(result, path)
+	}
+	return result
 }

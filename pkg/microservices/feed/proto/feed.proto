@@ -26,8 +26,9 @@ message User {
   bool online = 15;
   repeated string tags = 16;
 }
+
 message UserIdFeed {
-    int32 Id = 1;
+  int32 Id = 1;
 }
 
 service Feed {
