@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FeedClient interface {
-	Feed(ctx context.Context, in *UserIdFeed, opts ...grpc.CallOption) (*User, error)
+	Feed(ctx context.Context, in *FilterParams, opts ...grpc.CallOption) (*User, error)
 }
 
 type feedClient struct {
@@ -37,7 +37,7 @@ func NewFeedClient(cc grpc.ClientConnInterface) FeedClient {
 	return &feedClient{cc}
 }
 
-func (c *feedClient) Feed(ctx context.Context, in *UserIdFeed, opts ...grpc.CallOption) (*User, error) {
+func (c *feedClient) Feed(ctx context.Context, in *FilterParams, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
 	err := c.cc.Invoke(ctx, Feed_Feed_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -50,7 +50,7 @@ func (c *feedClient) Feed(ctx context.Context, in *UserIdFeed, opts ...grpc.Call
 // All implementations must embed UnimplementedFeedServer
 // for forward compatibility
 type FeedServer interface {
-	Feed(context.Context, *UserIdFeed) (*User, error)
+	Feed(context.Context, *FilterParams) (*User, error)
 	mustEmbedUnimplementedFeedServer()
 }
 
@@ -58,7 +58,7 @@ type FeedServer interface {
 type UnimplementedFeedServer struct {
 }
 
-func (UnimplementedFeedServer) Feed(context.Context, *UserIdFeed) (*User, error) {
+func (UnimplementedFeedServer) Feed(context.Context, *FilterParams) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Feed not implemented")
 }
 func (UnimplementedFeedServer) mustEmbedUnimplementedFeedServer() {}
@@ -75,7 +75,7 @@ func RegisterFeedServer(s grpc.ServiceRegistrar, srv FeedServer) {
 }
 
 func _Feed_Feed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserIdFeed)
+	in := new(FilterParams)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func _Feed_Feed_Handler(srv interface{}, ctx context.Context, dec func(interface
 		FullMethod: Feed_Feed_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FeedServer).Feed(ctx, req.(*UserIdFeed))
+		return srv.(FeedServer).Feed(ctx, req.(*FilterParams))
 	}
 	return interceptor(ctx, in, info, handler)
 }

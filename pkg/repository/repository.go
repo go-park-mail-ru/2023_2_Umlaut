@@ -18,7 +18,7 @@ type User interface {
 	CreateUser(ctx context.Context, user model.User) (int, error)
 	GetUser(ctx context.Context, mail string) (model.User, error)
 	GetUserById(ctx context.Context, id int) (model.User, error)
-	GetNextUser(ctx context.Context, user model.User) (model.User, error)
+	GetNextUser(ctx context.Context, user model.User, params model.FilterParams) (model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 	UpdateUserPassword(ctx context.Context, user model.User) error
 }

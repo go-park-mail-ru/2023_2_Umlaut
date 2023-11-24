@@ -27,10 +27,13 @@ message User {
   repeated string tags = 16;
 }
 
-message UserIdFeed {
-  int32 Id = 1;
+message FilterParams {
+  int32 user_id = 1;
+  int32 min_age = 2;
+  int32 max_age = 3;
+  repeated string tags = 4;
 }
 
 service Feed {
-  rpc Feed(UserIdFeed) returns(User) {}
+  rpc Feed(FilterParams) returns(User) {}
 }

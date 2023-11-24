@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/golang/protobuf/ptypes"
@@ -19,8 +20,13 @@ func NewFeedServer(feed *service.FeedService) *FeedServer {
 	return &FeedServer{FeedService: feed}
 }
 
-func (fs *FeedServer) Feed(ctx context.Context, userId *proto.UserIdFeed) (*proto.User, error) {
-	nextUser, err := fs.FeedService.GetNextUser(ctx, int(userId.Id))
+func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*proto.User, error) {
+	nextUser, err := fs.FeedService.GetNextUser(ctx, model.FilterParams{
+		UserId: int(params.UserId),
+		MinAge: int(params.MinAge),
+		MaxAge: int(params.MaxAge),
+		Tags:   params.Tags,
+	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

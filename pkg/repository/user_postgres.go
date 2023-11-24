@@ -85,11 +85,25 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	return user, err
 }
 
-func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
+func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params model.FilterParams) (model.User, error) {
 	var nextUser model.User
-	queryBuilder := psql.Select(static.UserDbField).From(userTable).Where(sq.NotEq{"id": user.Id})
-	if user.PreferGender != nil {
-		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
+
+	queryBuilder := psql.Select(static.UserDbField).
+		From(userTable).
+		Where(sq.NotEq{"id": user.Id}).
+		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = $1)", likeTable), user.Id)
+
+	if user.PreferGender != nil && user.UserGender != nil {
+		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender, "prefer_gender": user.UserGender})
+	}
+	if params.MinAge > 0 {
+		queryBuilder = queryBuilder.Where(sq.GtOrEq{"age": params.MinAge})
+	}
+	if params.MaxAge > 0 {
+		queryBuilder = queryBuilder.Where(sq.LtOrEq{"age": params.MaxAge})
+	}
+	if len(params.Tags) > 0 {
+		queryBuilder = queryBuilder.Where("ARRAY[" + buildTagArray(params.Tags) + "]::TEXT[] <@ tags")
 	}
 	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
 
@@ -106,6 +120,17 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	}
 
 	return nextUser, err
+}
+
+func buildTagArray(tags []string) string {
+	arrayString := ""
+	for i, tag := range tags {
+		if i > 0 {
+			arrayString += ", "
+		}
+		arrayString += "'" + tag + "'"
+	}
+	return arrayString
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {

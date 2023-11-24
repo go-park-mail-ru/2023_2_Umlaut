@@ -27,8 +27,9 @@ CREATE TABLE tag
 
 CREATE TABLE "like"
 (
-    liked_by_user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    liked_to_user_id INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    liked_by_user_id INT     NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    liked_to_user_id INT     NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    is_like          BOOLEAN NOT NULL,
     created_at       TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (liked_by_user_id, liked_to_user_id)
 );

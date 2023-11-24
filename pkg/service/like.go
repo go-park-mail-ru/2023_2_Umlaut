@@ -22,6 +22,9 @@ func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {
 	if err != nil {
 		return err
 	}
+	if !like.IsLike {
+		return nil
+	}
 	mutual, err := s.repoLike.IsMutualLike(ctx, like)
 	if err != nil {
 		return err

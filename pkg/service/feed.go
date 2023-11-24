@@ -18,12 +18,12 @@ func NewFeedService(repoUser repository.User, repoStore repository.Store, repoDi
 	return &FeedService{repoUser: repoUser, repoStore: repoStore, repoDialog: repoDialog}
 }
 
-func (s *FeedService) GetNextUser(ctx context.Context, userId int) (model.User, error) {
-	user, err := s.repoUser.GetUserById(ctx, userId)
+func (s *FeedService) GetNextUser(ctx context.Context, params model.FilterParams) (model.User, error) {
+	user, err := s.repoUser.GetUserById(ctx, params.UserId)
 	if err != nil {
 		return model.User{}, fmt.Errorf("GetNextUser error: %v", err)
 	}
-	nextUser, err := s.repoUser.GetNextUser(ctx, user)
+	nextUser, err := s.repoUser.GetNextUser(ctx, user, params)
 	if err != nil {
 		return model.User{}, fmt.Errorf("GetNextUser error: %v", err)
 	}

@@ -25,8 +25,8 @@ func NewLikePostgres(db *pgxpool.Pool) *LikePostgres {
 
 func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.Like, error) {
 	query, args, err := psql.Insert(likeTable).
-		Columns("liked_by_user_id", "liked_to_user_id").
-		Values(like.LikedByUserId, like.LikedToUserId).
+		Columns("liked_by_user_id", "liked_to_user_id", "is_like").
+		Values(like.LikedByUserId, like.LikedToUserId, like.IsLike).
 		ToSql()
 
 	if err != nil {
@@ -53,7 +53,7 @@ func (r *LikePostgres) IsMutualLike(ctx context.Context, like model.Like) (bool,
 
 	query, args, err := psql.Select(static.LikeDbField).
 		From(likeTable).
-		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
+		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId, "is_like": like.IsLike}).
 		ToSql()
 	if err != nil {
 		return false, fmt.Errorf("failed to check is like exists. err: %w", err)
