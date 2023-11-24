@@ -115,7 +115,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params 
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &nextUser)
 
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) || nextUser.Id == 0 {
 		return model.User{}, fmt.Errorf("user for: %s not found", user.Mail)
 	}
 

@@ -233,6 +233,26 @@ const docTemplate = `{
                 ],
                 "summary": "get user for feed",
                 "operationId": "feed",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Minimum age filter",
+                        "name": "min_age",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Maximum age filter",
+                        "name": "max_age",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tags filter",
+                        "name": "tags",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -672,6 +692,9 @@ const docTemplate = `{
         "model.Like": {
             "type": "object",
             "properties": {
+                "is_like": {
+                    "type": "boolean"
+                },
                 "liked_to_user_id": {
                     "type": "integer"
                 }

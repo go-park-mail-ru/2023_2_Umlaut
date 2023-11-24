@@ -14,7 +14,7 @@ import (
 // @Produce  json
 // @Param min_age query integer false "Minimum age filter"
 // @Param max_age query integer false "Maximum age filter"
-// @Param tags query array string false "Tags filter"
+// @Param tags query string false "Tags filter"
 // @Success 200 {object} ClientResponseDto[model.User]
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed [get]
@@ -33,14 +33,8 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseQueryParams(r *http.Request) *proto.FilterParams {
-	minAge, err := strconv.Atoi(r.URL.Query().Get("min_age"))
-	if err != nil {
-		return nil
-	}
-	maxAge, err := strconv.Atoi(r.URL.Query().Get("min_age"))
-	if err != nil {
-		return nil
-	}
+	minAge, _ := strconv.Atoi(r.URL.Query().Get("min_age"))
+	maxAge, _ := strconv.Atoi(r.URL.Query().Get("min_age"))
 	tags := strings.Split(r.URL.Query().Get("tags"), ",")
 	return &proto.FilterParams{
 		UserId: int32(r.Context().Value(keyUserID).(int)),

@@ -1,3 +1,12 @@
+CREATE OR REPLACE FUNCTION calculate_age(birth_date DATE)
+    RETURNS INTEGER AS
+$$
+BEGIN
+    RETURN DATE_PART('year', CURRENT_DATE) - DATE_PART('year', birth_date);
+END;
+$$ LANGUAGE plpgsql
+    IMMUTABLE;
+
 CREATE TABLE "user"
 (
     id            SERIAL PRIMARY KEY,
@@ -15,6 +24,7 @@ CREATE TABLE "user"
     birthday      DATE,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
+    age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
     created_at    TIMESTAMPTZ          DEFAULT NOW(),
     updated_at    TIMESTAMPTZ          DEFAULT NOW()
 );

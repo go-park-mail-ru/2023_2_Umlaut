@@ -112,6 +112,8 @@ definitions:
     type: object
   model.Like:
     properties:
+      is_like:
+        type: boolean
       liked_to_user_id:
         type: integer
     type: object
@@ -315,6 +317,19 @@ paths:
       consumes:
       - application/json
       operationId: feed
+      parameters:
+      - description: Minimum age filter
+        in: query
+        name: min_age
+        type: integer
+      - description: Maximum age filter
+        in: query
+        name: max_age
+        type: integer
+      - description: Tags filter
+        in: query
+        name: tags
+        type: string
       produces:
       - application/json
       responses:
