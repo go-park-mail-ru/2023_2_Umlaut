@@ -182,7 +182,7 @@ definitions:
     - name
     - password
     type: object
-host: localhost:8000
+host: umlaut-bmstu.me:8000
 info:
   contact: {}
   description: API Server for Umlaut Application
@@ -523,4 +523,24 @@ paths:
       summary: update user photo
       tags:
       - user
+  /api/v1/ws/messenger:
+    get:
+      consumes:
+      - application/json
+      description: Registers a user to the WebSocket hub and initiates connection
+      operationId: registerUserToHub
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: register user to WebSocket hub
+      tags:
+      - websocket
 swagger: "2.0"
