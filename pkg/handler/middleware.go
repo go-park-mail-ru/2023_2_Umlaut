@@ -18,6 +18,7 @@ type ctxKey string
 
 const (
 	keyUserID    ctxKey = "user_id"
+	keyAdminID   ctxKey = "admin_id"
 	keyLogger    ctxKey = "logger"
 	keyRequestId ctxKey = "request_id"
 	secret              = "qrkjk#4#%35FSFJlja#4353KSFjH"
@@ -32,6 +33,26 @@ func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
 	})
 
 	return corsMiddleware.Handler(next)
+}
+
+func (h *Handler) authAdminMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session, err := r.Cookie("admin_session_id")
+		if errors.Is(err, http.ErrNoCookie) {
+			newErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, "Need auth")
+			return
+		}
+
+		id, err := h.services.Authorization.GetSessionValue(r.Context(), session.Value)
+		if err != nil {
+			newErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, "Need auth")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), keyAdminID, id)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 func (h *Handler) authMiddleware(next http.Handler) http.Handler {
@@ -53,6 +74,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
 func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
