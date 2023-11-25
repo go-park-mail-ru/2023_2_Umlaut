@@ -30,15 +30,14 @@ func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) 
 	return s.repoAdmin.CreateFeedback(ctx, stat)
 }
 
-func (s *AdminService) GetFeedbackStatistics(ctx context.Context) (int, error) {
-	feedbacks, err := s.repoAdmin.GetFeedbacks(ctx)
-	var feedbackStat model.FeedbackStatistic
-	feedbackStat.AvgRating = getAvgRating(feedbacks)
-	feedbackStat.LikedMap
-	if err != nil {
-		return 0, err
+func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (model.RecommendationStatistic, error) {
+	recommendations, err := s.repoAdmin.GetRecommendations(ctx)
+	var recommendationsStat model.RecommendationStatistic
+	var counter []int32
+	for recommendation := range recommendations {
+
 	}
-	return 0, nil
+	return recommendationsStat, nil
 }
 
 func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {

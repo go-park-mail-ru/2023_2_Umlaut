@@ -118,6 +118,31 @@ func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, err
 	return feedbacks, nil
 }
 
+func (r *AdminPostgres) GetRecommendations(ctx context.Context) ([]model.Recommendation, error) {
+	query, args, err := psql.
+		Select("id", "user_id", "recommend").
+		From(recommendationTable).
+		Where(sq.Eq{"show": true}).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get feedback. err: %w", err)
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get feedback. err: %w", err)
+	}
+	defer rows.Close()
+
+	recommendations, err := scanRecommendations(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	return recommendations, nil
+}
+
 func scanAdmin(row pgx.Row, admin *model.Admin) error {
 	err := row.Scan(
 		&admin.Id,
@@ -159,4 +184,30 @@ func scanFeedbacks(rows pgx.Rows) ([]model.Feedback, error) {
 	}
 
 	return feedbacks, nil
+}
+func scanRecommendations(rows pgx.Rows) ([]model.Recommendation, error) {
+	var recommendations []model.Recommendation
+	var err error
+	for rows.Next() {
+		var feedback model.Recommendation
+		err = rows.Scan(
+			&feedback.Id,
+			&feedback.UserId,
+			&feedback.Recommend,
+			&feedback.Show,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		recommendations = append(recommendations, feedback)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("scan error in GetFeedbacks: %v", err)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows error in GetFeedbacks: %v", rows.Err())
+	}
+
+	return recommendations, nil
 }
