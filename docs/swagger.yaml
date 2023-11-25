@@ -42,6 +42,33 @@ definitions:
       status:
         type: integer
     type: object
+  handler.ClientResponseDto-int:
+    properties:
+      message:
+        type: string
+      payload:
+        type: integer
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-model_FeedbackStatistic:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/model.FeedbackStatistic'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-model_RecommendationStatistic:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/model.RecommendationStatistic'
+      status:
+        type: integer
+    type: object
   handler.ClientResponseDto-model_User:
     properties:
       message:
@@ -110,6 +137,48 @@ definitions:
           type: string
         type: array
     type: object
+  model.Feedback:
+    properties:
+      comment:
+        type: string
+      comment_fix:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      liked:
+        type: string
+      need_fix:
+        type: string
+      rating:
+        type: integer
+      show:
+        type: boolean
+      user_id:
+        type: integer
+    type: object
+  model.FeedbackStatistic:
+    properties:
+      avgRating:
+        type: number
+      comments:
+        items:
+          type: string
+        type: array
+      likedMap:
+        additionalProperties:
+          type: integer
+        type: object
+      needFixMap:
+        additionalProperties:
+          $ref: '#/definitions/model.NeedFixObject'
+        type: object
+      ratingCount:
+        items:
+          type: integer
+        type: array
+    type: object
   model.Like:
     properties:
       is_like:
@@ -129,6 +198,39 @@ definitions:
         type: string
       sender_id:
         type: integer
+    type: object
+  model.NeedFixObject:
+    properties:
+      commentFix:
+        items:
+          type: string
+        type: array
+      count:
+        type: integer
+    type: object
+  model.Recommendation:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      recommend:
+        type: integer
+      show:
+        type: boolean
+      user_id:
+        type: integer
+    type: object
+  model.RecommendationStatistic:
+    properties:
+      avgRecommend:
+        type: number
+      nps:
+        type: number
+      recommendCount:
+        items:
+          type: integer
+        type: array
     type: object
   model.User:
     properties:
@@ -178,6 +280,74 @@ info:
   title: Umlaut API
   version: "1.0"
 paths:
+  /api/v1/admin/feedback:
+    post:
+      consumes:
+      - application/json
+      operationId: FeedbackStatistic
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-model_FeedbackStatistic'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: statistic by feedback
+      tags:
+      - statistic
+  /api/v1/admin/recommendation:
+    post:
+      consumes:
+      - application/json
+      operationId: RecommendationStatistic
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-model_RecommendationStatistic'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: statistic by recommendation
+      tags:
+      - statistic
+  /api/v1/auth/admin:
+    post:
+      consumes:
+      - application/json
+      operationId: adminLogin
+      parameters:
+      - description: Sign-in input parameters
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: log in to admin
+      tags:
+      - auth
   /api/v1/auth/login:
     post:
       consumes:
@@ -344,6 +514,32 @@ paths:
       summary: get user for feed
       tags:
       - feed
+  /api/v1/feedback:
+    post:
+      consumes:
+      - application/json
+      operationId: Feedback
+      parameters:
+      - description: Statistic data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Feedback'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: create statistic
+      tags:
+      - statistic
   /api/v1/like:
     post:
       consumes:
@@ -370,6 +566,51 @@ paths:
       summary: create user like
       tags:
       - like
+  /api/v1/recommendation:
+    post:
+      consumes:
+      - application/json
+      operationId: FeedFeedback
+      parameters:
+      - description: feed_feedback data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Recommendation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: create feed feedback
+      tags:
+      - statistic
+  /api/v1/show-csat:
+    get:
+      consumes:
+      - application/json
+      operationId: CSAT
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-int'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: show csat for user
+      tags:
+      - statistic
   /api/v1/tag:
     get:
       consumes:

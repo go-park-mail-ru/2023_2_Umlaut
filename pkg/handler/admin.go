@@ -12,10 +12,10 @@ import (
 
 // @Summary create statistic
 // @Tags statistic
-// @ID statistic
+// @ID Feedback
 // @Accept  json
 // @Produce  json
-// @Param input body model.Statistic true "Statistic data"
+// @Param input body model.Feedback true "Statistic data"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feedback [post]
@@ -48,7 +48,7 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 
 // @Summary create recommendation
 // @Tags statistic
-// @ID statistic
+// @ID Recommendation
 // @Accept  json
 // @Produce  json
 // @Param input body model.Recommendation true "Recommendation data"
@@ -80,7 +80,7 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 
 // @Summary create feed feedback
 // @Tags statistic
-// @ID statistic
+// @ID FeedFeedback
 // @Accept  json
 // @Produce  json
 // @Param input body model.Recommendation true "feed_feedback data"
@@ -112,7 +112,7 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 
 // @Summary show csat for user
 // @Tags statistic
-// @ID statistic
+// @ID CSAT
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[int]
@@ -124,7 +124,7 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 
 // @Summary statistic by recommendation
 // @Tags statistic
-// @ID statistic
+// @ID RecommendationStatistic
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.RecommendationStatistic]
@@ -147,7 +147,7 @@ func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Requ
 
 // @Summary statistic by feedback
 // @Tags statistic
-// @ID statistic
+// @ID FeedbackStatistic
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.FeedbackStatistic]
