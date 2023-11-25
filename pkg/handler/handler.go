@@ -65,6 +65,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
 	apiRouter.HandleFunc("/feedback", h.createFeedback).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/feed-feedback", h.createFeedFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
 
 	r.Use(
