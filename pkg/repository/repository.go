@@ -42,6 +42,7 @@ type Admin interface {
 	GetAdmin(ctx context.Context, mail string) (model.Admin, error)
 	CreateFeedback(ctx context.Context, stat model.Feedback) (int, error)
 	CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error)
+	CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error)
 	GetFeedbacks(ctx context.Context) ([]model.Feedback, error)
 }
 

@@ -47,6 +47,7 @@ type Admin interface {
 	GetStatistic(ctx context.Context) (int, error)
 	CreateFeedback(ctx context.Context, stat model.Feedback) (int, error)
 	CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error)
+	CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error)
 }
 
 type Service struct {
