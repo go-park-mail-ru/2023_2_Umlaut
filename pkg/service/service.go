@@ -44,6 +44,10 @@ type Tag interface {
 	GetAllTags(ctx context.Context) ([]string, error)
 }
 
+type Complaint interface {
+	GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error)
+}
+
 type Service struct {
 	Authorization Authorization
 	Feed          Feed
@@ -51,6 +55,7 @@ type Service struct {
 	Like          Like
 	Dialog        Dialog
 	Tag           Tag
+	Complaint     Complaint
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -61,5 +66,6 @@ func NewService(repo *repository.Repository) *Service {
 		Like:          NewLikeService(repo.Like, repo.Dialog),
 		Dialog:        NewDialogService(repo.Dialog),
 		Tag:           NewTagService(repo.Tag),
+		Complaint:     NewComplaintService(repo.Complaint),
 	}
 }

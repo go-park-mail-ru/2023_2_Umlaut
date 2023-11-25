@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  handler.ClientResponseDto-array_model_ComplaintType:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/model.ComplaintType'
+        type: array
+      status:
+        type: integer
+    type: object
   handler.ClientResponseDto-array_model_Dialog:
     properties:
       message:
@@ -103,6 +114,13 @@ definitions:
     - mail
     - name
     - password
+    type: object
+  model.ComplaintType:
+    properties:
+      id:
+        type: integer
+      type_name:
+        type: string
     type: object
   model.Dialog:
     properties:
@@ -272,6 +290,29 @@ paths:
       summary: sign up account
       tags:
       - auth
+  /api/v1/complaint_types:
+    get:
+      consumes:
+      - application/json
+      operationId: complaintTypes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-array_model_ComplaintType'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get all complaint types
+      tags:
+      - complaint
   /api/v1/dialogs:
     get:
       consumes:
@@ -523,4 +564,24 @@ paths:
       summary: update user photo
       tags:
       - user
+  /api/v1/ws/messenger:
+    get:
+      consumes:
+      - application/json
+      description: Registers a user to the WebSocket hub and initiates connection
+      operationId: registerUserToHub
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: register user to WebSocket hub
+      tags:
+      - websocket
 swagger: "2.0"

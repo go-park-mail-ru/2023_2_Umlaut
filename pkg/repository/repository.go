@@ -51,6 +51,10 @@ type FileServer interface {
 	CreateBucket(ctx context.Context, bucketName string) error
 }
 
+type Complaint interface {
+	GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error)
+}
+
 type Repository struct {
 	User       User
 	Like       Like
@@ -58,6 +62,7 @@ type Repository struct {
 	Tag        Tag
 	Store      Store
 	FileServer FileServer
+	Complaint  Complaint
 }
 
 func NewRepository(db *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
@@ -66,6 +71,7 @@ func NewRepository(db *pgxpool.Pool, redisClient *redis.Client, minioClient *min
 		Like:       NewLikePostgres(db),
 		Dialog:     NewDialogPostgres(db),
 		Tag:        NewTagPostgres(db),
+		Complaint:  NewComplaintPostgres(db),
 		Store:      NewRedisStore(redisClient),
 		FileServer: NewMinioProvider(minioClient),
 	}

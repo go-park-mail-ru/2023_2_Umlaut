@@ -3,15 +3,18 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
-	userTable    = "\"user\""
-	likeTable    = "\"like\""
-	dialogTable  = "\"dialog\""
-	tagTable     = "\"tag\""
-	messageTable = "\"message\""
+	userTable          = "\"user\""
+	likeTable          = "\"like\""
+	dialogTable        = "\"dialog\""
+	tagTable           = "\"tag\""
+	messageTable       = "\"message\""
+	complaintTable = "\"complaint\""
+	complaintTypeTable = "\"complaint_type\""
 )
 
 type PostgresConfig struct {

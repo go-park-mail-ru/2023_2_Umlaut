@@ -68,7 +68,6 @@ CREATE TABLE complaint
     reporter_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     reported_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     complaint_type_id INT      NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
-    report_status     SMALLINT NOT NULL CHECK (report_status BETWEEN 0 AND 5),
     created_at        TIMESTAMPTZ DEFAULT NOW(),
     CHECK (reporter_user_id != reported_user_id)
 );
@@ -205,3 +204,11 @@ INSERT INTO message (dialog_id, sender_id, message_text)
 VALUES (2, 3, 'Hello'),
        (2, 4, 'Hello last'),
        (3, 5, 'Hello last 1');
+
+INSERT INTO complaint_type (type_name)
+VALUES ('Порнография'),
+       ('Рассылка спама'),
+       ('Оскорбительное поведение'),
+       ('Мошенничество'),
+       ('Рекламная страница'),
+       ('Клон моей страницы (или моя старая страница)');
