@@ -42,14 +42,14 @@ func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin,
 func (r *AdminPostgres) CreateStatistic(ctx context.Context, stat model.Statistic) (int, error) {
 	var id int
 	query, args, err := psql.Insert(statisticTable).
-		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment").
-		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.CommentFix, stat.Comment).
+		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment", "show").
+		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.CommentFix, stat.Comment, stat.Show).
 		ToSql()
 
 	if err != nil {
 		return 0, fmt.Errorf("failed to create statistic. err: %w", err)
 	}
-	
+
 	query += " RETURNING id"
 	row := r.db.QueryRow(ctx, query, args...)
 	err = row.Scan(&id)
@@ -60,12 +60,12 @@ func (r *AdminPostgres) CreateStatistic(ctx context.Context, stat model.Statisti
 func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
 	var id int
 	query, args, err := psql.Insert(recommendationTable).
-		Columns("user_id", "recommend").
-		Values(rec.UserId, rec.Recommend).
+		Columns("user_id", "recommend", "show").
+		Values(rec.UserId, rec.Recommend, rec.Show).
 		ToSql()
 
 	if err != nil {
-		return 0, err	
+		return 0, err
 	}
 
 	query += " RETURNING id"

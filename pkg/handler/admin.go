@@ -3,40 +3,38 @@ package handler
 import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"net/http"
 )
 
-// CreateStatistic @Summary create user like
-// @Tags like
-// @ID like
+// @Summary create statistic
+// @Tags statistic
+// @ID statistic
 // @Accept  json
 // @Produce  json
-// @Param input body model.Like true "Like data to update"
+// @Param input body model.Statistic true "Statistic data"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/like [post]
 func (h *Handler) CreateStatistic(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var like model.Statistic
-	if err := decoder.Decode(&like); err != nil {
+	var stat model.Statistic
+	if err := decoder.Decode(&stat); err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	userId := r.Context().Value(keyUserID).(int)
-	like.LikedByUserId = userId
+	_, err := h.adminMicroservice.CreateStatistic(
+		r.Context(),
+		&proto.Statistic{
+			UserId: int32(r.Context().Value(keyUserID).(int)),
+			Rating: int32(*stat.Rating),
+			//Liked: stat.Liked,
 
-	err := h.services.Like.CreateLike(r.Context(), like)
+		})
+
 	if err != nil {
-		if errors.Is(err, static.ErrAlreadyExists) {
-			newErrorClientResponseDto(r.Context(), w, http.StatusOK, "already liked")
-			return
-		}
-		if errors.Is(err, static.ErrMutualLike) {
-			newErrorClientResponseDto(r.Context(), w, http.StatusOK, "Mutual like")
-			return
-		}
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
 	NewSuccessClientResponseDto(r.Context(), w, "")
