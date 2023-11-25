@@ -60,6 +60,6 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 	return &proto.Empty{}, nil
 }
 
-func (as *AdminServer) GetAllStatistic(context.Context, *proto.Empty) (*proto.Feedback, error) {
-
+func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty) (*proto.FeedbackStatistic, error) {
+	
 }

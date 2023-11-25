@@ -75,6 +75,36 @@ func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Reco
 	return id, err
 }
 
+func (r *DialogPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
+	query, args, err := psql.
+		Select("d.id", "d.user1_id", "d.user2_id", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.created_at").
+		From(dialogTable + " d").
+		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
+		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
+		Where(sq.And{
+			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
+			sq.NotEq{"u.id": userId},
+		}).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+	}
+	defer rows.Close()
+
+	dialogs, err := scanDialogs(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	return dialogs, nil
+}
+
 func scanAdmin(row pgx.Row, admin *model.Admin) error {
 	err := row.Scan(
 		&admin.Id,
