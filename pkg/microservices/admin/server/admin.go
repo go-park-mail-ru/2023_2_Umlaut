@@ -94,7 +94,16 @@ func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty)
 }
 
 func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.Empty) (*proto.RecommendationStatistic, error) {
+	recommendationsStat, err := as.AdminService.GetRecommendationsStatistics(ctx)
+	if err != nil {
+		return &proto.RecommendationStatistic{}, status.Error(codes.Internal, err.Error())
+	}
 
+	return &proto.RecommendationStatistic{
+		RecommendCount: recommendationsStat.RecommendCount,
+		AvgRecommend:   recommendationsStat.AvgRecommend,
+		NPS:            recommendationsStat.NPS,
+	}, nil
 }
 
 func getProtoLikedMap(likedMap map[string]int32) []*proto.LikedMap {

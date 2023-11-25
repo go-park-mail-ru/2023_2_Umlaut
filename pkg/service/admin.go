@@ -33,10 +33,16 @@ func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) 
 func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (model.RecommendationStatistic, error) {
 	recommendations, err := s.repoAdmin.GetRecommendations(ctx)
 	var recommendationsStat model.RecommendationStatistic
-	var counter []int32
-	for recommendation := range recommendations {
-
+	var counter [11]int32
+	sum := 0
+	for _, recommendation := range recommendations {
+		if recommendation.Recommend != nil {
+			counter[*recommendation.Recommend] += 1
+			sum += *recommendation.Recommend
+		}
 	}
+	recommendationsStat.AvgRecommend = float32(sum) / float32(len(recommendations))
+	recommendationsStat.NPS = 5
 	return recommendationsStat, err
 }
 
