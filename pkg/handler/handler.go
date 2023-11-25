@@ -69,6 +69,15 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/show-csat", h.showCSAT).Methods("GET")
 
+	adminRouter := r.PathPrefix("/api/v1/admin").Subrouter()
+	adminRouter.Use(
+		//h.csrfMiddleware,
+		h.authAdminMiddleware,
+	)
+	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
+	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
+	adminRouter.HandleFunc("/recommendation", h.getRecommendationStatistic).Methods("GET")
+
 	r.Use(
 		h.loggingMiddleware,
 		h.panicRecoveryMiddleware,
