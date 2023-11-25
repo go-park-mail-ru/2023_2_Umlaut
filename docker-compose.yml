@@ -10,6 +10,7 @@ services:
     depends_on:
       - db
       - redis
+      - db_admin
     ports:
       - "8001:8001"
     environment:

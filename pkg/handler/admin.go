@@ -165,8 +165,8 @@ func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
 		AvgRating:   feedbackStat.AvgRating,
 		RatingCount: feedbackStat.RatingCount,
 		LikedMap:    getLikedMap(feedbackStat.LikedMap),
-		NeedFixMap: getNeedFixMap(feedbackStat.NeedFixMap),
-		Comments: feedbackStat.Comments,
+		NeedFixMap:  getNeedFixMap(feedbackStat.NeedFixMap),
+		Comments:    feedbackStat.Comments,
 	})
 }
 
@@ -182,10 +182,9 @@ func getNeedFixMap(needFixMap []*proto.NeedFixMap) map[string]model.NeedFixObjec
 	result := make(map[string]model.NeedFixObject)
 	for _, item := range needFixMap {
 		result[item.NeedFix] = model.NeedFixObject{
-			Count: item.NeedFixObject.Count,
+			Count:      item.NeedFixObject.Count,
 			CommentFix: item.NeedFixObject.CommentFix,
 		}
 	}
 	return result
 }
-
