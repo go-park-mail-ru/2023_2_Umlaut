@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	sq "github.com/Masterminds/squirrel"
@@ -38,6 +37,23 @@ func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin,
 	}
 
 	return admin, err
+}
+
+func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
+	var id int
+	query, args, err := psql.Insert(recommendationTable).
+		Columns("user_id", "recommend").
+		Values(rec.UserId, rec.Recommend).
+		ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	query += " RETURNING id"
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+	return id, err
 }
 
 func scanAdmin(row pgx.Row, admin *model.Admin) error {
