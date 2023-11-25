@@ -44,6 +44,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/logout", h.logout)
+	authRouter.HandleFunc("/admin", h.LogInAdmin)
 
 	apiRouter := r.PathPrefix("/api/v1").Subrouter()
 	apiRouter.Use(
