@@ -19,7 +19,7 @@ func (s *AdminService) GetStatistic(ctx context.Context) (int, error) {
 }
 
 func (s *AdminService) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
-	return repoAdmin.
+	return s.repoAdmin.CreateRecommendation(ctx, rec)
 }
 
 func (s *AdminService) CreateStatistic(ctx context.Context, stat model.Statistic) (int, error) {
