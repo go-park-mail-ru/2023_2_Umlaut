@@ -9,7 +9,7 @@ type Admin struct {
 	Salt         string `json:"-" db:"salt"`
 }
 
-type Statistic struct {
+type Feedback struct {
 	Id         int        `json:"id" db:"id"`
 	UserId     int        `json:"user_id" db:"user_id"`
 	Rating     *int       `json:"rating" db:"rating"`

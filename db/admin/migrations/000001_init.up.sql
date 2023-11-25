@@ -1,4 +1,4 @@
-CREATE TABLE statistic
+CREATE TABLE feedback
 (
     id          SERIAL PRIMARY KEY,
     user_id     INT NOT NULL,

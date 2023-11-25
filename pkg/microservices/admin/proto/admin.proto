@@ -6,7 +6,7 @@ package proto;
 
 //protoc --go_out=. --go-grpc_out=. --go-grpc_opt=paths=source_relative --go_opt=paths=source_relative *.proto
 
-message Statistic {
+message Feedback {
   int32 Id = 1;
   int32 UserId = 2;
   int32 Rating = 3;
@@ -28,7 +28,7 @@ message Empty {
 }
 
 service Admin {
-  rpc GetAllStatistic(Empty) returns(Statistic) {}
-  rpc CreateStatistic(Statistic) returns(Empty) {}
+  rpc GetAllStatistic(Empty) returns(Feedback) {}
+  rpc CreateStatistic(Feedback) returns(Empty) {}
   rpc CreateRecommendation(Recommendation) returns(Empty) {}
 }

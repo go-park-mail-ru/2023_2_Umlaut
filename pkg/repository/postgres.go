@@ -14,7 +14,7 @@ const (
 	tagTable       = "\"tag\""
 	messageTable   = "\"message\""
 	adminTable     = "\"admin\""
-	statisticTable = "\"statistic\""
+	feedbackTable = "\"feedback\""
 	recommendationTable = "\"recommendation\""
 )
 

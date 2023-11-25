@@ -40,7 +40,7 @@ type Tag interface {
 
 type Admin interface {
 	GetAdmin(ctx context.Context, mail string) (model.Admin, error)
-	CreateStatistic(ctx context.Context, stat model.Statistic) (int, error)
+	CreateStatistic(ctx context.Context, stat model.Feedback) (int, error)
 	CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error)
 }
 

@@ -19,14 +19,14 @@ import (
 // @Router /api/v1/like [post]
 func (h *Handler) CreateStatistic(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var stat model.Statistic
+	var stat model.Feedback
 	if err := decoder.Decode(&stat); err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	_, err := h.adminMicroservice.CreateStatistic(
 		r.Context(),
-		&proto.Statistic{
+		&proto.Feedback{
 			UserId:     int32(r.Context().Value(keyUserID).(int)),
 			Rating:     utils.ModifyInt(stat.Rating),
 			Liked:      utils.ModifyString(stat.Liked),

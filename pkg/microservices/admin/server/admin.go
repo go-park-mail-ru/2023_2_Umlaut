@@ -38,11 +38,11 @@ func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Reco
 	return &proto.Empty{}, nil
 }
 
-func (as *AdminServer) CreateStatistic(ctx context.Context, stat *proto.Statistic) (*proto.Empty, error) {
+func (as *AdminServer) CreateStatistic(ctx context.Context, stat *proto.Feedback) (*proto.Empty, error) {
 	rating := int(stat.Rating)
 	_, err := as.AdminService.CreateStatistic(
 		ctx,
-		model.Statistic{
+		model.Feedback{
 			Id:         int(stat.Id),
 			UserId:     int(stat.UserId),
 			Rating:     &rating,
@@ -60,6 +60,6 @@ func (as *AdminServer) CreateStatistic(ctx context.Context, stat *proto.Statisti
 	return &proto.Empty{}, nil
 }
 
-func (as *AdminServer) GetAllStatistic(context.Context, *proto.Empty) (*proto.Statistic, error) {
+func (as *AdminServer) GetAllStatistic(context.Context, *proto.Empty) (*proto.Feedback, error) {
 
 }

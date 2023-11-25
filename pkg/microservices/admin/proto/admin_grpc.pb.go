@@ -28,8 +28,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminClient interface {
-	GetAllStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Statistic, error)
-	CreateStatistic(ctx context.Context, in *Statistic, opts ...grpc.CallOption) (*Empty, error)
+	GetAllStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Feedback, error)
+	CreateStatistic(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error)
 	CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -41,8 +41,8 @@ func NewAdminClient(cc grpc.ClientConnInterface) AdminClient {
 	return &adminClient{cc}
 }
 
-func (c *adminClient) GetAllStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Statistic, error) {
-	out := new(Statistic)
+func (c *adminClient) GetAllStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Feedback, error) {
+	out := new(Feedback)
 	err := c.cc.Invoke(ctx, Admin_GetAllStatistic_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (c *adminClient) GetAllStatistic(ctx context.Context, in *Empty, opts ...gr
 	return out, nil
 }
 
-func (c *adminClient) CreateStatistic(ctx context.Context, in *Statistic, opts ...grpc.CallOption) (*Empty, error) {
+func (c *adminClient) CreateStatistic(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, Admin_CreateStatistic_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -72,8 +72,8 @@ func (c *adminClient) CreateRecommendation(ctx context.Context, in *Recommendati
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
 type AdminServer interface {
-	GetAllStatistic(context.Context, *Empty) (*Statistic, error)
-	CreateStatistic(context.Context, *Statistic) (*Empty, error)
+	GetAllStatistic(context.Context, *Empty) (*Feedback, error)
+	CreateStatistic(context.Context, *Feedback) (*Empty, error)
 	CreateRecommendation(context.Context, *Recommendation) (*Empty, error)
 	mustEmbedUnimplementedAdminServer()
 }
@@ -82,10 +82,10 @@ type AdminServer interface {
 type UnimplementedAdminServer struct {
 }
 
-func (UnimplementedAdminServer) GetAllStatistic(context.Context, *Empty) (*Statistic, error) {
+func (UnimplementedAdminServer) GetAllStatistic(context.Context, *Empty) (*Feedback, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllStatistic not implemented")
 }
-func (UnimplementedAdminServer) CreateStatistic(context.Context, *Statistic) (*Empty, error) {
+func (UnimplementedAdminServer) CreateStatistic(context.Context, *Feedback) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateStatistic not implemented")
 }
 func (UnimplementedAdminServer) CreateRecommendation(context.Context, *Recommendation) (*Empty, error) {
@@ -123,7 +123,7 @@ func _Admin_GetAllStatistic_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _Admin_CreateStatistic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Statistic)
+	in := new(Feedback)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func _Admin_CreateStatistic_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: Admin_CreateStatistic_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServer).CreateStatistic(ctx, req.(*Statistic))
+		return srv.(AdminServer).CreateStatistic(ctx, req.(*Feedback))
 	}
 	return interceptor(ctx, in, info, handler)
 }
