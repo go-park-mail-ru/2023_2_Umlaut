@@ -18,7 +18,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	db, err := utils.InitPostgres(ctx)
+	db, err := utils.InitPostgresAdmin(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize Postgres: %s", err.Error())
 	}

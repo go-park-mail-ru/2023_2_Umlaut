@@ -14,17 +14,17 @@ admin:
 
 db_umlaut:
   username: "postgres"
-  host: "db"
-  port: "5432"
-  dbname: "umlaut"
+  host: "localhost"
+  port: "5433"
+  dbname: "postgres"
   sslmode: "disable"
   password: "1474"
 
 db_admin:
   username: "postgres"
-  host: "db_admin"
-  port: "5432"
-  dbname: "admin"
+  host: "localhost"
+  port: "5434"
+  dbname: "postgres"
   sslmode: "disable"
   password: "1474"
 
