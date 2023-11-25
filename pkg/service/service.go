@@ -45,6 +45,8 @@ type Tag interface {
 
 type Admin interface {
 	GetStatistic(ctx context.Context) (int, error)
+	CreateStatistic(ctx context.Context, stat model.Statistic) (int, error)
+	CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error)
 }
 
 type Service struct {
