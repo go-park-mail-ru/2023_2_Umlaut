@@ -20,7 +20,7 @@ func NewAdminServer(feed *service.AdminService) *AdminServer {
 	return &AdminServer{AdminService: feed}
 }
 
-func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Recommendation) (*proto.Empty, error) {
+func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {
 	recommend := int(rec.Recommend)
 	_, err := as.AdminService.CreateRecommendation(
 		ctx,
@@ -32,13 +32,13 @@ func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Reco
 		})
 
 	if err != nil {
-		return &proto.Empty{}, status.Error(codes.Internal, err.Error())
+		return &proto.AdminEmpty{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &proto.Empty{}, nil
+	return &proto.AdminEmpty{}, nil
 }
 
-func (as *AdminServer) CreateFeedFeedback(ctx context.Context, rec *proto.Recommendation) (*proto.Empty, error) {
+func (as *AdminServer) CreateFeedFeedback(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {
 	recommend := int(rec.Recommend)
 	_, err := as.AdminService.CreateFeedFeedback(
 		ctx,
@@ -50,13 +50,13 @@ func (as *AdminServer) CreateFeedFeedback(ctx context.Context, rec *proto.Recomm
 		})
 
 	if err != nil {
-		return &proto.Empty{}, status.Error(codes.Internal, err.Error())
+		return &proto.AdminEmpty{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &proto.Empty{}, nil
+	return &proto.AdminEmpty{}, nil
 }
 
-func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback) (*proto.Empty, error) {
+func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback) (*proto.AdminEmpty, error) {
 	rating := int(stat.Rating)
 	_, err := as.AdminService.CreateFeedback(
 		ctx,
@@ -72,13 +72,13 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 		})
 
 	if err != nil {
-		return &proto.Empty{}, status.Error(codes.Internal, err.Error())
+		return &proto.AdminEmpty{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &proto.Empty{}, nil
+	return &proto.AdminEmpty{}, nil
 }
 
-func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty) (*proto.FeedbackStatistic, error) {
+func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.AdminEmpty) (*proto.FeedbackStatistic, error) {
 	feedbackStat, err := as.AdminService.GetFeedbackStatistics(ctx)
 	if err != nil {
 		return &proto.FeedbackStatistic{}, status.Error(codes.Internal, err.Error())
@@ -93,7 +93,7 @@ func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty)
 	}, nil
 }
 
-func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.Empty) (*proto.RecommendationStatistic, error) {
+func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.AdminEmpty) (*proto.RecommendationStatistic, error) {
 	recommendationsStat, err := as.AdminService.GetRecommendationsStatistics(ctx)
 	if err != nil {
 		return &proto.RecommendationStatistic{}, status.Error(codes.Internal, err.Error())
