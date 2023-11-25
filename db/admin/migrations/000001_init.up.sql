@@ -37,3 +37,8 @@ CREATE TABLE admin
     password_hash TEXT        NOT NULL,
     salt          TEXT        NOT NULL
 );
+
+INSERT INTO admin (name, mail, password_hash, salt)
+VALUES ('admin', 'admin@admin.ru',
+        '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b',
+        'cRbBjQPeCvjPxGcIYmtqPW')
