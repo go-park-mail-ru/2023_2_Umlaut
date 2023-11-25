@@ -19,15 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Authorization_SignUp_FullMethodName = "/proto.Authorization/SignUp"
-	Authorization_SignIn_FullMethodName = "/proto.Authorization/SignIn"
-	Authorization_LogOut_FullMethodName = "/proto.Authorization/LogOut"
+	Authorization_LogInAdmin_FullMethodName = "/proto.Authorization/LogInAdmin"
+	Authorization_SignUp_FullMethodName     = "/proto.Authorization/SignUp"
+	Authorization_SignIn_FullMethodName     = "/proto.Authorization/SignIn"
+	Authorization_LogOut_FullMethodName     = "/proto.Authorization/LogOut"
 )
 
 // AuthorizationClient is the client API for Authorization service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorizationClient interface {
+	LogInAdmin(ctx context.Context, in *SignInInput, opts ...grpc.CallOption) (*Cookie, error)
 	SignUp(ctx context.Context, in *SignUpInput, opts ...grpc.CallOption) (*UserId, error)
 	SignIn(ctx context.Context, in *SignInInput, opts ...grpc.CallOption) (*Cookie, error)
 	LogOut(ctx context.Context, in *Cookie, opts ...grpc.CallOption) (*Empty, error)
@@ -39,6 +41,15 @@ type authorizationClient struct {
 
 func NewAuthorizationClient(cc grpc.ClientConnInterface) AuthorizationClient {
 	return &authorizationClient{cc}
+}
+
+func (c *authorizationClient) LogInAdmin(ctx context.Context, in *SignInInput, opts ...grpc.CallOption) (*Cookie, error) {
+	out := new(Cookie)
+	err := c.cc.Invoke(ctx, Authorization_LogInAdmin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *authorizationClient) SignUp(ctx context.Context, in *SignUpInput, opts ...grpc.CallOption) (*UserId, error) {
@@ -72,6 +83,7 @@ func (c *authorizationClient) LogOut(ctx context.Context, in *Cookie, opts ...gr
 // All implementations must embed UnimplementedAuthorizationServer
 // for forward compatibility
 type AuthorizationServer interface {
+	LogInAdmin(context.Context, *SignInInput) (*Cookie, error)
 	SignUp(context.Context, *SignUpInput) (*UserId, error)
 	SignIn(context.Context, *SignInInput) (*Cookie, error)
 	LogOut(context.Context, *Cookie) (*Empty, error)
@@ -82,6 +94,9 @@ type AuthorizationServer interface {
 type UnimplementedAuthorizationServer struct {
 }
 
+func (UnimplementedAuthorizationServer) LogInAdmin(context.Context, *SignInInput) (*Cookie, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogInAdmin not implemented")
+}
 func (UnimplementedAuthorizationServer) SignUp(context.Context, *SignUpInput) (*UserId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
@@ -102,6 +117,24 @@ type UnsafeAuthorizationServer interface {
 
 func RegisterAuthorizationServer(s grpc.ServiceRegistrar, srv AuthorizationServer) {
 	s.RegisterService(&Authorization_ServiceDesc, srv)
+}
+
+func _Authorization_LogInAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignInInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServer).LogInAdmin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Authorization_LogInAdmin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServer).LogInAdmin(ctx, req.(*SignInInput))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Authorization_SignUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -165,6 +198,10 @@ var Authorization_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.Authorization",
 	HandlerType: (*AuthorizationServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "LogInAdmin",
+			Handler:    _Authorization_LogInAdmin_Handler,
+		},
 		{
 			MethodName: "SignUp",
 			Handler:    _Authorization_SignUp_Handler,
