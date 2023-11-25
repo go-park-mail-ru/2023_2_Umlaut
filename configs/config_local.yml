@@ -8,6 +8,10 @@ feed:
   host: "localhost"
   port: "8002"
 
+admin:
+  host: "localhost"
+  port: "8003"
+
 postgres:
   username: "postgres"
   host: "localhost"

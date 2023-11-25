@@ -29,6 +29,19 @@ services:
     environment:
       - DB_PASSWORD=1474
 
+  admin:
+    build:
+      context: ./
+      dockerfile: ./cmd/admin/Dockerfile
+    command: ./wait-for-postgres.sh db ./admin
+    restart: always
+    depends_on:
+      - db_admin
+    ports:
+      - "8003:8003"
+    environment:
+      - DB_PASSWORD=1474
+
   umlaut:
     build:
       context: ./
