@@ -17,6 +17,7 @@ type Statistic struct {
 	NeedFix    *string    `json:"need_fix" db:"need_fix"`
 	CommentFix *string    `json:"comment_fix" db:"comment_fix"`
 	Comment    *string    `json:"comment" db:"comment"`
+	Show       bool       `json:"show" db:"show"`
 	CreatedAt  *time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -24,6 +25,7 @@ type Recommendation struct {
 	Id        int        `json:"id" db:"id"`
 	UserId    int        `json:"user_id" db:"user_id"`
 	Recommend *int       `json:"recommend" db:"recommend"`
+	Show      bool       `json:"show" db:"show"`
 	CreatedAt *time.Time `json:"created_at" db:"created_at"`
 }
 

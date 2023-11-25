@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// @Summary log in to admin
+// LogInAdmin @Summary log in to admin
 // @Tags auth
 // @ID adminLogin
 // @Accept  json
