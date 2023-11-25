@@ -28,3 +28,12 @@ CREATE TABLE feed_feedback
     show       BOOlEAN,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE admin
+(
+    id            SERIAL PRIMARY KEY,
+    name          TEXT        NOT NULL,
+    mail          TEXT UNIQUE NOT NULL,
+    password_hash TEXT        NOT NULL,
+    salt          TEXT        NOT NULL
+);
