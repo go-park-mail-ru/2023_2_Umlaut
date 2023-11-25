@@ -67,6 +67,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/feedback", h.createFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/feed-feedback", h.createFeedFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/show-csat", h.showCSAT).Methods("GET")
 
 	r.Use(
 		h.loggingMiddleware,

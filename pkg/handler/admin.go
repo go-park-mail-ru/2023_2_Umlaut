@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
+	"math/rand"
 	"net/http"
 )
 
@@ -106,4 +107,16 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	NewSuccessClientResponseDto(r.Context(), w, "")
+}
+
+// @Summary show csat for user
+// @Tags statistic
+// @ID statistic
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[int]
+// @Failure 500 {object} ClientResponseDto[string]
+// @Router /api/v1/show-csat [get]
+func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
+	NewSuccessClientResponseDto(r.Context(), w, rand.Intn(4))
 }
