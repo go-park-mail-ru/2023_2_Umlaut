@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
@@ -15,22 +16,25 @@ import (
 )
 
 type Handler struct {
-	authMicroservice authProto.AuthorizationClient
-	feedMicroservice feedProto.FeedClient
-	services         *service.Service
-	logger           *zap.Logger
+	authMicroservice  authProto.AuthorizationClient
+	feedMicroservice  feedProto.FeedClient
+	adminMicroservice adminProto.AdminClient
+	services          *service.Service
+	logger            *zap.Logger
 }
 
 func NewHandler(
 	services *service.Service,
 	logger *zap.Logger,
 	authMicroservice authProto.AuthorizationClient,
-	feedMicroservice feedProto.FeedClient) *Handler {
+	feedMicroservice feedProto.FeedClient,
+	adminMicroservice adminProto.AdminClient) *Handler {
 	return &Handler{
-		services:         services,
-		logger:           logger,
-		authMicroservice: authMicroservice,
-		feedMicroservice: feedMicroservice,
+		services:          services,
+		logger:            logger,
+		authMicroservice:  authMicroservice,
+		feedMicroservice:  feedMicroservice,
+		adminMicroservice: adminMicroservice,
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
 	utils "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
+	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -18,23 +19,30 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, error) {
+func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, adminProto.AdminClient, error) {
 	authConn, err := grpc.Dial(
 		viper.GetString("authorization.host")+":"+viper.GetString("authorization.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	feedConn, err := grpc.Dial(
 		viper.GetString("feed.host")+":"+viper.GetString("feed.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+	adminConn, err := grpc.Dial(
+		viper.GetString("admin.host")+":"+viper.GetString("admin.port"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return nil, nil, nil, err
 	}
 
-	return authProto.NewAuthorizationClient(authConn), feedProto.NewFeedClient(feedConn), nil
+	return authProto.NewAuthorizationClient(authConn), feedProto.NewFeedClient(feedConn), adminProto.NewAdminClient(adminConn), nil
 }
 
 // @title Umlaut API
@@ -58,8 +66,8 @@ func main() {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
 	}
-	
-	db_admin, err := utils.InitPostgresAdmin(ctx)
+
+	dbAdmin, err := utils.InitPostgresAdmin(ctx)
 	if err != nil {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres admin: %s", err.Error())))
@@ -78,15 +86,15 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize Minio: %s", err.Error())))
 	}
 
-	authClient, feedConn, err := initMicroservices()
+	authClient, feedConn, adminConn, err := initMicroservices()
 	if err != nil {
 		logger.Error("initialize Microservices",
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
 	}
 
-	repos := repository.NewRepository(db, db_admin, sessionStore, fileClient)
+	repos := repository.NewRepository(db, dbAdmin, sessionStore, fileClient)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services, logger, authClient, feedConn)
+	handlers := handler.NewHandler(services, logger, authClient, feedConn, adminConn)
 	srv := new(umlaut.Server)
 
 	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
