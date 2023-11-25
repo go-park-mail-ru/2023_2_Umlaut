@@ -15,6 +15,7 @@ const (
 	messageTable   = "\"message\""
 	adminTable     = "\"admin\""
 	statisticTable = "\"statistic\""
+	recommendationTable = "\"recommendation\""
 )
 
 type PostgresConfig struct {
