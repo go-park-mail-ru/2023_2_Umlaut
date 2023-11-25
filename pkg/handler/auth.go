@@ -11,6 +11,37 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// @Summary log in to admin
+// @Tags auth
+// @ID adminLogin
+// @Accept  json
+// @Produce  json
+// @Param input body signInInput true "Sign-in input parameters"
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,404 {object} ClientResponseDto[string]
+// @Router /api/v1/auth/admin [post]
+func (h *Handler) LogInAdmin(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var input signInInput
+	if err := decoder.Decode(&input); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	cookie, err := h.authMicroservice.LogInAdmin(
+		r.Context(),
+		&proto.SignInInput{Mail: input.Mail, Password: input.Password},
+	)
+
+	if err != nil {
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
+	}
+
+	http.SetCookie(w, createCookie("admin_session_id", cookie.Cookie))
+	NewSuccessClientResponseDto(r.Context(), w, "")
+}
+
 // @Summary log in to account
 // @Tags auth
 // @ID login
@@ -38,7 +69,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, createCookie(cookie.Cookie))
+	http.SetCookie(w, createCookie("session_id", cookie.Cookie))
 	NewSuccessClientResponseDto(r.Context(), w, "")
 }
 
@@ -99,14 +130,14 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
 
-	http.SetCookie(w, createCookie(userId.Cookie.Cookie))
+	http.SetCookie(w, createCookie("session_id", userId.Cookie.Cookie))
 
 	NewSuccessClientResponseDto(r.Context(), w, idResponse{Id: int(userId.Id)})
 }
 
-func createCookie(SID string) *http.Cookie {
+func createCookie(name, SID string) *http.Cookie {
 	return &http.Cookie{
-		Name:     "session_id",
+		Name:     name,
 		Value:    SID,
 		Expires:  time.Now().Add(10 * time.Hour),
 		Path:     "/",
