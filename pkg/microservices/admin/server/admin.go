@@ -79,9 +79,40 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 }
 
 func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty) (*proto.FeedbackStatistic, error) {
+	feedbackStat, err := as.AdminService.GetFeedbackStatistics(ctx)
+	if err != nil {
+		return &proto.FeedbackStatistic{}, status.Error(codes.Internal, err.Error())
+	}
 
+	return &proto.FeedbackStatistic{
+		AvgRating: feedbackStat.AvgRating,
+		RatingCount: feedbackStat.RatingCount,
+		LikedMap: getProtoLikedMap(feedbackStat.LikedMap),
+		NeedFixMap: getProtoNeedFixMap(feedbackStat.NeedFixMap),
+		Comments: feedbackStat.Comments,
+	}, nil
 }
 
 func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.Empty) (*proto.RecommendationStatistic, error) {
 
+}
+
+func getProtoLikedMap(likedMap map[string]int32) []*proto.LikedMap{
+	result := []*proto.LikedMap{}
+	for key, value := range likedMap {
+		result = append(result, &proto.LikedMap{ Liked: key, Count: value })
+	}
+	return result
+}
+
+func getProtoNeedFixMap(needFixMap map[string]model.NeedFixObject) []*proto.NeedFixMap{
+	result := []*proto.NeedFixMap{}
+	for key, value := range needFixMap {
+		result = append(
+			result, 
+			&proto.NeedFixMap{ 
+				NeedFix: key, 
+				NeedFixObject: &proto.NeedFixObject{ Count: value.Count, CommentFix: value.CommentFix} })
+	}
+	return result
 }

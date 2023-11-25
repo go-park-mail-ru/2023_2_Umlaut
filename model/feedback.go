@@ -16,13 +16,13 @@ type Feedback struct {
 
 type FeedbackStatistic struct {
 	AvgRating   float32
-	RatingCount []int
-	LikedMap    map[string]int
+	RatingCount []int32
+	LikedMap    map[string]int32
 	NeedFixMap  map[string]NeedFixObject
 	Comments    []string
 }
 
 type NeedFixObject struct {
-	Count      int
+	Count      int32
 	CommentFix []string
 }
