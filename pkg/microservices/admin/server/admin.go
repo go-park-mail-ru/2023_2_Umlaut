@@ -16,6 +16,14 @@ func NewAdminServer(feed *service.AdminService) *AdminServer {
 	return &AdminServer{AdminService: feed}
 }
 
-func (fs *AdminServer) GetStatistic(ctx context.Context, _ *proto.Empty) (*proto.Statistic, error) {
-	return &proto.Statistic{}, nil
+func (fs *AdminServer) CreateRecommendation(context.Context, *proto.Recommendation) (*proto.Empty, error) {
+
+}
+
+func (fs *AdminServer) CreateStatistic(context.Context, *proto.Statistic) (*proto.Empty, error) {
+
+}
+
+func (fs *AdminServer) GetAllStatistic(context.Context, *proto.Empty) (*proto.Statistic, error) {
+
 }
