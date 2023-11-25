@@ -42,7 +42,7 @@ message LikedMap {
 
 message NeedFixMap {
   string NeedFix = 1;
-  repeated NeedFixObject NeedFixObject = 2;
+  NeedFixObject NeedFixObject = 2;
 }
 
 message NeedFixObject {
