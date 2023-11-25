@@ -91,7 +91,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params 
 	queryBuilder := psql.Select(static.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
-		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = $1)", likeTable), user.Id)
+		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = %d)", likeTable, user.Id))
 
 	if user.PreferGender != nil && user.UserGender != nil {
 		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender, "prefer_gender": user.UserGender})
@@ -102,7 +102,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params 
 	if params.MaxAge > 0 {
 		queryBuilder = queryBuilder.Where(sq.LtOrEq{"age": params.MaxAge})
 	}
-	if len(params.Tags) > 0 {
+	if len(params.Tags) > 0 && len(params.Tags[0]) > 1 {
 		queryBuilder = queryBuilder.Where("ARRAY[" + buildTagArray(params.Tags) + "]::TEXT[] <@ tags")
 	}
 	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
