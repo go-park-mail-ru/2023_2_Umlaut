@@ -17,7 +17,7 @@ import (
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feedback [post]
-func (h *Handler) CreateFeedback(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var stat model.Feedback
 	if err := decoder.Decode(&stat); err != nil {
@@ -53,7 +53,7 @@ func (h *Handler) CreateFeedback(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/recommendation [post]
-func (h *Handler) CreateRecommendation(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var rec model.Recommendation
 	if err := decoder.Decode(&rec); err != nil {

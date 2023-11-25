@@ -48,7 +48,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/logout", h.logout)
-	authRouter.HandleFunc("/admin", h.LogInAdmin)
+	authRouter.HandleFunc("/admin", h.logInAdmin)
 
 	apiRouter := r.PathPrefix("/api/v1").Subrouter()
 	apiRouter.Use(
@@ -64,6 +64,8 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
+	apiRouter.HandleFunc("/feedback", h.createFeedback).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
 
 	r.Use(
 		h.loggingMiddleware,

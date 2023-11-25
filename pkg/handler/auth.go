@@ -20,7 +20,7 @@ import (
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/admin [post]
-func (h *Handler) LogInAdmin(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signInInput
 	if err := decoder.Decode(&input); err != nil {
@@ -148,15 +148,15 @@ func createCookie(name, SID string) *http.Cookie {
 }
 
 func parseError(err error) (int, string) {
-	status, ok := status.FromError(err)
+	code, ok := status.FromError(err)
 	if ok {
-		switch status.Code() {
+		switch code.Code() {
 		case codes.InvalidArgument:
-			return http.StatusBadRequest, status.Message()
+			return http.StatusBadRequest, code.Message()
 		case codes.Unauthenticated:
-			return http.StatusUnauthorized, status.Message()
+			return http.StatusUnauthorized, code.Message()
 		case codes.Internal:
-			return http.StatusInternalServerError, status.Message()
+			return http.StatusInternalServerError, code.Message()
 		}
 	}
 	if err != nil {
