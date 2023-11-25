@@ -78,7 +78,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=1474
     ports:
-      - 5432:5432
+      - 5434:5434
 
   redis:
     image: redis:latest
