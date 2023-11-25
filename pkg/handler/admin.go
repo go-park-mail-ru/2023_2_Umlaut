@@ -130,5 +130,16 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/show-csat [get]
 func (h *Handler) recommendationStatistic(w http.ResponseWriter, r *http.Request) {
-	NewSuccessClientResponseDto(r.Context(), w, rand.Intn(4))
+	recommend, err := h.adminMicroservice.GetRecommendationStatistic(r.Context(), &proto.Empty{})
+	if err != nil {
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, &model.RecommendationStatistic{
+		AvgRecommend:   recommend.AvgRecommend,
+		NPS:            recommend.NPS,
+		RecommendCount: recommend.RecommendCount,
+	})
 }
