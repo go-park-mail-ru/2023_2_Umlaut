@@ -16,7 +16,7 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/v1/admin/feedback": {
-            "post": {
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -45,7 +45,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/admin/recommendation": {
-            "post": {
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -979,7 +979,7 @@ const docTemplate = `{
         "model.FeedbackStatistic": {
             "type": "object",
             "properties": {
-                "avgRating": {
+                "avg-rating": {
                     "type": "number"
                 },
                 "comments": {
@@ -988,19 +988,19 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "likedMap": {
+                "liked-map": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "integer"
                     }
                 },
-                "needFixMap": {
+                "need-fix-map": {
                     "type": "object",
                     "additionalProperties": {
                         "$ref": "#/definitions/model.NeedFixObject"
                     }
                 },
-                "ratingCount": {
+                "rating-count": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -1042,7 +1042,7 @@ const docTemplate = `{
         "model.NeedFixObject": {
             "type": "object",
             "properties": {
-                "commentFix": {
+                "comment_fix": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -1076,13 +1076,13 @@ const docTemplate = `{
         "model.RecommendationStatistic": {
             "type": "object",
             "properties": {
-                "avgRecommend": {
+                "avg-recommend": {
                     "type": "number"
                 },
                 "nps": {
                     "type": "number"
                 },
-                "recommendCount": {
+                "recommend-count": {
                     "type": "array",
                     "items": {
                         "type": "integer"

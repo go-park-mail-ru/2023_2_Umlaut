@@ -129,7 +129,7 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.RecommendationStatistic]
 // @Failure 500 {object} ClientResponseDto[string]
-// @Router /api/v1/admin/recommendation [post]
+// @Router /api/v1/admin/recommendation [get]
 func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Request) {
 	recommend, err := h.adminMicroservice.GetRecommendationStatistic(r.Context(), &proto.AdminEmpty{})
 	if err != nil {
@@ -152,7 +152,7 @@ func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Requ
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.FeedbackStatistic]
 // @Failure 500 {object} ClientResponseDto[string]
-// @Router /api/v1/admin/feedback [post]
+// @Router /api/v1/admin/feedback [get]
 func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
 	feedbackStat, err := h.adminMicroservice.GetFeedbackStatistic(r.Context(), &proto.AdminEmpty{})
 	if err != nil {

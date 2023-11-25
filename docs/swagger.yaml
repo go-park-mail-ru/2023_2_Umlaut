@@ -160,21 +160,21 @@ definitions:
     type: object
   model.FeedbackStatistic:
     properties:
-      avgRating:
+      avg-rating:
         type: number
       comments:
         items:
           type: string
         type: array
-      likedMap:
+      liked-map:
         additionalProperties:
           type: integer
         type: object
-      needFixMap:
+      need-fix-map:
         additionalProperties:
           $ref: '#/definitions/model.NeedFixObject'
         type: object
-      ratingCount:
+      rating-count:
         items:
           type: integer
         type: array
@@ -201,7 +201,7 @@ definitions:
     type: object
   model.NeedFixObject:
     properties:
-      commentFix:
+      comment_fix:
         items:
           type: string
         type: array
@@ -223,11 +223,11 @@ definitions:
     type: object
   model.RecommendationStatistic:
     properties:
-      avgRecommend:
+      avg-recommend:
         type: number
       nps:
         type: number
-      recommendCount:
+      recommend-count:
         items:
           type: integer
         type: array
@@ -281,7 +281,7 @@ info:
   version: "1.0"
 paths:
   /api/v1/admin/feedback:
-    post:
+    get:
       consumes:
       - application/json
       operationId: FeedbackStatistic
@@ -300,7 +300,7 @@ paths:
       tags:
       - statistic
   /api/v1/admin/recommendation:
-    post:
+    get:
       consumes:
       - application/json
       operationId: RecommendationStatistic
