@@ -30,11 +30,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminClient interface {
-	GetFeedbackStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FeedbackStatistic, error)
-	GetRecommendationStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RecommendationStatistic, error)
-	CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error)
-	CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error)
-	CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error)
+	GetFeedbackStatistic(ctx context.Context, in *AdminEmpty, opts ...grpc.CallOption) (*FeedbackStatistic, error)
+	GetRecommendationStatistic(ctx context.Context, in *AdminEmpty, opts ...grpc.CallOption) (*RecommendationStatistic, error)
+	CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*AdminEmpty, error)
+	CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*AdminEmpty, error)
+	CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*AdminEmpty, error)
 }
 
 type adminClient struct {
@@ -45,7 +45,7 @@ func NewAdminClient(cc grpc.ClientConnInterface) AdminClient {
 	return &adminClient{cc}
 }
 
-func (c *adminClient) GetFeedbackStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FeedbackStatistic, error) {
+func (c *adminClient) GetFeedbackStatistic(ctx context.Context, in *AdminEmpty, opts ...grpc.CallOption) (*FeedbackStatistic, error) {
 	out := new(FeedbackStatistic)
 	err := c.cc.Invoke(ctx, Admin_GetFeedbackStatistic_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *adminClient) GetFeedbackStatistic(ctx context.Context, in *Empty, opts 
 	return out, nil
 }
 
-func (c *adminClient) GetRecommendationStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RecommendationStatistic, error) {
+func (c *adminClient) GetRecommendationStatistic(ctx context.Context, in *AdminEmpty, opts ...grpc.CallOption) (*RecommendationStatistic, error) {
 	out := new(RecommendationStatistic)
 	err := c.cc.Invoke(ctx, Admin_GetRecommendationStatistic_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -63,8 +63,8 @@ func (c *adminClient) GetRecommendationStatistic(ctx context.Context, in *Empty,
 	return out, nil
 }
 
-func (c *adminClient) CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *adminClient) CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*AdminEmpty, error) {
+	out := new(AdminEmpty)
 	err := c.cc.Invoke(ctx, Admin_CreateFeedback_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,8 +72,8 @@ func (c *adminClient) CreateFeedback(ctx context.Context, in *Feedback, opts ...
 	return out, nil
 }
 
-func (c *adminClient) CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *adminClient) CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*AdminEmpty, error) {
+	out := new(AdminEmpty)
 	err := c.cc.Invoke(ctx, Admin_CreateRecommendation_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,8 @@ func (c *adminClient) CreateRecommendation(ctx context.Context, in *Recommendati
 	return out, nil
 }
 
-func (c *adminClient) CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *adminClient) CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*AdminEmpty, error) {
+	out := new(AdminEmpty)
 	err := c.cc.Invoke(ctx, Admin_CreateFeedFeedback_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -94,11 +94,11 @@ func (c *adminClient) CreateFeedFeedback(ctx context.Context, in *Recommendation
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
 type AdminServer interface {
-	GetFeedbackStatistic(context.Context, *Empty) (*FeedbackStatistic, error)
-	GetRecommendationStatistic(context.Context, *Empty) (*RecommendationStatistic, error)
-	CreateFeedback(context.Context, *Feedback) (*Empty, error)
-	CreateRecommendation(context.Context, *Recommendation) (*Empty, error)
-	CreateFeedFeedback(context.Context, *Recommendation) (*Empty, error)
+	GetFeedbackStatistic(context.Context, *AdminEmpty) (*FeedbackStatistic, error)
+	GetRecommendationStatistic(context.Context, *AdminEmpty) (*RecommendationStatistic, error)
+	CreateFeedback(context.Context, *Feedback) (*AdminEmpty, error)
+	CreateRecommendation(context.Context, *Recommendation) (*AdminEmpty, error)
+	CreateFeedFeedback(context.Context, *Recommendation) (*AdminEmpty, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -106,19 +106,19 @@ type AdminServer interface {
 type UnimplementedAdminServer struct {
 }
 
-func (UnimplementedAdminServer) GetFeedbackStatistic(context.Context, *Empty) (*FeedbackStatistic, error) {
+func (UnimplementedAdminServer) GetFeedbackStatistic(context.Context, *AdminEmpty) (*FeedbackStatistic, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFeedbackStatistic not implemented")
 }
-func (UnimplementedAdminServer) GetRecommendationStatistic(context.Context, *Empty) (*RecommendationStatistic, error) {
+func (UnimplementedAdminServer) GetRecommendationStatistic(context.Context, *AdminEmpty) (*RecommendationStatistic, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRecommendationStatistic not implemented")
 }
-func (UnimplementedAdminServer) CreateFeedback(context.Context, *Feedback) (*Empty, error) {
+func (UnimplementedAdminServer) CreateFeedback(context.Context, *Feedback) (*AdminEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedback not implemented")
 }
-func (UnimplementedAdminServer) CreateRecommendation(context.Context, *Recommendation) (*Empty, error) {
+func (UnimplementedAdminServer) CreateRecommendation(context.Context, *Recommendation) (*AdminEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRecommendation not implemented")
 }
-func (UnimplementedAdminServer) CreateFeedFeedback(context.Context, *Recommendation) (*Empty, error) {
+func (UnimplementedAdminServer) CreateFeedFeedback(context.Context, *Recommendation) (*AdminEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedFeedback not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
@@ -135,7 +135,7 @@ func RegisterAdminServer(s grpc.ServiceRegistrar, srv AdminServer) {
 }
 
 func _Admin_GetFeedbackStatistic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(AdminEmpty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,13 +147,13 @@ func _Admin_GetFeedbackStatistic_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: Admin_GetFeedbackStatistic_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServer).GetFeedbackStatistic(ctx, req.(*Empty))
+		return srv.(AdminServer).GetFeedbackStatistic(ctx, req.(*AdminEmpty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Admin_GetRecommendationStatistic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(AdminEmpty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func _Admin_GetRecommendationStatistic_Handler(srv interface{}, ctx context.Cont
 		FullMethod: Admin_GetRecommendationStatistic_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServer).GetRecommendationStatistic(ctx, req.(*Empty))
+		return srv.(AdminServer).GetRecommendationStatistic(ctx, req.(*AdminEmpty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
