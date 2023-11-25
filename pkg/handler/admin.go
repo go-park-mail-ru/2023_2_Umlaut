@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	utils "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"net/http"
@@ -26,10 +27,13 @@ func (h *Handler) CreateStatistic(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateStatistic(
 		r.Context(),
 		&proto.Statistic{
-			UserId: int32(r.Context().Value(keyUserID).(int)),
-			Rating: int32(*stat.Rating),
-			//Liked: stat.Liked,
-
+			UserId:     int32(r.Context().Value(keyUserID).(int)),
+			Rating:     utils.ModifyInt(stat.Rating),
+			Liked:      utils.ModifyString(stat.Liked),
+			NeedFix:    utils.ModifyString(stat.NeedFix),
+			CommentFix: utils.ModifyString(stat.CommentFix),
+			Comment:    utils.ModifyString(stat.Comment),
+			Show:       stat.Show,
 		})
 
 	if err != nil {
