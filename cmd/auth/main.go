@@ -22,6 +22,11 @@ func main() {
 		log.Fatalf("failed to initialize Postgres: %s", err.Error())
 	}
 
+	db_admin, err := utils.InitPostgresAdmin(ctx)
+	if err != nil {
+		log.Fatalf("failed to initialize Postgres admin: %s", err.Error())
+	}
+
 	sessionStore, err := utils.InitRedis()
 	if err != nil {
 		log.Fatalf("failed to initialize redisDb: %s", err.Error())
@@ -31,6 +36,7 @@ func main() {
 	authService := service.NewAuthService(
 		repository.NewUserPostgres(db),
 		repository.NewRedisStore(sessionStore),
+		repository.NewAdminPostgres(db_admin),
 	)
 
 	server := server.NewAuthServer(authService)

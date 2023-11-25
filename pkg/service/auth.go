@@ -16,10 +16,11 @@ import (
 type AuthService struct {
 	repoUser  repository.User
 	repoStore repository.Store
+	repoAdmin repository.Admin
 }
 
-func NewAuthService(repoUser repository.User, repoStore repository.Store) *AuthService {
-	return &AuthService{repoUser: repoUser, repoStore: repoStore}
+func NewAuthService(repoUser repository.User, repoStore repository.Store, repoAdmin repository.Admin) *AuthService {
+	return &AuthService{repoUser: repoUser, repoStore: repoStore, repoAdmin: repoAdmin}
 }
 
 func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, error) {
@@ -46,6 +47,19 @@ func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model
 	user.Sanitize()
 
 	return user, nil
+}
+
+func (s *AuthService) GetAdmin(ctx context.Context, mail, password string) (model.Admin, error) {
+	admin, err := s.repoAdmin.GetAdmin(ctx, mail)
+	if err != nil {
+		return admin, err
+	}
+	if generatePasswordHash(password, admin.Salt) != admin.PasswordHash {
+		return admin, errors.New("invalid")
+	}
+	admin.Sanitize()
+
+	return admin, nil
 }
 
 func (s *AuthService) GenerateCookie(ctx context.Context, id int) (string, error) {

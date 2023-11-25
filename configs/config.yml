@@ -21,6 +21,14 @@ postgres:
   sslmode: "disable"
   password: "1474"
 
+admin:
+  username: "postgres"
+  host: "db_admin"
+  port: "5432"
+  dbname: "admin"
+  sslmode: "disable"
+  password: "1474"
+
 redis:
   addr: "redis:6379"
   db: "0"

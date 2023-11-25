@@ -54,7 +54,7 @@ type Service struct {
 
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
-		Authorization: NewAuthService(repo.User, repo.Store),
+		Authorization: NewAuthService(repo.User, repo.Store, repo.Admin),
 		Feed:          NewFeedService(repo.User, repo.Store, repo.Dialog),
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
 		Like:          NewLikeService(repo.Like, repo.Dialog),
