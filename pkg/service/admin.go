@@ -21,3 +21,7 @@ func (s *AdminService) GetStatistic(ctx context.Context) (int, error) {
 func (s *AdminService) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
 	return 0, nil
 }
+
+func (s *AdminService) CreateStatistic(ctx context.Context, stat model.Statistic) (int, error) {
+	return 0, nil
+}
