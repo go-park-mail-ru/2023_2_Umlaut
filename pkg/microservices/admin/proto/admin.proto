@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "./;proto";
+
+package proto;
+
+//protoc --go_out=. --go-grpc_out=. --go-grpc_opt=paths=source_relative --go_opt=paths=source_relative *.proto
+
+message Statistic {
+  int32 id = 1;
+
+}
+
+message Empty {
+}
+
+service Admin {
+  rpc GetStatistic(Empty) returns(Statistic) {}
+}
