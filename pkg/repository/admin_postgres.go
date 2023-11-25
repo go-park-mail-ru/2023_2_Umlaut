@@ -97,6 +97,7 @@ func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, err
 	query, args, err := psql.
 		Select(static.FeedbackDbField).
 		From(feedbackTable).
+		Where(sq.Eq{"show": true}).
 		ToSql()
 
 	if err != nil {

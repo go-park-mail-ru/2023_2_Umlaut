@@ -32,8 +32,40 @@ func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) 
 
 func (s *AdminService) GetFeedbackStatistics(ctx context.Context) (int, error) {
 	feedbacks, err := s.repoAdmin.GetFeedbacks(ctx)
+	var feedbackStat model.FeedbackStatistic
+	feedbackStat.AvgRating = getAvgRating(feedbacks)
+	feedbackStat.LikedMap
 	if err != nil {
 		return 0, err
 	}
 	return 0, nil
+}
+
+func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {
+	likedMap := make(map[string]int)
+	needFixMap := make(map[string]model.NeedFixObject)
+	ratingCount :=
+	comment := []string{}
+	sum := 0
+	for _, feedback := range feedbacks {
+		if feedback.Liked != nil {
+			likedMap[*feedback.Liked] += 1
+		}
+		if feedback.NeedFix != nil {
+			tmp := needFixMap[*feedback.NeedFix]
+			tmp.Count += 1
+			if feedback.CommentFix != nil {
+				tmp.CommentFix = append(tmp.CommentFix, *feedback.CommentFix)
+			}
+			needFixMap[*feedback.NeedFix] = tmp
+		}
+		if feedback.Comment != nil {
+			comment = append(comment, *feedback.Comment)
+		}
+		sum += *feedback.Rating
+	}
+	return model.FeedbackStatistic{
+		AvgRating: float32(sum) / float32(len(feedbacks)),
+		RatingCount: ,
+	}
 }
