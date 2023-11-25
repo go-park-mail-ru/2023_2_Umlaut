@@ -25,3 +25,11 @@ func (s *AdminService) CreateRecommendation(ctx context.Context, rec model.Recom
 func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
 	return s.repoAdmin.CreateFeedback(ctx, stat)
 }
+
+func (s *AdminService) GetFeedbackStatistics(ctx context.Context) (int, error) {
+	feedbacks, err := s.repoAdmin.GetFeedbacks(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return 0, nil
+}

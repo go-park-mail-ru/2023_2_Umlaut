@@ -75,7 +75,7 @@ func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Reco
 	return id, err
 }
 
-func (r *DialogPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
+func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
 	query, args, err := psql.
 		Select(static.FeedbackDbField).
 		From(feedbackTable).
