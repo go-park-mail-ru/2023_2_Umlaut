@@ -43,6 +43,10 @@ type Tag interface {
 	GetAllTags(ctx context.Context) ([]string, error)
 }
 
+type Admin interface {
+	GetStatistic(ctx context.Context) (int, error)
+}
+
 type Service struct {
 	Authorization Authorization
 	Feed          Feed
@@ -50,6 +54,7 @@ type Service struct {
 	Like          Like
 	Dialog        Dialog
 	Tag           Tag
+	Admin         Admin
 }
 
 func NewService(repo *repository.Repository) *Service {
