@@ -75,7 +75,25 @@ func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Reco
 	return id, err
 }
 
-func (r *DialogPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
+func (r *AdminPostgres) CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error) {
+	var id int
+	query, args, err := psql.Insert(feedFeedbackTable).
+		Columns("user_id", "recommend", "show").
+		Values(rec.UserId, rec.Recommend, rec.Show).
+		ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	query += " RETURNING id"
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+
+	return id, err
+}
+
+func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
 	query, args, err := psql.
 		Select(static.FeedbackDbField).
 		From(feedbackTable).

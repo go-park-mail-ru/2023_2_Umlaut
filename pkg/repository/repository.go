@@ -43,6 +43,7 @@ type Admin interface {
 	CreateFeedback(ctx context.Context, stat model.Feedback) (int, error)
 	CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error)
 	CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error)
+	GetFeedbacks(ctx context.Context) ([]model.Feedback, error)
 }
 
 type Store interface {
