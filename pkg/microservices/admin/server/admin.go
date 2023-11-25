@@ -17,7 +17,7 @@ func NewAdminServer(feed *service.AdminService) *AdminServer {
 }
 
 func (fs *AdminServer) CreateRecommendation(context.Context, *proto.Recommendation) (*proto.Empty, error) {
-
+	
 }
 
 func (fs *AdminServer) CreateStatistic(context.Context, *proto.Statistic) (*proto.Empty, error) {
