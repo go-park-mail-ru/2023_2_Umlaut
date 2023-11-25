@@ -60,6 +60,10 @@ func main() {
 	}
 	
 	db_admin, err := utils.InitPostgresAdmin(ctx)
+	if err != nil {
+		logger.Error("initialize Postgres",
+			zap.String("Error", fmt.Sprintf("failed to initialize Postgres admin: %s", err.Error())))
+	}
 
 	sessionStore, err := utils.InitRedis()
 	if err != nil {
