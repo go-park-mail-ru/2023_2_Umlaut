@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"log"
 	"net"
 
-	utils "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/server"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"

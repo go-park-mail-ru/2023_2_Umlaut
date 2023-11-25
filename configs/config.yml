@@ -9,7 +9,7 @@ feed:
   port: "8002"
 
 admin:
-  host: "localhost"
+  host: "admin"
   port: "8003"
 
 db_umlaut:
