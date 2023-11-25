@@ -11,7 +11,7 @@ type Recommendation struct {
 }
 
 type RecommendationStatistic struct {
-	AvgRecommend   float32
-	NPS            float32
-	RecommendCount []int32
+	AvgRecommend   float32 `json:"avg-recommend"`
+	NPS            float32 `json:"nps"`
+	RecommendCount []int32 `json:"recommend-count"`
 }

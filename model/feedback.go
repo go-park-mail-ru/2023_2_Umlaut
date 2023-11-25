@@ -15,14 +15,14 @@ type Feedback struct {
 }
 
 type FeedbackStatistic struct {
-	AvgRating   float32
-	RatingCount []int32
-	LikedMap    map[string]int32
-	NeedFixMap  map[string]NeedFixObject
-	Comments    []string
+	AvgRating   float32                  `json:"avg-rating"`
+	RatingCount []int32                  `json:"rating-count"`
+	LikedMap    map[string]int32         `json:"liked-map"`
+	NeedFixMap  map[string]NeedFixObject `json:"need-fix-map"`
+	Comments    []string                 `json:"comments"`
 }
 
 type NeedFixObject struct {
-	Count      int32
-	CommentFix []string
+	Count      int32    `json:"count"`
+	CommentFix []string `json:"comment_fix"`
 }
