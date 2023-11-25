@@ -5,10 +5,10 @@ services:
     build:
       context: ./
       dockerfile: ./cmd/auth/Dockerfile
-    command: ./wait-for-postgres.sh db ./auth
+    command: ./wait-for-postgres.sh db_umlaut ./auth
     restart: always
     depends_on:
-      - db
+      - db_umlaut
       - redis
       - db_admin
     ports:
@@ -20,10 +20,10 @@ services:
     build:
       context: ./
       dockerfile: ./cmd/feed/Dockerfile
-    command: ./wait-for-postgres.sh db ./feed
+    command: ./wait-for-postgres.sh db_umlaut ./feed
     restart: always
     depends_on:
-      - db
+      - db_umlaut
       - redis
     ports:
       - "8002:8002"
@@ -34,7 +34,7 @@ services:
     build:
       context: ./
       dockerfile: ./cmd/admin/Dockerfile
-    command: ./wait-for-postgres.sh db ./admin
+    command: ./wait-for-postgres.sh db_admin ./admin
     restart: always
     depends_on:
       - db_admin
@@ -47,11 +47,11 @@ services:
     build:
       context: ./
       dockerfile: ./cmd/app/Dockerfile
-    command: ./wait-for-postgres.sh db ./umlaut
+    command: ./wait-for-postgres.sh db_umlaut ./umlaut
     ports:
       - 8000:8000
     depends_on:
-      - db
+      - db_umlaut
       - redis
       - minio
       - authorization
