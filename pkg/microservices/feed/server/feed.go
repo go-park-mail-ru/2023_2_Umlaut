@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	utils "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
@@ -43,41 +44,16 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 		Mail:         nextUser.Mail,
 		PasswordHash: nextUser.PasswordHash,
 		Salt:         nextUser.Salt,
-		UserGender:   modifyInt(nextUser.UserGender),
-		PreferGender: modifyInt(nextUser.PreferGender),
-		Description:  modifyString(nextUser.Description),
-		Age:          modifyInt(nextUser.Age),
-		Looking:      modifyString(nextUser.Looking),
-		ImagePaths:   modifyArray(nextUser.ImagePaths),
-		Education:    modifyString(nextUser.Education),
-		Hobbies:      modifyString(nextUser.Hobbies),
+		UserGender:   utils.ModifyInt(nextUser.UserGender),
+		PreferGender: utils.ModifyInt(nextUser.PreferGender),
+		Description:  utils.ModifyString(nextUser.Description),
+		Age:          utils.ModifyInt(nextUser.Age),
+		Looking:      utils.ModifyString(nextUser.Looking),
+		ImagePaths:   utils.ModifyArray(nextUser.ImagePaths),
+		Education:    utils.ModifyString(nextUser.Education),
+		Hobbies:      utils.ModifyString(nextUser.Hobbies),
 		Birthday:     birthdayProto,
 		Online:       nextUser.Online,
-		Tags:         modifyArray(nextUser.Tags),
+		Tags:         utils.ModifyArray(nextUser.Tags),
 	}, nil
-}
-
-func modifyString(data *string) string {
-	if data == nil {
-		return ""
-	}
-	return *data
-}
-
-func modifyInt(data *int) int32 {
-	if data == nil {
-		return 0
-	}
-	return int32(*data)
-}
-
-func modifyArray(data *[]string) []string {
-	if data == nil {
-		return []string{}
-	}
-	var result []string
-	for _, path := range *data {
-		result = append(result, path)
-	}
-	return result
 }
