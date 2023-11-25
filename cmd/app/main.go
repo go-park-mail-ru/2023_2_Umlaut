@@ -58,6 +58,8 @@ func main() {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
 	}
+	
+	db_admin, err := utils.InitPostgresAdmin(ctx)
 
 	sessionStore, err := utils.InitRedis()
 	if err != nil {
@@ -78,7 +80,7 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
 	}
 
-	repos := repository.NewRepository(db, sessionStore, fileClient)
+	repos := repository.NewRepository(db, db_admin, sessionStore, fileClient)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services, logger, authClient, feedConn)
 	srv := new(umlaut.Server)

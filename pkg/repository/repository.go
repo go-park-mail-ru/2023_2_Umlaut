@@ -38,6 +38,10 @@ type Tag interface {
 	GetAllTags(ctx context.Context) ([]string, error)
 }
 
+type Admin interface {
+	GetAdmin(ctx context.Context, mail string) (model.Admin, error)
+}
+
 type Store interface {
 	SetSession(ctx context.Context, SID string, id int, lifetime time.Duration) error
 	GetSession(ctx context.Context, SID string) (int, error)
@@ -55,16 +59,18 @@ type Repository struct {
 	Like       Like
 	Dialog     Dialog
 	Tag        Tag
+	Admin      Admin
 	Store      Store
 	FileServer FileServer
 }
 
-func NewRepository(db *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
+func NewRepository(db *pgxpool.Pool, db_admin *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),
 		Dialog:     NewDialogPostgres(db),
 		Tag:        NewTagPostgres(db),
+		Admin:      NewAdminPostgres(db_admin),
 		Store:      NewRedisStore(redisClient),
 		FileServer: NewMinioProvider(minioClient),
 	}

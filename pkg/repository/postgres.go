@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -12,6 +13,7 @@ const (
 	dialogTable  = "\"dialog\""
 	tagTable     = "\"tag\""
 	messageTable = "\"message\""
+	adminTable   = "\"admin\""
 )
 
 type PostgresConfig struct {

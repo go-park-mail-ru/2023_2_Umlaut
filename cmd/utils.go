@@ -46,6 +46,17 @@ func InitPostgres(ctx context.Context) (*pgxpool.Pool, error) {
 	})
 }
 
+func InitPostgresAdmin(ctx context.Context) (*pgxpool.Pool, error) {
+	return repository.NewPostgresDB(ctx, repository.PostgresConfig{
+		Host:     viper.GetString("admin.host"),
+		Port:     viper.GetString("admin.port"),
+		Username: viper.GetString("admin.username"),
+		DBName:   viper.GetString("admin.dbname"),
+		SSLMode:  viper.GetString("admin.sslmode"),
+		Password: viper.GetString("admin.password"), //os.Getenv("DB_PASSWORD"),
+	})
+}
+
 func InitRedis() (*redis.Client, error) {
 	redisDb, err := strconv.Atoi(viper.GetString("redis.db"))
 	if err != nil {
