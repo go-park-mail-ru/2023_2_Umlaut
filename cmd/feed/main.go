@@ -5,11 +5,11 @@ import (
 	"log"
 	"net"
 
-	utils "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/server"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
