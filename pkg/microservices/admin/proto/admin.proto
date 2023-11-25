@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 option go_package = "./;proto";
 
 package proto;
@@ -16,14 +14,12 @@ message Statistic {
   string NeedFix = 5;
   string CommentFix = 6;
   string Comment = 7;
-  google.protobuf.Timestamp CreatedAt = 8;
 }
 
 message Recommendation {
   int32 Id = 1;
   int32 UserId = 2;
   int32 Recommend = 3;
-  google.protobuf.Timestamp CreatedAt = 4;
 }
 
 message Empty {

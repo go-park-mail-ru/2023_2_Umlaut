@@ -42,8 +42,8 @@ func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin,
 func (r *AdminPostgres) CreateStatistic(ctx context.Context, stat model.Statistic) (int, error) {
 	var id int
 	query, args, err := psql.Insert(statisticTable).
-		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment", "created_at").
-		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.CommentFix, stat.Comment, stat.CreatedAt).
+		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment").
+		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.CommentFix, stat.Comment).
 		ToSql()
 
 	if err != nil {
