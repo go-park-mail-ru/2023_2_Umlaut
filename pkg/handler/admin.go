@@ -2,11 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"math/rand"
+	"net/http"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
-	"math/rand"
-	"net/http"
 )
 
 // @Summary create statistic
@@ -126,10 +127,10 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 // @ID statistic
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[RecommendationStatistic]
+// @Success 200 {object} ClientResponseDto[model.RecommendationStatistic]
 // @Failure 500 {object} ClientResponseDto[string]
-// @Router /api/v1/show-csat [get]
-func (h *Handler) recommendationStatistic(w http.ResponseWriter, r *http.Request) {
+// @Router /api/v1/admin/recommendation [post]
+func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Request) {
 	recommend, err := h.adminMicroservice.GetRecommendationStatistic(r.Context(), &proto.Empty{})
 	if err != nil {
 		statusCode, message := parseError(err)
@@ -143,3 +144,48 @@ func (h *Handler) recommendationStatistic(w http.ResponseWriter, r *http.Request
 		RecommendCount: recommend.RecommendCount,
 	})
 }
+
+// @Summary statistic by feedback
+// @Tags statistic
+// @ID statistic
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[model.FeedbackStatistic]
+// @Failure 500 {object} ClientResponseDto[string]
+// @Router /api/v1/admin/feedback [post]
+func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
+	feedbackStat, err := h.adminMicroservice.GetFeedbackStatistic(r.Context(), &proto.Empty{})
+	if err != nil {
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, &model.FeedbackStatistic{
+		AvgRating:   feedbackStat.AvgRating,
+		RatingCount: feedbackStat.RatingCount,
+		LikedMap:    getLikedMap(feedbackStat.LikedMap),
+		NeedFixMap: getNeedFixMap(feedbackStat.NeedFixMap),
+		Comments: feedbackStat.Comments,
+	})
+}
+
+func getLikedMap(likedMap []*proto.LikedMap) map[string]int32 {
+	result := make(map[string]int32)
+	for _, item := range likedMap {
+		result[item.Liked] = item.Count
+	}
+	return result
+}
+
+func getNeedFixMap(needFixMap []*proto.NeedFixMap) map[string]model.NeedFixObject {
+	result := make(map[string]model.NeedFixObject)
+	for _, item := range needFixMap {
+		result[item.NeedFix] = model.NeedFixObject{
+			Count: item.NeedFixObject.Count,
+			CommentFix: item.NeedFixObject.CommentFix,
+		}
+	}
+	return result
+}
+
