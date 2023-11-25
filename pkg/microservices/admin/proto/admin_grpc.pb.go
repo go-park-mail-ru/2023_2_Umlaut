@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Admin_GetAllStatistic_FullMethodName      = "/proto.Admin/GetAllStatistic"
-	Admin_CreateStatistic_FullMethodName      = "/proto.Admin/CreateStatistic"
+	Admin_CreateFeedback_FullMethodName       = "/proto.Admin/CreateFeedback"
 	Admin_CreateRecommendation_FullMethodName = "/proto.Admin/CreateRecommendation"
 )
 
@@ -29,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminClient interface {
 	GetAllStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Feedback, error)
-	CreateStatistic(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error)
+	CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error)
 	CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -50,9 +50,9 @@ func (c *adminClient) GetAllStatistic(ctx context.Context, in *Empty, opts ...gr
 	return out, nil
 }
 
-func (c *adminClient) CreateStatistic(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error) {
+func (c *adminClient) CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, Admin_CreateStatistic_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Admin_CreateFeedback_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (c *adminClient) CreateRecommendation(ctx context.Context, in *Recommendati
 // for forward compatibility
 type AdminServer interface {
 	GetAllStatistic(context.Context, *Empty) (*Feedback, error)
-	CreateStatistic(context.Context, *Feedback) (*Empty, error)
+	CreateFeedback(context.Context, *Feedback) (*Empty, error)
 	CreateRecommendation(context.Context, *Recommendation) (*Empty, error)
 	mustEmbedUnimplementedAdminServer()
 }
@@ -85,8 +85,8 @@ type UnimplementedAdminServer struct {
 func (UnimplementedAdminServer) GetAllStatistic(context.Context, *Empty) (*Feedback, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllStatistic not implemented")
 }
-func (UnimplementedAdminServer) CreateStatistic(context.Context, *Feedback) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateStatistic not implemented")
+func (UnimplementedAdminServer) CreateFeedback(context.Context, *Feedback) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedback not implemented")
 }
 func (UnimplementedAdminServer) CreateRecommendation(context.Context, *Recommendation) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRecommendation not implemented")
@@ -122,20 +122,20 @@ func _Admin_GetAllStatistic_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Admin_CreateStatistic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Admin_CreateFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Feedback)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServer).CreateStatistic(ctx, in)
+		return srv.(AdminServer).CreateFeedback(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Admin_CreateStatistic_FullMethodName,
+		FullMethod: Admin_CreateFeedback_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServer).CreateStatistic(ctx, req.(*Feedback))
+		return srv.(AdminServer).CreateFeedback(ctx, req.(*Feedback))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -170,8 +170,8 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Admin_GetAllStatistic_Handler,
 		},
 		{
-			MethodName: "CreateStatistic",
-			Handler:    _Admin_CreateStatistic_Handler,
+			MethodName: "CreateFeedback",
+			Handler:    _Admin_CreateFeedback_Handler,
 		},
 		{
 			MethodName: "CreateRecommendation",

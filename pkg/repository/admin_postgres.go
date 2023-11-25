@@ -39,7 +39,7 @@ func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin,
 	return admin, err
 }
 
-func (r *AdminPostgres) CreateStatistic(ctx context.Context, stat model.Feedback) (int, error) {
+func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
 	var id int
 	query, args, err := psql.Insert(feedbackTable).
 		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment", "show").

@@ -29,6 +29,6 @@ message Empty {
 
 service Admin {
   rpc GetAllStatistic(Empty) returns(Feedback) {}
-  rpc CreateStatistic(Feedback) returns(Empty) {}
+  rpc CreateFeedback(Feedback) returns(Empty) {}
   rpc CreateRecommendation(Recommendation) returns(Empty) {}
 }

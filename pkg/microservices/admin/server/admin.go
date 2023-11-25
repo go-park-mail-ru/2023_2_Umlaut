@@ -38,9 +38,9 @@ func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Reco
 	return &proto.Empty{}, nil
 }
 
-func (as *AdminServer) CreateStatistic(ctx context.Context, stat *proto.Feedback) (*proto.Empty, error) {
+func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback) (*proto.Empty, error) {
 	rating := int(stat.Rating)
-	_, err := as.AdminService.CreateStatistic(
+	_, err := as.AdminService.CreateFeedback(
 		ctx,
 		model.Feedback{
 			Id:         int(stat.Id),

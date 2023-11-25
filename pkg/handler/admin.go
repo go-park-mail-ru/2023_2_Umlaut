@@ -24,7 +24,7 @@ func (h *Handler) CreateFeedback(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	_, err := h.adminMicroservice.CreateStatistic(
+	_, err := h.adminMicroservice.CreateFeedback(
 		r.Context(),
 		&proto.Feedback{
 			UserId:     int32(r.Context().Value(keyUserID).(int)),
