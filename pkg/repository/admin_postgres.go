@@ -49,6 +49,7 @@ func (r *AdminPostgres) CreateStatistic(ctx context.Context, stat model.Statisti
 	if err != nil {
 		return 0, fmt.Errorf("failed to create statistic. err: %w", err)
 	}
+	
 	query += " RETURNING id"
 	row := r.db.QueryRow(ctx, query, args...)
 	err = row.Scan(&id)
