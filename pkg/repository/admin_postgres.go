@@ -77,32 +77,26 @@ func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Reco
 
 func (r *DialogPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
 	query, args, err := psql.
-		Select("d.id", "d.user1_id", "d.user2_id", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.created_at").
-		From(dialogTable + " d").
-		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
-		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
-		Where(sq.And{
-			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
-			sq.NotEq{"u.id": userId},
-		}).
+		Select(static.FeedbackDbField).
+		From(feedbackTable).
 		ToSql()
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+		return nil, fmt.Errorf("failed to get feedback. err: %w", err)
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+		return nil, fmt.Errorf("failed to get feedback. err: %w", err)
 	}
 	defer rows.Close()
 
-	dialogs, err := scanDialogs(rows)
+	feedbacks, err := scanFeedbacks(rows)
 	if err != nil {
 		return nil, err
 	}
 
-	return dialogs, nil
+	return feedbacks, nil
 }
 
 func scanAdmin(row pgx.Row, admin *model.Admin) error {
@@ -114,4 +108,36 @@ func scanAdmin(row pgx.Row, admin *model.Admin) error {
 	)
 
 	return err
+}
+
+func scanFeedbacks(rows pgx.Rows) ([]model.Feedback, error) {
+	var feedbacks []model.Feedback
+	var err error
+	for rows.Next() {
+		var feedback model.Feedback
+		err = rows.Scan(
+			&feedback.Id,
+			&feedback.UserId,
+			&feedback.Rating,
+			&feedback.Liked,
+			&feedback.NeedFix,
+			&feedback.CommentFix,
+			&feedback.Comment,
+			&feedback.Show,
+			&feedback.CreatedAt,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		feedbacks = append(feedbacks, feedback)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("scan error in GetFeedbacks: %v", err)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows error in GetFeedbacks: %v", rows.Err())
+	}
+
+	return feedbacks, nil
 }
