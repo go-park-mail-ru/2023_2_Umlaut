@@ -31,7 +31,8 @@ message Empty {
 }
 
 service Authorization {
-  rpc SignUp(SignUpInput) returns(UserId) {}
-  rpc SignIn(SignInInput) returns(Cookie) {}
-  rpc LogOut(Cookie) returns(Empty) {}
+    rpc LogInAdmin(SignInInput) returns(Cookie) {}
+    rpc SignUp(SignUpInput) returns(UserId) {}
+    rpc SignIn(SignInInput) returns(Cookie) {}
+    rpc LogOut(Cookie) returns(Empty) {}
 }

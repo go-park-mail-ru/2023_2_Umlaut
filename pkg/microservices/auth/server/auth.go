@@ -20,6 +20,24 @@ func NewAuthServer(auth *service.AuthService) *AuthServer {
 	return &AuthServer{Authorization: auth}
 }
 
+func (as *AuthServer) LogInAdmin(ctx context.Context, input *proto.SignInInput) (*proto.Cookie, error) {
+	if input.Mail == "" || input.Password == "" {
+		return &proto.Cookie{}, status.Error(codes.InvalidArgument, "missing required fields")
+	}
+
+	admin, err := as.Authorization.GetAdmin(ctx, input.Mail, input.Password)
+	if err != nil {
+		return &proto.Cookie{}, status.Error(codes.Unauthenticated, "invalid mail or password")
+	}
+
+	SID, err := as.Authorization.GenerateCookie(ctx, admin.Id)
+	if err != nil {
+		return &proto.Cookie{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.Cookie{Cookie: SID}, nil
+}
+
 func (as *AuthServer) LogOut(ctx context.Context, cookie *proto.Cookie) (*proto.Empty, error) {
 	if err := as.Authorization.DeleteCookie(ctx, cookie.Cookie); err != nil {
 		return &proto.Empty{}, status.Error(codes.Internal, "invalid cookie deletion")
