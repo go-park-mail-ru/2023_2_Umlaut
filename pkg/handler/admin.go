@@ -120,3 +120,15 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 	NewSuccessClientResponseDto(r.Context(), w, rand.Intn(4))
 }
+
+// @Summary statistic by recommendation
+// @Tags statistic
+// @ID statistic
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[RecommendationStatistic]
+// @Failure 500 {object} ClientResponseDto[string]
+// @Router /api/v1/show-csat [get]
+func (h *Handler) recommendationStatistic(w http.ResponseWriter, r *http.Request) {
+	NewSuccessClientResponseDto(r.Context(), w, rand.Intn(4))
+}
