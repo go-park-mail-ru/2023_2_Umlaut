@@ -81,3 +81,7 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty) (*proto.FeedbackStatistic, error) {
 
 }
+
+func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.Empty) (*proto.RecommendationStatistic, error) {
+
+}

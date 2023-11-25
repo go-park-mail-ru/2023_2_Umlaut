@@ -50,8 +50,15 @@ message NeedFixObject {
   repeated string CommentFix = 2;
 }
 
+message RecommendationStatistic {
+  float AvgRecommend = 1;
+  float NPS = 2;
+  repeated int32 RecommendCount = 3;
+}
+
 service Admin {
   rpc GetFeedbackStatistic(Empty) returns(FeedbackStatistic) {}
+  rpc GetRecommendationStatistic(Empty) returns(RecommendationStatistic) {}
   rpc CreateFeedback(Feedback) returns(Empty) {}
   rpc CreateRecommendation(Recommendation) returns(Empty) {}
   rpc CreateFeedFeedback(Recommendation) returns(Empty) {}
