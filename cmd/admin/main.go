@@ -39,7 +39,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	proto.RegisterAdminServer(grpcServer)
+	proto.RegisterAdminServer(grpcServer, adminServer)
 
 	err = grpcServer.Serve(listen)
 	if err != nil {
