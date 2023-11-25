@@ -37,23 +37,23 @@ func InitLogger() (*zap.Logger, error) {
 
 func InitPostgres(ctx context.Context) (*pgxpool.Pool, error) {
 	return repository.NewPostgresDB(ctx, repository.PostgresConfig{
-		Host:     viper.GetString("postgres.host"),
-		Port:     viper.GetString("postgres.port"),
-		Username: viper.GetString("postgres.username"),
-		DBName:   viper.GetString("postgres.dbname"),
-		SSLMode:  viper.GetString("postgres.sslmode"),
-		Password: viper.GetString("postgres.password"), //os.Getenv("DB_PASSWORD"),
+		Host:     viper.GetString("db_umlaut.host"),
+		Port:     viper.GetString("db_umlaut.port"),
+		Username: viper.GetString("db_umlaut.username"),
+		DBName:   viper.GetString("db_umlaut.dbname"),
+		SSLMode:  viper.GetString("db_umlaut.sslmode"),
+		Password: viper.GetString("db_umlaut.password"), //os.Getenv("DB_PASSWORD"),
 	})
 }
 
 func InitPostgresAdmin(ctx context.Context) (*pgxpool.Pool, error) {
 	return repository.NewPostgresDB(ctx, repository.PostgresConfig{
-		Host:     viper.GetString("admin.host"),
-		Port:     viper.GetString("admin.port"),
-		Username: viper.GetString("admin.username"),
-		DBName:   viper.GetString("admin.dbname"),
-		SSLMode:  viper.GetString("admin.sslmode"),
-		Password: viper.GetString("admin.password"), //os.Getenv("DB_PASSWORD"),
+		Host:     viper.GetString("db_admin.host"),
+		Port:     viper.GetString("db_admin.port"),
+		Username: viper.GetString("db_admin.username"),
+		DBName:   viper.GetString("db_admin.dbname"),
+		SSLMode:  viper.GetString("db_admin.sslmode"),
+		Password: viper.GetString("db_admin.password"), //os.Getenv("DB_PASSWORD"),
 	})
 }
 

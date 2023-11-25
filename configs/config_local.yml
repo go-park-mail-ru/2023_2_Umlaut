@@ -12,17 +12,17 @@ admin:
   host: "localhost"
   port: "8003"
 
-postgres:
+db_umlaut:
   username: "postgres"
-  host: "localhost"
-  port: "5433"
-  dbname: "postgres"
+  host: "db"
+  port: "5432"
+  dbname: "umlaut"
   sslmode: "disable"
   password: "1474"
 
-admin:
+db_admin:
   username: "postgres"
-  host: "localhost"
+  host: "db_admin"
   port: "5432"
   dbname: "admin"
   sslmode: "disable"

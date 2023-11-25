@@ -57,12 +57,23 @@ services:
     environment:
       - DB_PASSWORD=1474
 
-  db:
+  db_umlaut:
     restart: always
     image: postgres:latest
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
-      - ./db/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/umlaut/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=1474
+    ports:
+      - 5432:5432
+
+  db_admin:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - ./.database/postgres/data:/var/lib/postgresql/data
+      - ./db/admin/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=1474
     ports:
