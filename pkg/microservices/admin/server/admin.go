@@ -38,6 +38,24 @@ func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Reco
 	return &proto.Empty{}, nil
 }
 
+func (as *AdminServer) CreateFeedFeedback(ctx context.Context, rec *proto.Recommendation) (*proto.Empty, error) {
+	recommend := int(rec.Recommend)
+	_, err := as.AdminService.CreateFeedFeedback(
+		ctx,
+		model.Recommendation{
+			Id:        int(rec.Id),
+			UserId:    int(rec.UserId),
+			Recommend: &recommend,
+			Show:      rec.Show,
+		})
+
+	if err != nil {
+		return &proto.Empty{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.Empty{}, nil
+}
+
 func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback) (*proto.Empty, error) {
 	rating := int(stat.Rating)
 	_, err := as.AdminService.CreateFeedback(
@@ -61,5 +79,5 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 }
 
 func (as *AdminServer) GetFeedbackStatistic(ctx context.Context, _ *proto.Empty) (*proto.FeedbackStatistic, error) {
-	
+
 }

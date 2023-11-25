@@ -32,12 +32,6 @@ message FeedbackStatistic {
   repeated string Comments = 5;
 }
 
-service Admin {
-  rpc GetFeedbackStatistic(Empty) returns(FeedbackStatistic) {}
-  rpc CreateFeedback(Feedback) returns(Empty) {}
-  rpc CreateRecommendation(Recommendation) returns(Empty) {}
-}
-
 message Empty {
 }
 
@@ -54,4 +48,11 @@ message NeedFixMap {
 message NeedFixObject {
   int32 Count = 1;
   repeated string CommentFix = 2;
+}
+
+service Admin {
+  rpc GetFeedbackStatistic(Empty) returns(FeedbackStatistic) {}
+  rpc CreateFeedback(Feedback) returns(Empty) {}
+  rpc CreateRecommendation(Recommendation) returns(Empty) {}
+  rpc CreateFeedFeedback(Recommendation) returns(Empty) {}
 }

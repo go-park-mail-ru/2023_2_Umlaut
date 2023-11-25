@@ -22,6 +22,7 @@ const (
 	Admin_GetFeedbackStatistic_FullMethodName = "/proto.Admin/GetFeedbackStatistic"
 	Admin_CreateFeedback_FullMethodName       = "/proto.Admin/CreateFeedback"
 	Admin_CreateRecommendation_FullMethodName = "/proto.Admin/CreateRecommendation"
+	Admin_CreateFeedFeedback_FullMethodName   = "/proto.Admin/CreateFeedFeedback"
 )
 
 // AdminClient is the client API for Admin service.
@@ -31,6 +32,7 @@ type AdminClient interface {
 	GetFeedbackStatistic(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*FeedbackStatistic, error)
 	CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*Empty, error)
 	CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error)
+	CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type adminClient struct {
@@ -68,6 +70,15 @@ func (c *adminClient) CreateRecommendation(ctx context.Context, in *Recommendati
 	return out, nil
 }
 
+func (c *adminClient) CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Admin_CreateFeedFeedback_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type AdminServer interface {
 	GetFeedbackStatistic(context.Context, *Empty) (*FeedbackStatistic, error)
 	CreateFeedback(context.Context, *Feedback) (*Empty, error)
 	CreateRecommendation(context.Context, *Recommendation) (*Empty, error)
+	CreateFeedFeedback(context.Context, *Recommendation) (*Empty, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedAdminServer) CreateFeedback(context.Context, *Feedback) (*Emp
 }
 func (UnimplementedAdminServer) CreateRecommendation(context.Context, *Recommendation) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRecommendation not implemented")
+}
+func (UnimplementedAdminServer) CreateFeedFeedback(context.Context, *Recommendation) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedFeedback not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 
@@ -158,6 +173,24 @@ func _Admin_CreateRecommendation_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_CreateFeedFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Recommendation)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).CreateFeedFeedback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_CreateFeedFeedback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).CreateFeedFeedback(ctx, req.(*Recommendation))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRecommendation",
 			Handler:    _Admin_CreateRecommendation_Handler,
+		},
+		{
+			MethodName: "CreateFeedFeedback",
+			Handler:    _Admin_CreateFeedFeedback_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
