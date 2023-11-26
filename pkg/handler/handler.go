@@ -2,6 +2,8 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
+
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
@@ -12,7 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 type Handler struct {
@@ -44,7 +45,7 @@ func NewHandler(
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("%s:8000/swagger/doc.json", static.Host)),
+		httpSwagger.URL(fmt.Sprintf("http://%s:8000/swagger/doc.json", static.Adress)),
 	))
 
 	authRouter := r.PathPrefix("/api/v1/auth").Subrouter()
