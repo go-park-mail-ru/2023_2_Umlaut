@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"log"
 
 	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
@@ -92,10 +93,13 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
 	}
 
+	hub := ws.NewHub()
 	repos := repository.NewRepository(db, dbAdmin, sessionStore, fileClient)
 	services := service.NewService(repos)
-	handlers := handler.NewHandler(services, logger, authClient, feedConn, adminConn)
+	handlers := handler.NewHandler(services, hub, logger, authClient, feedConn, adminConn)
+
 	srv := new(umlaut.Server)
+	go hub.Run()
 
 	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logger.Error("running http server",

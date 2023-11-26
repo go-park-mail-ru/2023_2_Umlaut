@@ -49,7 +49,7 @@ CREATE TABLE dialog
     id         SERIAL PRIMARY KEY,
     user1_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     user2_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
---     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL,
+--     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL, не раскоментирывать!
     UNIQUE (user1_id, user2_id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT check_pair_order CHECK (user1_id < user2_id)
@@ -158,12 +158,26 @@ EXECUTE FUNCTION update_updated_at();
 
 -- fill db
 INSERT INTO tag (name)
-VALUES ('Спорт'),
-       ('Музыка'),
+VALUES ('Романтика'),
        ('Путешествия'),
-       ('Еда'),
+       ('Фитнес'),
+       ('Кулинария'),
        ('Искусство'),
-       ('Наука');
+       ('Музыка'),
+       ('Фотография'),
+       ('Литература'),
+       ('Технологии'),
+       ('Экология'),
+       ('Кино и телевидение'),
+       ('Спорт'),
+       ('Психология'),
+       ('Домашние животные'),
+       ('Игры'),
+       ('Автомобили'),
+       ('Финансы и бизнес'),
+       ('Мода'),
+       ('Природа'),
+       ('Образование');
 
 INSERT INTO "user" (name, mail, password_hash, salt, user_gender, prefer_gender, description, looking, image_paths,
                     education, hobbies, birthday, tags)
