@@ -1,7 +1,10 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/gorilla/websocket"
 	"log"
 	"time"
@@ -38,7 +41,7 @@ func (c *Client) WriteMessage() {
 	}
 }
 
-func (c *Client) ReadMessage(hub *Hub) {
+func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Service) {
 	defer func() {
 		hub.Unregister <- c
 		c.Conn.Close()
@@ -55,10 +58,17 @@ func (c *Client) ReadMessage(hub *Hub) {
 
 		var receivedMessage Message
 		err = json.Unmarshal(m, &receivedMessage)
-		//TODO: сохранить сообщение в бд
 		if err != nil {
 			log.Printf("error: %v", err)
 			break
+		}
+		receivedMessage.Id, err = services.Message.SaveMessage(ctx, model.Message{
+			SenderId: &receivedMessage.SenderId,
+			DialogId: &receivedMessage.DialogId,
+			Text:     &receivedMessage.Text,
+		})
+		if err != nil {
+			//TODO: do something
 		}
 
 		hub.Broadcast <- &receivedMessage
