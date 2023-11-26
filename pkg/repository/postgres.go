@@ -13,6 +13,9 @@ const (
 	dialogTable         = "\"dialog\""
 	tagTable            = "\"tag\""
 	messageTable        = "\"message\""
+	complaintTable = "\"complaint\""
+	complaintTypeTable = "\"complaint_type\""
+
 	adminTable          = "\"admin\""
 	feedbackTable       = "\"feedback\""
 	recommendationTable = "\"recommendation\""

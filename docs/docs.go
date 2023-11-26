@@ -246,6 +246,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/complaint_types": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "get all complaint types",
+                "operationId": "complaintTypes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_ComplaintType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dialogs": {
             "get": {
                 "consumes": [
@@ -730,9 +765,56 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/ws/messenger": {
+            "get": {
+                "description": "Registers a user to the WebSocket hub and initiates connection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "websocket"
+                ],
+                "summary": "register user to WebSocket hub",
+                "operationId": "registerUserToHub",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "handler.ClientResponseDto-array_model_ComplaintType": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ComplaintType"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-array_model_Dialog": {
             "type": "object",
             "properties": {
@@ -918,6 +1000,17 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ComplaintType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "type_name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Dialog": {
             "type": "object",
             "properties": {
@@ -1033,6 +1126,9 @@ const docTemplate = `{
                 },
                 "message_text": {
                     "type": "string"
+                },
+                "recipient_id": {
+                    "type": "integer"
                 },
                 "sender_id": {
                     "type": "integer"

@@ -10,4 +10,5 @@ var (
 	UserDbField     = "id, name, mail, password_hash, salt, user_gender, prefer_gender, description, looking, image_paths, education, hobbies, birthday, online, tags"
 	AdminDbField    = "id, mail, password_hash, salt"
 	FeedbackDbField = "id, user_id, rating, liked, need_fix, comment_fix, comment, show, created_at"
+	ComplaintTypeDbFiend = "id, type_name"
 )

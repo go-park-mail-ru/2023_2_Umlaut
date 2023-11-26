@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
@@ -20,17 +21,20 @@ type Handler struct {
 	feedMicroservice  feedProto.FeedClient
 	adminMicroservice adminProto.AdminClient
 	services          *service.Service
+	hub               *ws.Hub
 	logger            *zap.Logger
 }
 
 func NewHandler(
 	services *service.Service,
+	hub *ws.Hub,
 	logger *zap.Logger,
 	authMicroservice authProto.AuthorizationClient,
 	feedMicroservice feedProto.FeedClient,
 	adminMicroservice adminProto.AdminClient) *Handler {
 	return &Handler{
 		services:          services,
+		hub:               hub,
 		logger:            logger,
 		authMicroservice:  authMicroservice,
 		feedMicroservice:  feedMicroservice,
@@ -64,6 +68,10 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
+	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
+
+	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
+
 	apiRouter.HandleFunc("/feedback", h.createFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/feed-feedback", h.createFeedFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
@@ -77,6 +85,8 @@ func (h *Handler) InitRoutes() http.Handler {
 	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
 	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
 	adminRouter.HandleFunc("/recommendation", h.getRecommendationStatistic).Methods("GET")
+	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
+	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
 
 	r.Use(
 		h.loggingMiddleware,
