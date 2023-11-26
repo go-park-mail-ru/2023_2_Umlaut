@@ -214,8 +214,6 @@ definitions:
         type: integer
       message_text:
         type: string
-      recipient_id:
-        type: integer
       sender_id:
         type: integer
     type: object
@@ -293,7 +291,7 @@ definitions:
     - name
     - password
     type: object
-host: umlaut-bmstu.me:8000
+host: localhost:8000
 info:
   contact: {}
   description: API Server for Umlaut Application

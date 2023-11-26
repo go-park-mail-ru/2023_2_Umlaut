@@ -23,11 +23,11 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.addDialogsToUserHub(w, r, userId, dialogs)
-	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
-		return
-	}
+	//err = h.addDialogsToUserHub(w, r, userId, dialogs)
+	//if err != nil {
+	//	newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
+	//	return
+	//}
 
 	NewSuccessClientResponseArrayDto(r.Context(), w, dialogs)
 }
@@ -47,7 +47,7 @@ func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	messages, err := h.services.Dialog.GetDialogMessages(r.Context(), id)
+	messages, err := h.services.Message.GetDialogMessages(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return

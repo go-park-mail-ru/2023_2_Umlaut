@@ -31,7 +31,11 @@ type Like interface {
 type Dialog interface {
 	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
 	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
+}
+
+type Message interface {
 	GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error)
+	CreateMessage(ctx context.Context, message model.Message) (int, error)
 }
 
 type Tag interface {
@@ -67,6 +71,7 @@ type Repository struct {
 	User       User
 	Like       Like
 	Dialog     Dialog
+	Message    Message
 	Tag        Tag
 	Admin      Admin
 	Store      Store
@@ -79,6 +84,7 @@ func NewRepository(db *pgxpool.Pool, db_admin *pgxpool.Pool, redisClient *redis.
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),
 		Dialog:     NewDialogPostgres(db),
+		Message:    NewMessagePostgres(db),
 		Tag:        NewTagPostgres(db),
 		Admin:      NewAdminPostgres(db_admin),
 		Complaint:  NewComplaintPostgres(db),

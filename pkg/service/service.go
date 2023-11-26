@@ -36,7 +36,11 @@ type Like interface {
 type Dialog interface {
 	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
 	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
+}
+
+type Message interface {
 	GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error)
+	SaveMessage(ctx context.Context, message model.Message) (int, error)
 }
 
 type Tag interface {
@@ -62,6 +66,7 @@ type Service struct {
 	User          User
 	Like          Like
 	Dialog        Dialog
+	Message       Message
 	Tag           Tag
 	Admin         Admin
 	Complaint     Complaint
@@ -74,6 +79,7 @@ func NewService(repo *repository.Repository) *Service {
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
 		Like:          NewLikeService(repo.Like, repo.Dialog),
 		Dialog:        NewDialogService(repo.Dialog),
+		Message:       NewMessageService(repo.Message),
 		Tag:           NewTagService(repo.Tag),
 		Admin:         NewAdminService(repo.Admin),
 		Complaint:     NewComplaintService(repo.Complaint),

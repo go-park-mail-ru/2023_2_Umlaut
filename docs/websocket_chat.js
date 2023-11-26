@@ -1,4 +1,4 @@
-let socket = new WebSocket("ws://umlaut-bmstu.me:8000/api/v1/ws/messenger");
+let socket = new WebSocket("wss://umlaut-bmstu.me:8000/api/v1/ws/messenger");
 
 socket.onopen = () => {
     console.log("Successfully Connected");

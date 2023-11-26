@@ -80,32 +80,6 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	return dialogs, nil
 }
 
-func (r *DialogPostgres) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
-	queryBuilder := psql.
-		Select(static.MessageDbField).
-		From(messageTable).
-		Where(sq.Eq{"dialog_id": dialogId}).
-		OrderBy("created_at desc")
-	query, args, err := queryBuilder.ToSql()
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to get message for dialogId %d. err: %w", dialogId, err)
-	}
-
-	rows, err := r.db.Query(ctx, query, args...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get message for dialogId %d. err: %w", dialogId, err)
-	}
-	defer rows.Close()
-
-	messages, err := scanMessages(rows)
-	if err != nil {
-		return nil, err
-	}
-
-	return messages, nil
-}
-
 func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
 	var dialogs []model.Dialog
 	var err error
@@ -127,7 +101,7 @@ func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
-		//TODO: check scan last msg
+
 		if lastMessage.Id == nil {
 			dialog.LastMessage = nil
 		} else {
@@ -143,31 +117,4 @@ func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
 	}
 
 	return dialogs, nil
-}
-
-func scanMessages(rows pgx.Rows) ([]model.Message, error) {
-	var messages []model.Message
-	var err error
-	for rows.Next() {
-		var message model.Message
-		err = rows.Scan(
-			&message.Id,
-			&message.SenderId,
-			&message.DialogId,
-			&message.Text,
-			&message.CreatedAt,
-		)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
-		}
-		messages = append(messages, message)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("scan error in GetDialogMessages: %v", err)
-	}
-	if rows.Err() != nil {
-		return nil, fmt.Errorf("rows error in GetDialogMessages: %v", rows.Err())
-	}
-
-	return messages, nil
 }

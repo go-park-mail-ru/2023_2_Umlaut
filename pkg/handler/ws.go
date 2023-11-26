@@ -1,12 +1,9 @@
 package handler
 
 import (
-	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"time"
 )
 
 var upgrader = websocket.Upgrader{
@@ -42,29 +39,29 @@ func (h *Handler) registerUserToHub(w http.ResponseWriter, r *http.Request) {
 		Conn:    conn,
 	}
 	h.hub.Register <- cl
-	m := &ws.Message{
-		Id:          -1,
-		SenderId:    -1,
-		RecipientId: -1,
-		DialogId:    -1,
-		Text:        "HELLO FROM WS! TEST!",
-		CreatedAt:   time.Now(),
-	}
-	h.hub.Broadcast <- m
-	go cl.WriteMessage()
-	cl.ReadMessage(h.hub)
-}
-
-func (h *Handler) addDialogsToUserHub(w http.ResponseWriter, r *http.Request, userId int, dialogs []model.Dialog) error {
-	//if _, ok := h.hub.Users[userId]; !ok {
-	//	h.registerUserToHub(w, r)
+	//m := &ws.Message{
+	//	Id:          -1,
+	//	SenderId:    -1,
+	//	RecipientId: -1,
+	//	DialogId:    -1,
+	//	Text:        "HELLO FROM WS! TEST!",
+	//	CreatedAt:   time.Now(),
 	//}
-	if _, ok := h.hub.Users[userId]; !ok {
-		return errors.New("user has not ws connect")
-	}
-
-	for _, dialog := range dialogs {
-		h.hub.Users[userId].Dialogs[dialog.Id] = true
-	}
-	return nil
+	//h.hub.Broadcast <- m
+	go cl.WriteMessage()
+	cl.ReadMessage(r.Context(), h.hub, h.services)
 }
+
+//func (h *Handler) addDialogsToUserHub(w http.ResponseWriter, r *http.Request, userId int, dialogs []model.Dialog) error {
+//	//if _, ok := h.hub.Users[userId]; !ok {
+//	//	h.registerUserToHub(w, r)
+//	//}
+//	if _, ok := h.hub.Users[userId]; !ok {
+//		return errors.New("user has not ws connect")
+//	}
+//
+//	for _, dialog := range dialogs {
+//		h.hub.Users[userId].Dialogs[dialog.Id] = true
+//	}
+//	return nil
+//}
