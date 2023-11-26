@@ -34,7 +34,7 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 
 func parseQueryParams(r *http.Request) *proto.FilterParams {
 	minAge, _ := strconv.Atoi(r.URL.Query().Get("min_age"))
-	maxAge, _ := strconv.Atoi(r.URL.Query().Get("min_age"))
+	maxAge, _ := strconv.Atoi(r.URL.Query().Get("max_age"))
 	tags := strings.Split(r.URL.Query().Get("tags"), ",")
 	return &proto.FilterParams{
 		UserId: int32(r.Context().Value(keyUserID).(int)),

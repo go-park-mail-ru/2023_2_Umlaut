@@ -30,7 +30,7 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 		Tags:   params.Tags,
 	})
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
 	birthdayProto, err := ptypes.TimestampProto(*nextUser.Birthday)

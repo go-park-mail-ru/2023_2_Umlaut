@@ -2,8 +2,8 @@ package static
 
 var (
 	Host     = Protocol + Adress
-	Protocol = "http://"
-	Adress   = "localhost"
+	Protocol = "https://"
+	Adress   = "umlaut-bmstu.me"
 
 	MessageDbField       = "id, dialog_id, sender_id, message_text, created_at"
 	LikeDbField          = "liked_by_user_id, liked_to_user_id"
