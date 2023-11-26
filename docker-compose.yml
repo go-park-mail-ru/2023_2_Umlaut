@@ -73,12 +73,12 @@ services:
     restart: always
     image: postgres:latest
     volumes:
-      - ./.database/postgres/data:/var/lib/postgresql/data
+      - ./.database/postgres_admin/data:/var/lib/postgresql/data
       - ./db/admin/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=1474
     ports:
-      - 5434:5434
+      - 5434:5432
 
   redis:
     image: redis:latest

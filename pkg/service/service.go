@@ -52,6 +52,10 @@ type Admin interface {
 	GetFeedbackStatistics(ctx context.Context) (model.FeedbackStatistic, error)
 }
 
+type Complaint interface {
+	GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error)
+}
+
 type Service struct {
 	Authorization Authorization
 	Feed          Feed
@@ -60,6 +64,7 @@ type Service struct {
 	Dialog        Dialog
 	Tag           Tag
 	Admin         Admin
+	Complaint     Complaint
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -71,5 +76,6 @@ func NewService(repo *repository.Repository) *Service {
 		Dialog:        NewDialogService(repo.Dialog),
 		Tag:           NewTagService(repo.Tag),
 		Admin:         NewAdminService(repo.Admin),
+		Complaint:     NewComplaintService(repo.Complaint),
 	}
 }

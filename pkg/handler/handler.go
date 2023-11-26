@@ -2,10 +2,9 @@ package handler
 
 import (
 	"fmt"
-	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
-	"net/http"
-
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
+	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
@@ -13,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 type Handler struct {
@@ -20,17 +20,20 @@ type Handler struct {
 	feedMicroservice  feedProto.FeedClient
 	adminMicroservice adminProto.AdminClient
 	services          *service.Service
+	hub               *ws.Hub
 	logger            *zap.Logger
 }
 
 func NewHandler(
 	services *service.Service,
+	hub *ws.Hub,
 	logger *zap.Logger,
 	authMicroservice authProto.AuthorizationClient,
 	feedMicroservice feedProto.FeedClient,
 	adminMicroservice adminProto.AdminClient) *Handler {
 	return &Handler{
 		services:          services,
+		hub:               hub,
 		logger:            logger,
 		authMicroservice:  authMicroservice,
 		feedMicroservice:  feedMicroservice,
@@ -41,7 +44,7 @@ func NewHandler(
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("%s:8000/swagger/doc.json", static.Host)),
+		httpSwagger.URL(fmt.Sprintf("http://%s:8000/swagger/doc.json", static.Adress)),
 	))
 
 	authRouter := r.PathPrefix("/api/v1/auth").Subrouter()
@@ -64,6 +67,10 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
+	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
+
+	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
+
 	apiRouter.HandleFunc("/feedback", h.createFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/feed-feedback", h.createFeedFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
