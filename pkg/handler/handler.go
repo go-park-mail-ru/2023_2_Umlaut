@@ -2,11 +2,9 @@ package handler
 
 import (
 	"fmt"
-	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
-	"net/http"
-
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
+	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
@@ -14,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 type Handler struct {
@@ -85,8 +84,6 @@ func (h *Handler) InitRoutes() http.Handler {
 	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
 	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
 	adminRouter.HandleFunc("/recommendation", h.getRecommendationStatistic).Methods("GET")
-	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
-	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
 
 	r.Use(
 		h.loggingMiddleware,
