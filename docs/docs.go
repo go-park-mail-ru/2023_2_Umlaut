@@ -246,6 +246,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/complaint_types": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "get all complaint types",
+                "operationId": "complaintTypes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_ComplaintType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dialogs": {
             "get": {
                 "consumes": [
@@ -763,6 +798,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handler.ClientResponseDto-array_model_ComplaintType": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ComplaintType"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-array_model_Dialog": {
             "type": "object",
             "properties": {
@@ -944,6 +996,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ComplaintType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "type_name": {
                     "type": "string"
                 }
             }
