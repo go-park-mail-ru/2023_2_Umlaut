@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"log"
 
 	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
@@ -24,6 +25,8 @@ func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, a
 	authConn, err := grpc.Dial(
 		viper.GetString("authorization.host")+":"+viper.GetString("authorization.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
 	)
 	if err != nil {
 		return nil, nil, nil, err
@@ -31,6 +34,8 @@ func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, a
 	feedConn, err := grpc.Dial(
 		viper.GetString("feed.host")+":"+viper.GetString("feed.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
 	)
 	if err != nil {
 		return nil, nil, nil, err
@@ -38,6 +43,8 @@ func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, a
 	adminConn, err := grpc.Dial(
 		viper.GetString("admin.host")+":"+viper.GetString("admin.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
 	)
 	if err != nil {
 		return nil, nil, nil, err

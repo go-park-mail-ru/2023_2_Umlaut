@@ -70,8 +70,8 @@ func scanMessages(rows pgx.Rows) ([]model.Message, error) {
 		var message model.Message
 		err = rows.Scan(
 			&message.Id,
-			&message.SenderId,
 			&message.DialogId,
+			&message.SenderId,
 			&message.Text,
 			&message.CreatedAt,
 		)

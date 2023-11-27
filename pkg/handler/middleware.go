@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -106,11 +107,19 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 
+		method := r.Method
+		path := r.RequestURI
+		timing := time.Since(start)
+
 		childLogger.Info("Request handled",
-			zap.String("Method", r.Method),
-			zap.String("RequestURI", r.RequestURI),
-			zap.Duration("Time", time.Since(start)),
+			zap.String("Method", method),
+			zap.String("RequestURI", path),
+			zap.Duration("Time", timing),
 		)
+
+		status := 200
+		h.metrics.Hits.WithLabelValues(strconv.Itoa(status), path, method).Inc()
+		h.metrics.Duration.WithLabelValues(strconv.Itoa(status), path, method).Observe(timing.Seconds())
 	})
 }
 

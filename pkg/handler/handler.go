@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/monitoring"
 	"net/http"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
@@ -23,6 +24,7 @@ type Handler struct {
 	services          *service.Service
 	hub               *ws.Hub
 	logger            *zap.Logger
+	metrics           *monitoring.PrometheusMetrics
 }
 
 func NewHandler(
@@ -44,6 +46,7 @@ func NewHandler(
 
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
+	h.metrics = monitoring.RegisterMonitoring(r)
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", static.Host)),
 	))
