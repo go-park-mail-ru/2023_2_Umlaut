@@ -80,7 +80,6 @@ func (h *Handler) InitRoutes() http.Handler {
 
 	adminRouter := r.PathPrefix("/api/v1/admin").Subrouter()
 	adminRouter.Use(
-		//h.csrfMiddleware,
 		h.authAdminMiddleware,
 	)
 	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")

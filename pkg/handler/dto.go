@@ -84,6 +84,6 @@ func sendData(ctx context.Context, w http.ResponseWriter, response interface{}, 
 	*logger = *logger.With(zap.Any("Status", statusCode), zap.Any("Message", message))
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
+	w.WriteHeader(http.StatusOK)
 	w.Write(responseJSON)
 }
