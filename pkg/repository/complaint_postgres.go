@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -44,27 +45,27 @@ func (r *ComplaintPostgres) GetComplaintTypes(ctx context.Context) ([]model.Comp
 	return complaintTypes, nil
 }
 
-// func (r *ComplaintPostgres) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
-// 	var id int
-// 	query, args, err := psql.Insert(complaintTable).
-// 		Columns("reporter_user_id", "reported_user_id", "complaint_type_id").
-// 		Values(complaint.ReporterUserId, complaint.ReportedUserId, complaint.ComplaintTypeId).
-// 		ToSql()
+func (r *ComplaintPostgres) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
+	var id int
+	query, args, err := psql.Insert(complaintTable).
+		Columns("reporter_user_id", "reported_user_id", "complaint_type_id").
+		Values(complaint.ReporterUserId, complaint.ReportedUserId, complaint.ComplaintTypeId).
+		ToSql()
 
-// 	if err != nil {
-// 		return 0, fmt.Errorf("failed to create complaint. err: %w", err)
-// 	}
+	if err != nil {
+		return 0, fmt.Errorf("failed to create complaint. err: %w", err)
+	}
 
-// 	query += " RETURNING id"
-// 	row := r.db.QueryRow(ctx, query, args...)
-// 	err = row.Scan(&id)
-// 	if err != nil {
-// 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-// 			return 0, static.ErrAlreadyExists
-// 		}
-// 	}
-// 	return id, err
-// }
+	query += " RETURNING id"
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			return 0, static.ErrAlreadyExists
+		}
+	}
+	return id, err
+}
 
 func scanComplaintTypes(rows pgx.Rows) ([]model.ComplaintType, error) {
 	var complaintTypes []model.ComplaintType

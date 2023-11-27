@@ -49,6 +49,7 @@ CREATE TABLE dialog
     id         SERIAL PRIMARY KEY,
     user1_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     user2_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    banned     BOOlEAN DEFAULT FALSE,
 --     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL, не раскоментирывать!
     UNIQUE (user1_id, user2_id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -80,6 +81,7 @@ CREATE TABLE complaint
     reported_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     complaint_type_id INT      NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
     created_at        TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (reporter_user_id, reported_user_id),
     CHECK (reporter_user_id != reported_user_id)
 );
 
@@ -153,6 +155,21 @@ CREATE TRIGGER user_updated_at_trigger
     ON "user"
     FOR EACH ROW
 EXECUTE FUNCTION update_updated_at();
+
+CREATE OR REPLACE FUNCTION update_banned_dialog()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE dialog SET banned = TRUE WHERE user1_id = LEAST(NEW.reporter_user_id, NEW.reported_user_id) AND user2_id = GREATEST(NEW.reporter_user_id, NEW.reported_user_id);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_banned_dialog
+    AFTER INSERT
+    ON complaint
+    FOR EACH ROW
+EXECUTE FUNCTION update_banned_dialog();
 
 
 -- fill db
