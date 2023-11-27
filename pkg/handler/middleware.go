@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"log"
 	"net/http"
+	"regexp"
 	"runtime/debug"
 	"strconv"
 	"time"
@@ -109,6 +110,10 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		)
 
 		status := 200
+		re := regexp.MustCompile(`\d+`)
+		method = re.ReplaceAllString(method, "id")
+
+		h.metrics.RequestCounter.Add(1)
 		h.metrics.Hits.WithLabelValues(strconv.Itoa(status), path, method).Inc()
 		h.metrics.Duration.WithLabelValues(strconv.Itoa(status), path, method).Observe(timing.Seconds())
 	})
