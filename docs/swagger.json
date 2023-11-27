@@ -9,6 +9,124 @@
     "host": "umlaut-bmstu.me",
     "basePath": "/",
     "paths": {
+        "/api/v1/admin/complaint": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "get next complaint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_Complaint"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/complaint/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "accept complaint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "complaint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "delete complaint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "complaint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/admin/feedback": {
             "get": {
                 "consumes": [
@@ -818,6 +936,50 @@
                 }
             }
         },
+        "/api/v1/user/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "get user information by id",
+                "operationId": "userById",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/ws/messenger": {
             "get": {
                 "description": "Registers a user to the WebSocket hub and initiates connection",
@@ -946,6 +1108,20 @@
                 }
             }
         },
+        "handler.ClientResponseDto-model_Complaint": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/model.Complaint"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-model_FeedbackStatistic": {
             "type": "object",
             "properties": {
@@ -1055,8 +1231,8 @@
         "model.Complaint": {
             "type": "object",
             "properties": {
-                "complaint_type_id": {
-                    "type": "integer"
+                "complaint_type": {
+                    "type": "string"
                 },
                 "created_at": {
                     "type": "string"

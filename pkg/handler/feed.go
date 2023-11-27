@@ -1,11 +1,14 @@
 package handler
 
 import (
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/golang/protobuf/ptypes"
 )
 
 // @Summary get user for feed
@@ -30,7 +33,28 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
-	NewSuccessClientResponseDto(r.Context(), w, user)
+	birthday, err := ptypes.Timestamp(user.Birthday)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	preferGender := int(user.PreferGender)
+	age := int(user.Age)
+	
+	NewSuccessClientResponseDto(r.Context(), w, model.User{
+		Id: int(user.Id),
+		Name: user.Name,
+		Mail: user.Mail,
+		PreferGender: &preferGender,
+		Description: &user.Description,
+		Age: &age,
+		Looking: &user.Looking,
+		Education: &user.Education,
+		Hobbies: &user.Hobbies,
+		Birthday: &birthday,
+		Tags: &user.Tags,
+		ImagePaths: &user.ImagePaths,
+	})
 }
 
 func parseQueryParams(r *http.Request) *proto.FilterParams {

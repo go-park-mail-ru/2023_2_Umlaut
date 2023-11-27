@@ -49,6 +49,7 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 // @Tags user
 // @ID userById
 // @Accept  json
+// @Param id path integer true "user ID"
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.User]
 // @Failure 404,500 {object} ClientResponseDto[string]

@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -45,6 +47,9 @@ func (as *AdminServer) DeleteComplaint(ctx context.Context, complaint *proto.Com
 
 func (as *AdminServer) GetNextComplaint(ctx context.Context, _ *proto.AdminEmpty) (*proto.Complaint, error) {
 	complaint, err := as.ComplaintService.GetNextComplaint(ctx)
+	if errors.Is(err, static.ErrNoData) {
+		return &proto.Complaint{}, status.Error(codes.NotFound, "complaints ended")
+	}
 	if err != nil {
 		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
 	}

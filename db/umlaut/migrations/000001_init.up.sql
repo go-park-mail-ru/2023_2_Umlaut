@@ -178,7 +178,7 @@ CREATE OR REPLACE FUNCTION delete_invalid_complaint_type()
 $$
 BEGIN
     IF NEW.complaint_type NOT IN (SELECT type_name FROM complaint_type) THEN
-        NEW.complaint_type = "";
+        NEW.complaint_type = "Неизвестная причина";
     END IF;
     RETURN NEW;
 END;
@@ -195,14 +195,6 @@ CREATE OR REPLACE FUNCTION update_banned_user()
 $$
 BEGIN
     UPDATE "user" SET banned = TRUE WHERE id = NEW.reported_user_id;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION update_banned_user_dialogs()
-    RETURNS TRIGGER AS
-$$
-BEGIN
     UPDATE dialog SET banned = TRUE WHERE user1_id = NEW.reported_user_id OR user2_id = NEW.reported_user_id;
     RETURN NEW;
 END;
@@ -212,7 +204,7 @@ CREATE TRIGGER trigger_update_banned_user
     AFTER UPDATE
     ON complaint
     FOR EACH ROW
-EXECUTE FUNCTION update_banned_user(), update_banned_user_dialogs();
+EXECUTE FUNCTION update_banned_user();
 
 
 -- fill db

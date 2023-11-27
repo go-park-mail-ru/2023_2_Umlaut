@@ -9,6 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/gorilla/mux"
 )
 
@@ -75,14 +76,26 @@ func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		statusCode, message := parseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
+	}
+	createdAt, err := ptypes.Timestamp(complaint.CreatedAt)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
-	NewSuccessClientResponseDto(r.Context(), w, complaint)
+	NewSuccessClientResponseDto(r.Context(), w, model.Complaint{
+		Id: int(complaint.Id),
+		ReporterUserId: int(complaint.ReporterUserId),
+		ReportedUserId: int(complaint.ReportedUserId),
+		CreatedAt: &createdAt,
+	})
 }
 
 // @Summary delete complaint
 // @Tags complaint
 // @Accept  json
+// @Param id path integer true "complaint ID"
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 401,500 {object} ClientResponseDto[string]
@@ -99,12 +112,13 @@ func (h *Handler) deleteComplaint(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
 
-	NewSuccessClientResponseDto(r.Context(), w, "success")
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }
 
 // @Summary accept complaint
 // @Tags complaint
 // @Accept  json
+// @Param id path integer true "complaint ID"
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 401,500 {object} ClientResponseDto[string]
@@ -121,5 +135,5 @@ func (h *Handler) acceptComplaint(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
 
-	NewSuccessClientResponseDto(r.Context(), w, "success")
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }

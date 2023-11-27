@@ -62,6 +62,15 @@ definitions:
       status:
         type: integer
     type: object
+  handler.ClientResponseDto-model_Complaint:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/model.Complaint'
+      status:
+        type: integer
+    type: object
   handler.ClientResponseDto-model_FeedbackStatistic:
     properties:
       message:
@@ -133,8 +142,8 @@ definitions:
     type: object
   model.Complaint:
     properties:
-      complaint_type_id:
-        type: integer
+      complaint_type:
+        type: string
       created_at:
         type: string
       id:
@@ -313,6 +322,83 @@ info:
   title: Umlaut API
   version: "1.0"
 paths:
+  /api/v1/admin/complaint:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-model_Complaint'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get next complaint
+      tags:
+      - complaint
+  /api/v1/admin/complaint/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: complaint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: delete complaint
+      tags:
+      - complaint
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: complaint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: accept complaint
+      tags:
+      - complaint
   /api/v1/admin/feedback:
     get:
       consumes:
@@ -778,6 +864,35 @@ paths:
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: update user
+      tags:
+      - user
+  /api/v1/user/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: userById
+      parameters:
+      - description: user ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-model_User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: get user information by id
       tags:
       - user
   /api/v1/user/photo:
