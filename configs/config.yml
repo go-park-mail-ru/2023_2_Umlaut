@@ -47,7 +47,8 @@ cors:
     "http://127.0.0.1:8000",
     "http://umlaut-bmstu.me",
     "http://umlaut-bmstu.me:8000",
-    "https://umlaut-bmstu.me"
+    "https://umlaut-bmstu.me",
+    "https://umlaut-bmstu.me:8000"
   ]
   methods: [
     "GET",
