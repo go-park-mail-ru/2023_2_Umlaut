@@ -4,7 +4,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 type PrometheusMetrics struct {
@@ -33,9 +32,7 @@ func RegisterMonitoring(router *mux.Router) *PrometheusMetrics {
 
 	prometheus.MustRegister(metrics.Hits, metrics.Duration)
 
-	router.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-		promhttp.Handler()
-	})
+	router.Path("/metrics").Handler(promhttp.Handler())
 
 	return metrics
 }
