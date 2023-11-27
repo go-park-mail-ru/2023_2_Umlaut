@@ -38,6 +38,9 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, err
 
 func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model.User, error) {
 	user, err := s.repoUser.GetUser(ctx, mail)
+	if errors.Is(err, static.ErrBannedUser) {
+		return model.User{}, err
+	}
 	if err != nil {
 		return user, err
 	}

@@ -59,6 +59,17 @@ func (h *Handler) InitRoutes() http.Handler {
 	authRouter.HandleFunc("/logout", h.logout)
 	authRouter.HandleFunc("/admin", h.logInAdmin)
 
+	adminRouter := r.PathPrefix("/api/v1/admin").Subrouter()
+	adminRouter.Use(
+		h.authAdminMiddleware,
+	)
+	adminRouter.HandleFunc("/complaint", h.getNextComplaint).Methods("GET")
+	adminRouter.HandleFunc("/complaint/{id}", h.deleteComplaint).Methods("DELETE")
+	adminRouter.HandleFunc("/complaint/{id}", h.acceptComplaint).Methods("GET")
+	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
+	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
+	adminRouter.HandleFunc("/recommendation", h.getRecommendationStatistic).Methods("GET")
+
 	apiRouter := r.PathPrefix("/api/v1").Subrouter()
 	apiRouter.Use(
 		//h.csrfMiddleware,
@@ -67,6 +78,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
 	apiRouter.HandleFunc("/user", h.user).Methods("GET")
 	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/user/{id}", h.userById).Methods("GET")
 	apiRouter.HandleFunc("/user/photo", h.updateUserPhoto).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
 	apiRouter.HandleFunc("/like", h.createLike).Methods("POST", "OPTIONS")
@@ -82,14 +94,6 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/feed-feedback", h.createFeedFeedback).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/show-csat", h.showCSAT).Methods("GET")
-
-	adminRouter := r.PathPrefix("/api/v1/admin").Subrouter()
-	adminRouter.Use(
-		h.authAdminMiddleware,
-	)
-	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
-	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
-	adminRouter.HandleFunc("/recommendation", h.getRecommendationStatistic).Methods("GET")
 
 	r.Use(
 		h.loggingMiddleware,

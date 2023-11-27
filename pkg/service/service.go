@@ -59,6 +59,7 @@ type Admin interface {
 type Complaint interface {
 	GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error)
 	CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error)
+	GetNextComplaint(ctx context.Context) (model.Complaint, error)
 }
 
 type Service struct {

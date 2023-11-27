@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -21,4 +22,21 @@ func (s *ComplaintService) GetComplaintTypes(ctx context.Context) ([]model.Compl
 
 func (s *ComplaintService) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
 	return s.repoComplaint.CreateComplaint(ctx, complaint)
+}
+
+func (s *ComplaintService) GetNextComplaint(ctx context.Context) (model.Complaint, error) {
+	return s.repoComplaint.GetNextComplaint(ctx)
+}
+
+func (s *ComplaintService) AcceptComplaint(ctx context.Context, complaintId int) error {
+	_, err := s.repoComplaint.AcceptComplaint(ctx, complaintId)
+	if err != nil {
+		return fmt.Errorf("AcceptComplaint error: %v", err)
+	}
+
+	return nil
+}
+
+func (s *ComplaintService) DeleteComplaint(ctx context.Context, complaintId int) error {
+	return s.repoComplaint.DeleteComplaint(ctx, complaintId)
 }

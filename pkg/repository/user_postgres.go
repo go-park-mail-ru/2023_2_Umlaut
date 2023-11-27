@@ -62,6 +62,9 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("user with mail: %s not found", mail)
 	}
+	if user.Banned {
+		return model.User{}, static.ErrBannedUser
+	}
 
 	return user, err
 }
@@ -80,6 +83,9 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("user with id: %d not found", id)
+	}
+	if user.Banned {
+		return model.User{}, static.ErrBannedUser
 	}
 
 	return user, err
@@ -202,6 +208,7 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Education,
 		&user.Hobbies,
 		&user.Birthday,
+		&user.Banned,
 		&user.Online,
 		&user.Tags,
 	)

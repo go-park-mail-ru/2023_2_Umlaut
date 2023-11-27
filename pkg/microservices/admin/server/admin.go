@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -13,11 +14,52 @@ import (
 type AdminServer struct {
 	proto.UnimplementedAdminServer
 
-	AdminService *service.AdminService
+	AdminService     *service.AdminService
+	ComplaintService *service.ComplaintService
 }
 
-func NewAdminServer(feed *service.AdminService) *AdminServer {
-	return &AdminServer{AdminService: feed}
+func NewAdminServer(admin *service.AdminService, complaint *service.ComplaintService) *AdminServer {
+	return &AdminServer{
+		AdminService: admin,
+		ComplaintService: complaint,
+	}
+}
+
+func (as *AdminServer) AcceptComplaint(ctx context.Context, complaint *proto.Complaint) (*proto.AdminEmpty, error) {
+	err := as.ComplaintService.AcceptComplaint(ctx, int(complaint.Id))
+	if err != nil {
+		return &proto.AdminEmpty{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.AdminEmpty{}, nil
+}
+
+func (as *AdminServer) DeleteComplaint(ctx context.Context, complaint *proto.Complaint) (*proto.AdminEmpty, error) {
+	err := as.ComplaintService.DeleteComplaint(ctx, int(complaint.Id))
+	if err != nil {
+		return &proto.AdminEmpty{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.AdminEmpty{}, nil
+}
+
+func (as *AdminServer) GetNextComplaint(ctx context.Context, _ *proto.AdminEmpty) (*proto.Complaint, error) {
+	complaint, err := as.ComplaintService.GetNextComplaint(ctx)
+	if err != nil {
+		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
+	}
+	createdAt, err := ptypes.TimestampProto(*complaint.CreatedAt)
+	if err != nil {
+		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &proto.Complaint{
+		Id: int32(complaint.Id),
+		ReporterUserId: int32(complaint.ReporterUserId),
+		ReportedUserId: int32(complaint.ReportedUserId),
+		ComplaintType: complaint.ComplaintType,
+		CreatedAt: createdAt,
+	}, nil
 }
 
 func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -48,8 +49,8 @@ func (r *ComplaintPostgres) GetComplaintTypes(ctx context.Context) ([]model.Comp
 func (r *ComplaintPostgres) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
 	var id int
 	query, args, err := psql.Insert(complaintTable).
-		Columns("reporter_user_id", "reported_user_id", "complaint_type_id").
-		Values(complaint.ReporterUserId, complaint.ReportedUserId, complaint.ComplaintTypeId).
+		Columns("reporter_user_id", "reported_user_id", "complaint_type").
+		Values(complaint.ReporterUserId, complaint.ReportedUserId, complaint.ComplaintType).
 		ToSql()
 
 	if err != nil {
@@ -65,6 +66,68 @@ func (r *ComplaintPostgres) CreateComplaint(ctx context.Context, complaint model
 		}
 	}
 	return id, err
+}
+
+func (r *ComplaintPostgres) GetNextComplaint(ctx context.Context) (model.Complaint, error) {
+	query, args, err := psql.Select(static.ComplaintDbFiend).
+		From(complaintTable).
+		Where(sq.Eq{"report_status": 0}).
+		Limit(1).ToSql()
+	if err != nil {
+		return model.Complaint{}, fmt.Errorf("failed to get next complaint. err: %w", err)
+	}
+	var nextComplaint model.Complaint
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanComplaint(row, &nextComplaint)
+
+	if errors.Is(err, pgx.ErrNoRows) || nextComplaint.Id == 0 {
+		return model.Complaint{}, static.ErrNoData
+	}
+
+	return nextComplaint, err
+}
+
+func (r *ComplaintPostgres) DeleteComplaint(ctx context.Context, complaintId int) error {
+	query, args, err := psql.Delete(complaintTable).
+		Where(sq.Eq{"id": complaintId}).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to delete complaint. err: %w", err)
+	}
+	
+	r.db.QueryRow(ctx, query, args...)
+
+	return nil
+}
+
+func (r *ComplaintPostgres) AcceptComplaint(ctx context.Context, complaintId int) (model.Complaint, error) {
+	query, args, err := psql.Update(complaintTable).
+		Set("report_status", 1).
+		Where(sq.Eq{"id": complaintId}).
+		ToSql()
+
+	if err != nil {
+		return model.Complaint{}, err
+	}
+
+	query += fmt.Sprintf(" RETURNING %s", static.ComplaintDbFiend)
+	var updatedComplaint model.Complaint
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanComplaint(row, &updatedComplaint)
+
+	return updatedComplaint, err
+}
+
+func scanComplaint(row pgx.Row, complaint *model.Complaint) error {
+	err := row.Scan(
+		&complaint.Id,
+		&complaint.ReporterUserId,
+		&complaint.ReportedUserId,
+		&complaint.ComplaintType,
+		&complaint.CreatedAt,
+	)
+
+	return err
 }
 
 func scanComplaintTypes(rows pgx.Rows) ([]model.ComplaintType, error) {

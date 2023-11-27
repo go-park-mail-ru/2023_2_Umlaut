@@ -40,9 +40,14 @@ func init() {
 func main() {
 	ctx := context.Background()
 
-	db, err := utils.InitPostgresAdmin(ctx)
+	db_admin, err := utils.InitPostgresAdmin(ctx)
 	if err != nil {
-		log.Fatalf("failed to initialize Postgres: %s", err.Error())
+		log.Fatalf("failed to initialize Postgres admin: %s", err.Error())
+	}
+
+	db_umlaut, err := utils.InitPostgres(ctx)
+	if err != nil {
+		log.Fatalf("failed to initialize Postgres umlaut: %s", err.Error())
 	}
 
 	sessionStore, err := utils.InitRedis()
@@ -51,9 +56,10 @@ func main() {
 	}
 	defer sessionStore.Close()
 
-	adminService := service.NewAdminService(repository.NewAdminPostgres(db))
+	adminService := service.NewAdminService(repository.NewAdminPostgres(db_admin))
+	complaintService := service.NewComplaintService(repository.NewComplaintPostgres(db_umlaut))
 
-	adminServer := server.NewAdminServer(adminService)
+	adminServer := server.NewAdminServer(adminService, complaintService)
 	viper.GetString("admin.port")
 	listen, err := net.Listen("tcp", ":"+viper.GetString("admin.port"))
 	if err != nil {

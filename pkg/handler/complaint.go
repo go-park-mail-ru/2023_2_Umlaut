@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/gorilla/mux"
 )
 
 // @Summary get all complaint types
@@ -58,4 +61,65 @@ func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	NewSuccessClientResponseDto(r.Context(), w, "")
+}
+
+// @Summary get next complaint
+// @Tags complaint
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[model.Complaint]
+// @Failure 401,500 {object} ClientResponseDto[string]
+// @Router /api/v1/admin/complaint [get]
+func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
+	complaint, err := h.adminMicroservice.GetNextComplaint(r.Context(), &proto.AdminEmpty{})
+	if err != nil {
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, complaint)
+}
+
+// @Summary delete complaint
+// @Tags complaint
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 401,500 {object} ClientResponseDto[string]
+// @Router /api/v1/admin/complaint/{id} [delete]
+func (h *Handler) deleteComplaint(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
+		return
+	}
+	_, err = h.adminMicroservice.DeleteComplaint(r.Context(), &proto.Complaint{Id: int32(id)})
+	if err != nil {
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, "success")
+}
+
+// @Summary accept complaint
+// @Tags complaint
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 401,500 {object} ClientResponseDto[string]
+// @Router /api/v1/admin/complaint/{id} [get]
+func (h *Handler) acceptComplaint(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
+		return
+	}
+	_, err = h.adminMicroservice.AcceptComplaint(r.Context(), &proto.Complaint{Id: int32(id)})
+	if err != nil {
+		statusCode, message := parseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, "success")
 }

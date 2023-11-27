@@ -159,6 +159,8 @@ func parseError(err error) (int, string) {
 			return http.StatusInternalServerError, code.Message()
 		case codes.NotFound:
 			return http.StatusNotFound, code.Message()
+		case codes.PermissionDenied:
+			return http.StatusForbidden, code.Message()
 		}
 	}
 	if err != nil {

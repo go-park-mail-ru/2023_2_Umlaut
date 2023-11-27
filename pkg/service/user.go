@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mime/multipart"
 	"net/http"
@@ -24,6 +25,9 @@ func NewUserService(repoUser repository.User, repoStore repository.Store, repoMi
 
 func (s *UserService) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
 	user, err := s.repoUser.GetUserById(ctx, userId)
+	if errors.Is(err, static.ErrBannedUser) {
+		return model.User{}, err
+	}
 	if err != nil {
 		return model.User{}, fmt.Errorf("GetCurrentUser error: %v", err)
 	}
@@ -75,6 +79,9 @@ func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart
 		return fileName, fmt.Errorf("CreateFile error: %v", err)
 	}
 	currentUser, err := s.repoUser.GetUserById(ctx, userId)
+	if errors.Is(err, static.ErrBannedUser) {
+		return fileName, err
+	}
 	if err != nil {
 		return fileName, fmt.Errorf("CreateFile error: %v", err)
 	}
@@ -93,6 +100,9 @@ func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart
 
 func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) error {
 	currentUser, err := s.repoUser.GetUserById(ctx, userId)
+	if errors.Is(err, static.ErrBannedUser) {
+		return err
+	}
 	if err != nil {
 		return fmt.Errorf("DeleteFile error: %v", err)
 	}
