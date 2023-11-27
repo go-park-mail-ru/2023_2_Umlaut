@@ -45,7 +45,7 @@ func NewHandler(
 func (h *Handler) InitRoutes() http.Handler {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("https://%s:8000/swagger/doc.json", static.Adress)),
+		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", static.Host)),
 	))
 
 	authRouter := r.PathPrefix("/api/v1/auth").Subrouter()
