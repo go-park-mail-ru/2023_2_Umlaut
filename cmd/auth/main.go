@@ -21,13 +21,10 @@ import (
 )
 
 var (
-	// Create a metrics registry.
 	reg = prometheus.NewRegistry()
 
-	// Create some standard server metrics.
 	grpcMetrics = grpc_prometheus.NewServerMetrics()
 
-	// Create a customized counter metric.
 	info = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "grpcMetrics",
 		Help: "help",
@@ -35,7 +32,6 @@ var (
 )
 
 func init() {
-	// Register standard server metrics and customized metrics to registry.
 	reg.MustRegister(grpcMetrics, info)
 	info.WithLabelValues("Test")
 }
@@ -80,7 +76,7 @@ func main() {
 
 	http.Handle("/metrics", promhttp.Handler())
 	httpServer := &http.Server{
-		Addr:    ":9092",
+		Addr:    ":9091",
 		Handler: nil,
 	}
 
