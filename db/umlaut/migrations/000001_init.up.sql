@@ -22,6 +22,7 @@ CREATE TABLE "user"
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
+    banned        BOOlEAN DEFAULT FALSE,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
     age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
@@ -79,7 +80,8 @@ CREATE TABLE complaint
     id                SERIAL PRIMARY KEY,
     reporter_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     reported_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type_id INT      NOT NULL REFERENCES complaint_type (id) ON DELETE CASCADE,
+    complaint_type    TEXT     NOT NULL,
+    report_status     SMALLINT DEFAULT 0,
     created_at        TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (reporter_user_id, reported_user_id),
     CHECK (reporter_user_id != reported_user_id)
@@ -170,6 +172,47 @@ CREATE TRIGGER trigger_update_banned_dialog
     ON complaint
     FOR EACH ROW
 EXECUTE FUNCTION update_banned_dialog();
+
+CREATE OR REPLACE FUNCTION delete_invalid_complaint_type()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF NEW.complaint_type NOT IN (SELECT type_name FROM complaint_type) THEN
+        NEW.complaint_type = "";
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_delete_invalid_complaint_type
+    BEFORE INSERT or UPDATE
+    ON complaint
+    FOR EACH ROW
+EXECUTE FUNCTION delete_invalid_complaint_type();
+
+CREATE OR REPLACE FUNCTION update_banned_user()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE "user" SET banned = TRUE WHERE id = NEW.reported_user_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_banned_user_dialogs()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE dialog SET banned = TRUE WHERE user1_id = NEW.reported_user_id OR user2_id = NEW.reported_user_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_banned_user
+    AFTER UPDATE
+    ON complaint
+    FOR EACH ROW
+EXECUTE FUNCTION update_banned_user(), update_banned_user_dialogs();
 
 
 -- fill db

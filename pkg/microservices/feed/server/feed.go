@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
@@ -29,6 +31,9 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 		MaxAge: int(params.MaxAge),
 		Tags:   params.Tags,
 	})
+	if errors.Is(err, static.ErrBannedUser) {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	}
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}

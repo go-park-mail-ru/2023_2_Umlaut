@@ -66,6 +66,9 @@ type FileServer interface {
 type Complaint interface {
 	GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error)
 	CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error)
+	GetNextComplaint(ctx context.Context) (model.Complaint, error)
+	DeleteComplaint(ctx context.Context, complaintId int) error
+	AcceptComplaint(ctx context.Context, complaintId int) (model.Complaint, error)
 }
 
 type Repository struct {

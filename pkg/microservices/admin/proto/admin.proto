@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "./;proto";
 
 package proto;
@@ -56,10 +58,22 @@ message RecommendationStatistic {
   repeated int32 RecommendCount = 3;
 }
 
+message Complaint {
+	int32 Id = 1;
+	int32 ReporterUserId = 2;
+  int32 ReportedUserId = 3;
+	string ComplaintType = 4;
+	google.protobuf.Timestamp CreatedAt = 5;
+}
+
 service Admin {
   rpc GetFeedbackStatistic(AdminEmpty) returns(FeedbackStatistic) {}
   rpc GetRecommendationStatistic(AdminEmpty) returns(RecommendationStatistic) {}
   rpc CreateFeedback(Feedback) returns(AdminEmpty) {}
   rpc CreateRecommendation(Recommendation) returns(AdminEmpty) {}
   rpc CreateFeedFeedback(Recommendation) returns(AdminEmpty) {}
+
+  rpc GetNextComplaint(AdminEmpty) returns(Complaint) {}
+  rpc DeleteComplaint(Complaint) returns(AdminEmpty) {}
+  rpc AcceptComplaint(Complaint) returns(AdminEmpty) {}
 }

@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/gorilla/mux"
 )
 
 // @Summary get user information
@@ -21,6 +23,10 @@ import (
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(static.KeyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
@@ -35,6 +41,35 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("X-Csrf-Token", token)
 	w.Header().Set("Access-Control-Expose-Headers", "X-Csrf-Token")
+
+	NewSuccessClientResponseDto(r.Context(), w, currentUser)
+}
+
+// @Summary get user information by id
+// @Tags user
+// @ID userById
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 404,500 {object} ClientResponseDto[string]
+// @Router /api/v1/user/{id} [get]
+func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
+		return
+	}
+
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	currentUser.Mail = ""
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	NewSuccessClientResponseDto(r.Context(), w, currentUser)
 }
@@ -93,6 +128,10 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	link, err := h.services.User.CreateFile(r.Context(), id, file, head.Size)
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
@@ -118,6 +157,10 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(static.KeyUserID).(int)
 
 	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
 	if errors.Is(err, static.ErrNoFiles) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "This user has no photos")
 		return

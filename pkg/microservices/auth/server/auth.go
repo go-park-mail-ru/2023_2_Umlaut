@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -52,6 +54,9 @@ func (as *AuthServer) SignIn(ctx context.Context, input *proto.SignInInput) (*pr
 	}
 
 	user, err := as.Authorization.GetUser(ctx, input.Mail, input.Password)
+	if errors.Is(err, static.ErrBannedUser) {
+		return &proto.Cookie{}, status.Error(codes.PermissionDenied, err.Error())
+	}
 	if err != nil {
 		return &proto.Cookie{}, status.Error(codes.Unauthenticated, "invalid mail or password")
 	}

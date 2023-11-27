@@ -24,6 +24,9 @@ const (
 	Admin_CreateFeedback_FullMethodName             = "/proto.Admin/CreateFeedback"
 	Admin_CreateRecommendation_FullMethodName       = "/proto.Admin/CreateRecommendation"
 	Admin_CreateFeedFeedback_FullMethodName         = "/proto.Admin/CreateFeedFeedback"
+	Admin_GetNextComplaint_FullMethodName           = "/proto.Admin/GetNextComplaint"
+	Admin_DeleteComplaint_FullMethodName            = "/proto.Admin/DeleteComplaint"
+	Admin_AcceptComplaint_FullMethodName            = "/proto.Admin/AcceptComplaint"
 )
 
 // AdminClient is the client API for Admin service.
@@ -35,6 +38,9 @@ type AdminClient interface {
 	CreateFeedback(ctx context.Context, in *Feedback, opts ...grpc.CallOption) (*AdminEmpty, error)
 	CreateRecommendation(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*AdminEmpty, error)
 	CreateFeedFeedback(ctx context.Context, in *Recommendation, opts ...grpc.CallOption) (*AdminEmpty, error)
+	GetNextComplaint(ctx context.Context, in *AdminEmpty, opts ...grpc.CallOption) (*Complaint, error)
+	DeleteComplaint(ctx context.Context, in *Complaint, opts ...grpc.CallOption) (*AdminEmpty, error)
+	AcceptComplaint(ctx context.Context, in *Complaint, opts ...grpc.CallOption) (*AdminEmpty, error)
 }
 
 type adminClient struct {
@@ -90,6 +96,33 @@ func (c *adminClient) CreateFeedFeedback(ctx context.Context, in *Recommendation
 	return out, nil
 }
 
+func (c *adminClient) GetNextComplaint(ctx context.Context, in *AdminEmpty, opts ...grpc.CallOption) (*Complaint, error) {
+	out := new(Complaint)
+	err := c.cc.Invoke(ctx, Admin_GetNextComplaint_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) DeleteComplaint(ctx context.Context, in *Complaint, opts ...grpc.CallOption) (*AdminEmpty, error) {
+	out := new(AdminEmpty)
+	err := c.cc.Invoke(ctx, Admin_DeleteComplaint_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminClient) AcceptComplaint(ctx context.Context, in *Complaint, opts ...grpc.CallOption) (*AdminEmpty, error) {
+	out := new(AdminEmpty)
+	err := c.cc.Invoke(ctx, Admin_AcceptComplaint_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
@@ -99,6 +132,9 @@ type AdminServer interface {
 	CreateFeedback(context.Context, *Feedback) (*AdminEmpty, error)
 	CreateRecommendation(context.Context, *Recommendation) (*AdminEmpty, error)
 	CreateFeedFeedback(context.Context, *Recommendation) (*AdminEmpty, error)
+	GetNextComplaint(context.Context, *AdminEmpty) (*Complaint, error)
+	DeleteComplaint(context.Context, *Complaint) (*AdminEmpty, error)
+	AcceptComplaint(context.Context, *Complaint) (*AdminEmpty, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -120,6 +156,15 @@ func (UnimplementedAdminServer) CreateRecommendation(context.Context, *Recommend
 }
 func (UnimplementedAdminServer) CreateFeedFeedback(context.Context, *Recommendation) (*AdminEmpty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFeedFeedback not implemented")
+}
+func (UnimplementedAdminServer) GetNextComplaint(context.Context, *AdminEmpty) (*Complaint, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNextComplaint not implemented")
+}
+func (UnimplementedAdminServer) DeleteComplaint(context.Context, *Complaint) (*AdminEmpty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteComplaint not implemented")
+}
+func (UnimplementedAdminServer) AcceptComplaint(context.Context, *Complaint) (*AdminEmpty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptComplaint not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 
@@ -224,6 +269,60 @@ func _Admin_CreateFeedFeedback_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_GetNextComplaint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminEmpty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).GetNextComplaint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_GetNextComplaint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).GetNextComplaint(ctx, req.(*AdminEmpty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_DeleteComplaint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Complaint)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).DeleteComplaint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_DeleteComplaint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).DeleteComplaint(ctx, req.(*Complaint))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Admin_AcceptComplaint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Complaint)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).AcceptComplaint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_AcceptComplaint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).AcceptComplaint(ctx, req.(*Complaint))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +349,18 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateFeedFeedback",
 			Handler:    _Admin_CreateFeedFeedback_Handler,
+		},
+		{
+			MethodName: "GetNextComplaint",
+			Handler:    _Admin_GetNextComplaint_Handler,
+		},
+		{
+			MethodName: "DeleteComplaint",
+			Handler:    _Admin_DeleteComplaint_Handler,
+		},
+		{
+			MethodName: "AcceptComplaint",
+			Handler:    _Admin_AcceptComplaint_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

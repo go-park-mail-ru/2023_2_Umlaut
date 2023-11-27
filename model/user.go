@@ -25,6 +25,7 @@ type User struct {
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
 	Online       bool       `json:"online" db:"online"`
+	Banned       bool       `json:"-" db:"banned" swaggerignore:"true"`
 	Tags         *[]string  `json:"tags" db:"tags"`
 }
 
