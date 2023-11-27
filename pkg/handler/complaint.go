@@ -45,7 +45,7 @@ func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	complaint.ReporterUserId = r.Context().Value(keyUserID).(int)
+	complaint.ReporterUserId = r.Context().Value(static.KeyUserID).(int)
 
 	_, err := h.services.Complaint.CreateComplaint(r.Context(), complaint)
 	if err != nil {
