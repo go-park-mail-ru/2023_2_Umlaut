@@ -18,3 +18,7 @@ func NewComplaintService(repoComplaint repository.Complaint) *ComplaintService {
 func (s *ComplaintService) GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error) {
 	return s.repoComplaint.GetComplaintTypes(ctx)
 }
+
+func (s *ComplaintService) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
+	return s.repoComplaint.CreateComplaint(ctx, complaint)
+}

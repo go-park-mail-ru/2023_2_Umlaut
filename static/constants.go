@@ -2,7 +2,7 @@ package static
 
 var (
 	Host = "https://umlaut-bmstu.me"
-	//Host = "http://localhost:8000"
+	// Host = "http://localhost:8000"
 
 	MessageDbField       = "id, dialog_id, sender_id, message_text, created_at"
 	LikeDbField          = "liked_by_user_id, liked_to_user_id"

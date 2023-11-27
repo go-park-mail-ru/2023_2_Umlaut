@@ -240,6 +240,64 @@
                 }
             }
         },
+        "/api/v1/complaint": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "create complaint",
+                "operationId": "complaint",
+                "parameters": [
+                    {
+                        "description": "Complaint data to create",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Complaint"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/complaint_types": {
             "get": {
                 "consumes": [
@@ -994,6 +1052,26 @@
                 }
             }
         },
+        "model.Complaint": {
+            "type": "object",
+            "properties": {
+                "complaint_type_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "reported_user_id": {
+                    "type": "integer"
+                },
+                "reporter_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.ComplaintType": {
             "type": "object",
             "properties": {
@@ -1008,6 +1086,9 @@
         "model.Dialog": {
             "type": "object",
             "properties": {
+                "banned": {
+                    "type": "boolean"
+                },
                 "companion": {
                     "type": "string"
                 },

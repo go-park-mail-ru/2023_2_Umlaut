@@ -72,6 +72,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
 	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
+	apiRouter.HandleFunc("/complaint", h.createComplaint).Methods("POST", "OPTIONS")
 
 	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
 
@@ -82,7 +83,6 @@ func (h *Handler) InitRoutes() http.Handler {
 
 	adminRouter := r.PathPrefix("/api/v1/admin").Subrouter()
 	adminRouter.Use(
-		//h.csrfMiddleware,
 		h.authAdminMiddleware,
 	)
 	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
