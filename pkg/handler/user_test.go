@@ -62,7 +62,7 @@ func TestHandler_user(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{User: repo}
 			handler := Handler{services, ctx}
 
@@ -176,7 +176,7 @@ func TestHandler_updateUser(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 0)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 0)
 			services := &service.Service{User: repo}
 			handler := Handler{services, ctx}
 
@@ -227,7 +227,7 @@ func TestHandler_updateUserPhoto(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{User: repo}
 			handler := Handler{services, ctx}
 

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"math/rand"
 	"net/http"
 
@@ -29,7 +30,7 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateFeedback(
 		r.Context(),
 		&proto.Feedback{
-			UserId:     int32(r.Context().Value(keyUserID).(int)),
+			UserId:     int32(r.Context().Value(static.KeyUserID).(int)),
 			Rating:     utils.ModifyInt(stat.Rating),
 			Liked:      utils.ModifyString(stat.Liked),
 			NeedFix:    utils.ModifyString(stat.NeedFix),
@@ -65,7 +66,7 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateRecommendation(
 		r.Context(),
 		&proto.Recommendation{
-			UserId:    int32(r.Context().Value(keyUserID).(int)),
+			UserId:    int32(r.Context().Value(static.KeyUserID).(int)),
 			Recommend: utils.ModifyInt(rec.Recommend),
 			Show:      rec.Show,
 		})
@@ -97,7 +98,7 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateRecommendation(
 		r.Context(),
 		&proto.Recommendation{
-			UserId:    int32(r.Context().Value(keyUserID).(int)),
+			UserId:    int32(r.Context().Value(static.KeyUserID).(int)),
 			Recommend: utils.ModifyInt(rec.Recommend),
 			Show:      rec.Show,
 		})

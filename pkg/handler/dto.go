@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"log"
 	"net/http"
 
@@ -77,7 +78,7 @@ func sendData(ctx context.Context, w http.ResponseWriter, response interface{}, 
 		return
 	}
 
-	logger, ok := ctx.Value(keyLogger).(*zap.Logger)
+	logger, ok := ctx.Value(static.KeyLogger).(*zap.Logger)
 	if !ok {
 		log.Println("Logger not found in context")
 	}

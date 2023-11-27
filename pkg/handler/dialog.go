@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -15,7 +16,7 @@ import (
 // @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/dialogs [get]
 func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(keyUserID).(int)
+	userId := r.Context().Value(static.KeyUserID).(int)
 
 	dialogs, err := h.services.Dialog.GetDialogs(r.Context(), userId)
 	if err != nil {

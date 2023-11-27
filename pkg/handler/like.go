@@ -25,7 +25,7 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	userId := r.Context().Value(keyUserID).(int)
+	userId := r.Context().Value(static.KeyUserID).(int)
 	like.LikedByUserId = userId
 
 	err := h.services.Like.CreateLike(r.Context(), like)

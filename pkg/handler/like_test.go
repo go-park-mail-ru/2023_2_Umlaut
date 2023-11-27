@@ -83,7 +83,7 @@ func TestHandler_createLike(t *testing.T) {
 			repoDialog := mock_service.NewMockDialog(c)
 			test.mockBehavior(repoLike, repoDialog)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{Like: repoLike, Dialog: repoDialog}
 			handler := Handler{services, ctx}
 

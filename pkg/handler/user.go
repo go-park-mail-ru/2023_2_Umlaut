@@ -19,7 +19,7 @@ import (
 // @Failure 404,500 {object} ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(keyUserID).(int)
+	id := r.Context().Value(static.KeyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
@@ -27,7 +27,7 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, _ := r.Cookie("session_id")
-	jwtToken := NewJwtToken(secret)
+	jwtToken := NewJwtToken(static.Secret)
 	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "csrf token creation error")
@@ -56,7 +56,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Id = r.Context().Value(keyUserID).(int)
+	user.Id = r.Context().Value(static.KeyUserID).(int)
 	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
 		if errors.Is(err, static.ErrAlreadyExists) {
@@ -83,7 +83,7 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [post]
 func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(keyUserID).(int)
+	id := r.Context().Value(static.KeyUserID).(int)
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
@@ -115,7 +115,7 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.Context().Value(keyUserID).(int)
+	id := r.Context().Value(static.KeyUserID).(int)
 
 	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
 	if errors.Is(err, static.ErrNoFiles) {

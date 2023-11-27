@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -13,16 +14,6 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-)
-
-type ctxKey string
-
-const (
-	keyUserID    ctxKey = "user_id"
-	keyAdminID   ctxKey = "admin_id"
-	keyLogger    ctxKey = "logger"
-	keyRequestId ctxKey = "request_id"
-	secret              = "qrkjk#4#%35FSFJlja#4353KSFjH"
 )
 
 func (h *Handler) corsMiddleware(next http.Handler) http.Handler {
@@ -50,7 +41,7 @@ func (h *Handler) authAdminMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), keyAdminID, id)
+		ctx := context.WithValue(r.Context(), static.KeyAdminID, id)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -70,7 +61,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), keyUserID, id)
+		ctx := context.WithValue(r.Context(), static.KeyUserID, id)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -83,7 +74,7 @@ func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		session, _ := r.Cookie("session_id")
-		jwtToken := NewJwtToken(secret)
+		jwtToken := NewJwtToken(static.Secret)
 
 		CSRFToken := r.Header.Get("X-Csrf-Token")
 
@@ -102,8 +93,8 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		start := time.Now()
 
 		childLogger := h.logger.With(zap.String("RequestID", uuid.NewString()))
-		ctx := context.WithValue(r.Context(), keyLogger, childLogger)
-		ctx = context.WithValue(ctx, keyRequestId, uuid.NewString())
+		ctx := context.WithValue(r.Context(), static.KeyLogger, childLogger)
+		ctx = context.WithValue(ctx, static.KeyRequestId, uuid.NewString())
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 
@@ -127,7 +118,7 @@ func (h *Handler) panicRecoveryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				logger, ok := r.Context().Value(keyLogger).(*zap.Logger)
+				logger, ok := r.Context().Value(static.KeyLogger).(*zap.Logger)
 				if !ok {
 					log.Println("Logger not found in context")
 				}

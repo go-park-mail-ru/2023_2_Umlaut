@@ -72,7 +72,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	}
 	defer rows.Close()
 
-	dialogs, err := scanDialogs(rows)
+	dialogs, err := scanDialogs(rows, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	return dialogs, nil
 }
 
-func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
+func scanDialogs(rows pgx.Rows, userId int) ([]model.Dialog, error) {
 	var dialogs []model.Dialog
 	var err error
 	for rows.Next() {
@@ -107,6 +107,13 @@ func scanDialogs(rows pgx.Rows) ([]model.Dialog, error) {
 		} else {
 			dialog.LastMessage = &lastMessage
 		}
+
+		if dialog.User1Id == userId {
+			tmp := dialog.User1Id
+			dialog.User1Id = dialog.User2Id
+			dialog.User2Id = tmp
+		}
+
 		dialogs = append(dialogs, dialog)
 	}
 	if err != nil {

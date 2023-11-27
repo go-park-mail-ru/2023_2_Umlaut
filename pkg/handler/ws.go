@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/websocket"
 	"net/http"
 )
@@ -24,7 +25,7 @@ var upgrader = websocket.Upgrader{
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/ws/messenger [get]
 func (h *Handler) registerUserToHub(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(keyUserID).(int)
+	userId := r.Context().Value(static.KeyUserID).(int)
 	if _, ok := h.hub.Users[userId]; ok {
 		return
 	}

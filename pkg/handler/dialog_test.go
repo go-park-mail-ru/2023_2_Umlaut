@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -60,7 +61,7 @@ func TestHandler_getDialogs(t *testing.T) {
 			repoDialog := mock_service.NewMockDialog(c)
 			test.mockBehavior(repoDialog)
 
-			ctx := context.WithValue(context.Background(), keyUserID, mockUserID)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, mockUserID)
 			services := &service.Service{Dialog: repoDialog}
 			handler := Handler{services, ctx}
 

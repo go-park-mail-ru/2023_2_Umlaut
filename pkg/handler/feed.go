@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"net/http"
 	"strconv"
 	"strings"
@@ -37,7 +38,7 @@ func parseQueryParams(r *http.Request) *proto.FilterParams {
 	maxAge, _ := strconv.Atoi(r.URL.Query().Get("max_age"))
 	tags := strings.Split(r.URL.Query().Get("tags"), ",")
 	return &proto.FilterParams{
-		UserId: int32(r.Context().Value(keyUserID).(int)),
+		UserId: int32(r.Context().Value(static.KeyUserID).(int)),
 		MinAge: int32(minAge),
 		MaxAge: int32(maxAge),
 		Tags:   tags,

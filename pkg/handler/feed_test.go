@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -62,7 +63,7 @@ func TestHandler_feed(t *testing.T) {
 			repo := mock_service.NewMockFeed(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{Feed: repo}
 			handler := Handler{services, ctx}
 
@@ -132,7 +133,7 @@ func TestHandler_getNextUsers(t *testing.T) {
 			repo := mock_service.NewMockFeed(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{Feed: repo}
 			handler := Handler{services, ctx}
 
