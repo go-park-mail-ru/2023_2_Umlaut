@@ -5,11 +5,11 @@
 
 ## Ссылки
 
-[Деплой](http://umlaut-bmstu.me)
+[Деплой](https://umlaut-bmstu.me)
 
 [Репозиторий фронтенд-части Ümlaut](https://github.com/frontend-park-mail-ru/2023_2_Umlaut)
 
-[Документация API](http://umlaut-bmstu.me:8000/swagger/index.html#/)
+[Документация API](https://umlaut-bmstu.me/swagger/index.html#/)
 
 ## Команда Ümlaut
 
