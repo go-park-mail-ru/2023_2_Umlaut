@@ -2,8 +2,9 @@ package handler
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/monitoring"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/monitoring"
 
 	_ "github.com/go-park-mail-ru/2023_2_Umlaut/docs"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
@@ -45,10 +46,8 @@ func NewHandler(
 }
 
 func (h *Handler) InitRoutes() http.Handler {
-	metric := mux.NewRouter()
-	h.metrics = monitoring.RegisterMonitoring(metric)
-
 	r := mux.NewRouter()
+	h.metrics = monitoring.RegisterMonitoring(r)
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", static.Host)),
 	))
