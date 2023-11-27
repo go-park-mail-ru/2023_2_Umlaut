@@ -291,7 +291,7 @@ definitions:
     - name
     - password
     type: object
-host: umlaut-bmstu.me:8000
+host: umlaut-bmstu.me
 info:
   contact: {}
   description: API Server for Umlaut Application
