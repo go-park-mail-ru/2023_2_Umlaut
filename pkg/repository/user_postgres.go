@@ -91,6 +91,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params 
 	queryBuilder := psql.Select(static.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
+		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)). 
 		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = %d)", likeTable, user.Id))
 
 	if user.PreferGender != nil && user.UserGender != nil {

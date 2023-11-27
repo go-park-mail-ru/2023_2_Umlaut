@@ -35,7 +35,7 @@ func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param input body model.Complaint true "Complaint data to create"
 // @Success 200 {object} ClientResponseDto[string]
-// @Failure 400, 401, 409, 500 {object} ClientResponseDto[string]
+// @Failure 400,401,409,500 {object} ClientResponseDto[string]
 // @Router /api/v1/complaint [post]
 func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)

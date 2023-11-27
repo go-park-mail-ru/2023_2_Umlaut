@@ -131,6 +131,19 @@ definitions:
     - name
     - password
     type: object
+  model.Complaint:
+    properties:
+      complaint_type_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      reported_user_id:
+        type: integer
+      reporter_user_id:
+        type: integer
+    type: object
   model.ComplaintType:
     properties:
       id:
@@ -140,6 +153,8 @@ definitions:
     type: object
   model.Dialog:
     properties:
+      banned:
+        type: boolean
       companion:
         type: string
       id:
@@ -449,6 +464,44 @@ paths:
       summary: sign up account
       tags:
       - auth
+  /api/v1/complaint:
+    post:
+      consumes:
+      - application/json
+      operationId: complaint
+      parameters:
+      - description: Complaint data to create
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Complaint'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: create complaint
+      tags:
+      - complaint
   /api/v1/complaint_types:
     get:
       consumes:
