@@ -119,7 +119,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		)
 
 		re := regexp.MustCompile(`\d+`)
-		method = strings.Split(re.ReplaceAllString(method, "id"), "?")[0]
+		path = strings.Split(re.ReplaceAllString(path, "id"), "?")[0]
 
 		h.metrics.RequestCounter.Add(1)
 		h.metrics.Hits.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Inc()
