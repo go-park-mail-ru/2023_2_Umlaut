@@ -15,19 +15,20 @@ type PrometheusMetrics struct {
 func RegisterMonitoring(router *mux.Router) *PrometheusMetrics {
 	var metrics = new(PrometheusMetrics)
 	metrics.RequestCounter = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: "api_",
-		Name:      "request_",
-		Help:      "Number of request.",
+		Namespace: "api",
+		Name:      "requests_total",
+		Help:      "Total number of requests.",
 	})
 	metrics.Hits = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "api_",
-		Name:      "hits_",
-		Help:      "All request hits.",
+		Namespace: "api",
+		Name:      "hits_total",
+		Help:      "Total number of hits.",
 	}, []string{"status", "path", "method"})
 	metrics.Duration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Namespace: "api_",
-		Name:      "duration_",
-		Help:      "Request duration.",
+		Namespace: "api",
+		Name:      "request_duration_seconds",
+		Help:      "Duration of requests.",
+		Buckets:   prometheus.DefBuckets,
 	}, []string{"status", "path", "method"})
 
 	prometheus.MustRegister(metrics.RequestCounter, metrics.Hits, metrics.Duration)
