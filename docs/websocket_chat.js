@@ -1,4 +1,5 @@
 let socket = new WebSocket("wss://umlaut-bmstu.me/websocket");
+//let socket = new WebSocket("ws:localhost:8000//api/v1/umlaut-bmstu.me/websocket");
 
 socket.onopen = () => {
     console.log("Successfully Connected");
