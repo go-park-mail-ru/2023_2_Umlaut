@@ -22,8 +22,8 @@ func NewMessagePostgres(db *pgxpool.Pool) *MessagePostgres {
 func (r *MessagePostgres) CreateMessage(ctx context.Context, message model.Message) (int, error) {
 	var id int
 	query, args, err := psql.Insert(messageTable).
-		Columns("sender_id", "dialog_id", "message_text", "is_read").
-		Values(message.SenderId, message.DialogId, message.Text, message.IsRead).
+		Columns("sender_id", "dialog_id", "message_text").
+		Values(message.SenderId, message.DialogId, message.Text).
 		ToSql()
 
 	if err != nil {
