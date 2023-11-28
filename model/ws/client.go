@@ -68,7 +68,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			break
 		}
 		receivedMessage.Id, err = services.Message.SaveOrUpdateMessage(ctx, model.Message{
-			Id:       &receivedMessage.SenderId,
+			Id:       &receivedMessage.Id,
 			SenderId: &receivedMessage.SenderId,
 			DialogId: &receivedMessage.DialogId,
 			Text:     &receivedMessage.Text,
