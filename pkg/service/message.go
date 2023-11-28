@@ -21,7 +21,6 @@ func (s *MessageService) GetDialogMessages(ctx context.Context, dialogId int) ([
 func (s *MessageService) SaveOrUpdateMessage(ctx context.Context, message model.Message) (int, error) {
 	if message.Id != nil && *message.Id > 0 {
 		return s.repoMessage.UpdateMessage(ctx, message)
-	} else {
-		return s.repoMessage.CreateMessage(ctx, message)
 	}
+	return s.repoMessage.CreateMessage(ctx, message)
 }
