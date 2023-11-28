@@ -177,23 +177,6 @@ CREATE TRIGGER trigger_update_banned_dialog
     FOR EACH ROW
 EXECUTE FUNCTION update_banned_dialog();
 
-CREATE OR REPLACE FUNCTION delete_invalid_complaint_type()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    IF NEW.complaint_type NOT IN (SELECT type_name FROM complaint_type) THEN
-        NEW.complaint_type = "Неизвестная причина";
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_delete_invalid_complaint_type
-    BEFORE INSERT or UPDATE
-    ON complaint
-    FOR EACH ROW
-EXECUTE FUNCTION delete_invalid_complaint_type();
-
 CREATE OR REPLACE FUNCTION update_banned_user()
     RETURNS TRIGGER AS
 $$

@@ -46,9 +46,6 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 	return &proto.User{
 		Id:           int32(nextUser.Id),
 		Name:         nextUser.Name,
-		Mail:         nextUser.Mail,
-		PasswordHash: nextUser.PasswordHash,
-		Salt:         nextUser.Salt,
 		UserGender:   utils.ModifyInt(nextUser.UserGender),
 		PreferGender: utils.ModifyInt(nextUser.PreferGender),
 		Description:  utils.ModifyString(nextUser.Description),

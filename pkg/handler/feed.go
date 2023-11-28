@@ -44,7 +44,6 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	NewSuccessClientResponseDto(r.Context(), w, model.User{
 		Id: int(user.Id),
 		Name: user.Name,
-		Mail: user.Mail,
 		PreferGender: &preferGender,
 		Description: &user.Description,
 		Age: &age,

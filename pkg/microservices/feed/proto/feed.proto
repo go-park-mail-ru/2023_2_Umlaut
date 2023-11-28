@@ -11,9 +11,6 @@ package proto;
 message User {
   int32 id = 1;
   string name = 2;
-  string mail = 3;
-  string password_hash = 4;
-  string salt = 5;
   int32 user_gender = 6;
   int32 prefer_gender = 7;
   string description = 8;
