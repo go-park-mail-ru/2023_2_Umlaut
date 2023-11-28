@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc/keepalive"
 	"log"
 	"net"
 	"net/http"
 	"time"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc/keepalive"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/interceptors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/server"
@@ -67,8 +69,11 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			grpc.UnaryServerInterceptor(interceptors.PanicRecoveryInterceptor),
+			grpc.UnaryServerInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		),
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
-		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
 	)
 
