@@ -67,7 +67,7 @@ func main() {
 	logger.Info("Starting server...")
 	defer logger.Sync()
 
-	ctx := context.WithValue(context.Background(), "logger", logger)
+	ctx := context.Background()
 
 	db, err := utils.InitPostgres(ctx)
 	if err != nil {

@@ -95,6 +95,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		statusCode, message := parseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
 	}
 
 	session.Expires = time.Now().AddDate(0, 0, -1)
@@ -128,6 +129,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		statusCode, message := parseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
 	}
 
 	http.SetCookie(w, createCookie("session_id", userId.Cookie.Cookie))
