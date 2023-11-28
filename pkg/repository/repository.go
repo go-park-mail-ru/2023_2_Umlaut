@@ -35,8 +35,8 @@ type Dialog interface {
 
 type Message interface {
 	GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error)
-	CreateMessage(ctx context.Context, message model.Message) (int, error)
-	UpdateMessage(ctx context.Context, message model.Message) (int, error)
+	CreateMessage(ctx context.Context, message model.Message) (model.Message, error)
+	UpdateMessage(ctx context.Context, message model.Message) (model.Message, error)
 }
 
 type Tag interface {

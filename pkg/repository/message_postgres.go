@@ -19,26 +19,27 @@ func NewMessagePostgres(db *pgxpool.Pool) *MessagePostgres {
 	return &MessagePostgres{db: db}
 }
 
-func (r *MessagePostgres) CreateMessage(ctx context.Context, message model.Message) (int, error) {
-	var id int
+func (r *MessagePostgres) CreateMessage(ctx context.Context, message model.Message) (model.Message, error) {
 	query, args, err := psql.Insert(messageTable).
 		Columns("sender_id", "dialog_id", "message_text").
 		Values(message.SenderId, message.DialogId, message.Text).
 		ToSql()
 
 	if err != nil {
-		return 0, err
+		return model.Message{}, err
 	}
 
-	query += " RETURNING id"
+	query += fmt.Sprintf(" RETURNING %s", static.MessageDbField)
 	row := r.db.QueryRow(ctx, query, args...)
-	err = row.Scan(&id)
+	newMessage, err := scanMessage(row)
+	if err != nil {
+		return model.Message{}, err
+	}
 
-	return id, err
+	return newMessage, err
 }
 
-func (r *MessagePostgres) UpdateMessage(ctx context.Context, message model.Message) (int, error) {
-	var id int
+func (r *MessagePostgres) UpdateMessage(ctx context.Context, message model.Message) (model.Message, error) {
 	query, args, err := psql.Update(messageTable).
 		Set("message_text", message.Text).
 		Set("is_read", message.IsRead).
@@ -46,14 +47,17 @@ func (r *MessagePostgres) UpdateMessage(ctx context.Context, message model.Messa
 		ToSql()
 
 	if err != nil {
-		return 0, err
+		return model.Message{}, err
 	}
 
-	query += " RETURNING id"
+	query += fmt.Sprintf(" RETURNING %s", static.MessageDbField)
 	row := r.db.QueryRow(ctx, query, args...)
-	err = row.Scan(&id)
+	newMessage, err := scanMessage(row)
+	if err != nil {
+		return model.Message{}, err
+	}
 
-	return id, err
+	return newMessage, err
 }
 
 func (r *MessagePostgres) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
@@ -108,4 +112,17 @@ func scanMessages(rows pgx.Rows) ([]model.Message, error) {
 	}
 
 	return messages, nil
+}
+
+func scanMessage(rows pgx.Row) (model.Message, error) {
+	var message model.Message
+	err := rows.Scan(
+		&message.Id,
+		&message.DialogId,
+		&message.SenderId,
+		&message.Text,
+		&message.IsRead,
+		&message.CreatedAt,
+	)
+	return message, err
 }

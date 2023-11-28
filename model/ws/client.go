@@ -67,7 +67,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			log.Printf("error: %v", err)
 			break
 		}
-		receivedMessage.Id, err = services.Message.SaveOrUpdateMessage(ctx, model.Message{
+		newMessage, err := services.Message.SaveOrUpdateMessage(ctx, model.Message{
 			Id:       &receivedMessage.Id,
 			SenderId: &receivedMessage.SenderId,
 			DialogId: &receivedMessage.DialogId,
@@ -76,9 +76,15 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 		})
 		if err != nil {
 			//TODO: do something
-		}
-		if !isEdit {
-			hub.Broadcast <- &receivedMessage
+		} else if !isEdit {
+			hub.Broadcast <- &Message{
+				Id:        *newMessage.Id,
+				SenderId:  *newMessage.SenderId,
+				DialogId:  *newMessage.DialogId,
+				Text:      *newMessage.Text,
+				IsRead:    newMessage.IsRead,
+				CreatedAt: *newMessage.CreatedAt,
+			}
 		}
 	}
 }
