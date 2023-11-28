@@ -3,9 +3,10 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"log"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 
 	"go.uber.org/zap"
 )
@@ -83,6 +84,13 @@ func sendData(ctx context.Context, w http.ResponseWriter, response interface{}, 
 		log.Println("Logger not found in context")
 	}
 	*logger = *logger.With(zap.Any("Status", statusCode), zap.Any("Message", message))
+
+	requestInfo, ok := ctx.Value(static.KeyRequestInfo).(*RequestInfo)
+	if !ok {
+		log.Println("Logger not found in context")
+	}
+	requestInfo.Status = statusCode
+	requestInfo.Message = message
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

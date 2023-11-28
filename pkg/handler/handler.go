@@ -52,13 +52,14 @@ func (h *Handler) InitRoutes() http.Handler {
 		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", static.Host)),
 	))
 
-	authRouter := r.PathPrefix("/api/v1/auth").Subrouter()
+	api := r.PathPrefix("/api").Subrouter()
+	authRouter := api.PathPrefix("/v1/auth").Subrouter()
 	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/logout", h.logout)
 	authRouter.HandleFunc("/admin", h.logInAdmin)
 
-	adminRouter := r.PathPrefix("/api/v1/admin").Subrouter()
+	adminRouter := api.PathPrefix("/v1/admin").Subrouter()
 	adminRouter.Use(
 		h.authAdminMiddleware,
 	)
@@ -69,7 +70,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
 	adminRouter.HandleFunc("/recommendation", h.getRecommendationStatistic).Methods("GET")
 
-	apiRouter := r.PathPrefix("/api/v1").Subrouter()
+	apiRouter := api.PathPrefix("/v1").Subrouter()
 	apiRouter.Use(
 		//h.csrfMiddleware,
 		h.authMiddleware,
@@ -94,7 +95,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/recommendation", h.createRecommendation).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/show-csat", h.showCSAT).Methods("GET")
 
-	r.Use(
+	api.Use(
 		h.loggingMiddleware,
 		h.panicRecoveryMiddleware,
 		h.corsMiddleware,

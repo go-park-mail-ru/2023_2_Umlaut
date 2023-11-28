@@ -3,13 +3,15 @@ package handler
 import (
 	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"log"
 	"net/http"
 	"regexp"
 	"runtime/debug"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 
 	"github.com/google/uuid"
 	"github.com/rs/cors"
@@ -89,13 +91,20 @@ func (h *Handler) csrfMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+type RequestInfo struct {
+	Status  int
+	Message string
+}
+
 func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
+		requestInfo := &RequestInfo{}
 		childLogger := h.logger.With(zap.String("RequestID", uuid.NewString()))
 		ctx := context.WithValue(r.Context(), static.KeyLogger, childLogger)
 		ctx = context.WithValue(ctx, static.KeyRequestId, uuid.NewString())
+		ctx = context.WithValue(ctx, static.KeyRequestInfo, requestInfo)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 
@@ -109,13 +118,12 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 			zap.Duration("Time", timing),
 		)
 
-		status := 200
 		re := regexp.MustCompile(`\d+`)
-		method = re.ReplaceAllString(method, "id")
+		method = strings.Split(re.ReplaceAllString(method, "id"), "?")[0]
 
 		h.metrics.RequestCounter.Add(1)
-		h.metrics.Hits.WithLabelValues(strconv.Itoa(status), path, method).Inc()
-		h.metrics.Duration.WithLabelValues(strconv.Itoa(status), path, method).Observe(timing.Seconds())
+		h.metrics.Hits.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Inc()
+		h.metrics.Duration.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Observe(timing.Seconds())
 	})
 }
 
