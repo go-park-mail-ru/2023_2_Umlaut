@@ -151,3 +151,7 @@ services:
       - "3000:3000"
     volumes:
       - ./monitoring:/etc/config
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  grafana_data:
