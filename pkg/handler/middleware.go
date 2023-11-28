@@ -121,7 +121,6 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		re := regexp.MustCompile(`\d+`)
 		path = strings.Split(re.ReplaceAllString(path, "1"), "?")[0]
 
-		h.metrics.RequestCounter.Inc()
 		h.metrics.Hits.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Inc()
 		h.metrics.Duration.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Observe(timing.Seconds())
 	})
