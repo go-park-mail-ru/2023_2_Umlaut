@@ -1381,6 +1381,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "is_read": {
+                    "type": "boolean"
+                },
                 "message_text": {
                     "type": "string"
                 },
