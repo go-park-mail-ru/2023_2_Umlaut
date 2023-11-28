@@ -16,6 +16,7 @@ type Message struct {
 	RecipientId int       `json:"recipient_id"`
 	DialogId    int       `json:"dialog_id"`
 	Text        string    `json:"message_text"`
+	IsRead      bool      `json:"is_read"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
@@ -58,19 +59,26 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 
 		var receivedMessage Message
 		err = json.Unmarshal(m, &receivedMessage)
+		isEdit := false
+		if receivedMessage.Id > 0 {
+			isEdit = true
+		}
 		if err != nil {
 			log.Printf("error: %v", err)
 			break
 		}
-		receivedMessage.Id, err = services.Message.SaveMessage(ctx, model.Message{
+		receivedMessage.Id, err = services.Message.SaveOrUpdateMessage(ctx, model.Message{
+			Id:       &receivedMessage.SenderId,
 			SenderId: &receivedMessage.SenderId,
 			DialogId: &receivedMessage.DialogId,
 			Text:     &receivedMessage.Text,
+			IsRead:   receivedMessage.IsRead,
 		})
 		if err != nil {
 			//TODO: do something
 		}
-
-		hub.Broadcast <- &receivedMessage
+		if !isEdit {
+			hub.Broadcast <- &receivedMessage
+		}
 	}
 }

@@ -22,8 +22,27 @@ func NewMessagePostgres(db *pgxpool.Pool) *MessagePostgres {
 func (r *MessagePostgres) CreateMessage(ctx context.Context, message model.Message) (int, error) {
 	var id int
 	query, args, err := psql.Insert(messageTable).
-		Columns("sender_id", "dialog_id", "message_text").
-		Values(message.SenderId, message.DialogId, message.Text).
+		Columns("sender_id", "dialog_id", "message_text", "is_read").
+		Values(message.SenderId, message.DialogId, message.Text, message.IsRead).
+		ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	query += " RETURNING id"
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+
+	return id, err
+}
+
+func (r *MessagePostgres) UpdateMessage(ctx context.Context, message model.Message) (int, error) {
+	var id int
+	query, args, err := psql.Update(messageTable).
+		Set("message_text", message.Text).
+		Set("is_read", message.IsRead).
+		Where(sq.Eq{"id": message.Id}).
 		ToSql()
 
 	if err != nil {
@@ -73,6 +92,7 @@ func scanMessages(rows pgx.Rows) ([]model.Message, error) {
 			&message.DialogId,
 			&message.SenderId,
 			&message.Text,
+			&message.IsRead,
 			&message.CreatedAt,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {

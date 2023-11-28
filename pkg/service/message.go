@@ -18,6 +18,10 @@ func (s *MessageService) GetDialogMessages(ctx context.Context, dialogId int) ([
 	return s.repoMessage.GetDialogMessages(ctx, dialogId)
 }
 
-func (s *MessageService) SaveMessage(ctx context.Context, message model.Message) (int, error) {
-	return s.repoMessage.CreateMessage(ctx, message)
+func (s *MessageService) SaveOrUpdateMessage(ctx context.Context, message model.Message) (int, error) {
+	if message.Id != nil && *message.Id > 0 {
+		return s.repoMessage.UpdateMessage(ctx, message)
+	} else {
+		return s.repoMessage.CreateMessage(ctx, message)
+	}
 }

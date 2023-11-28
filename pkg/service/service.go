@@ -40,7 +40,7 @@ type Dialog interface {
 
 type Message interface {
 	GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error)
-	SaveMessage(ctx context.Context, message model.Message) (int, error)
+	SaveOrUpdateMessage(ctx context.Context, message model.Message) (int, error)
 }
 
 type Tag interface {

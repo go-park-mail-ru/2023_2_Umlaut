@@ -22,7 +22,7 @@ CREATE TABLE "user"
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
-    banned        BOOlEAN DEFAULT FALSE,
+    banned        BOOlEAN              DEFAULT FALSE,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
     age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
@@ -50,7 +50,7 @@ CREATE TABLE dialog
     id         SERIAL PRIMARY KEY,
     user1_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     user2_id   INT NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
-    banned     BOOlEAN DEFAULT FALSE,
+    banned     BOOlEAN     DEFAULT FALSE,
 --     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL, не раскоментирывать!
     UNIQUE (user1_id, user2_id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -63,6 +63,7 @@ CREATE TABLE message
     dialog_id    INT  NOT NULL REFERENCES dialog (id) ON DELETE CASCADE,
     sender_id    INT  NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     message_text TEXT NOT NULL,
+    is_read      BOOLEAN     DEFAULT FALSE,
     created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -77,12 +78,12 @@ CREATE TABLE complaint_type
 
 CREATE TABLE complaint
 (
-    id                SERIAL PRIMARY KEY,
-    reporter_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    reported_user_id  INT      NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type    TEXT     NOT NULL,
-    report_status     SMALLINT DEFAULT 0,
-    created_at        TIMESTAMPTZ DEFAULT NOW(),
+    id               SERIAL PRIMARY KEY,
+    reporter_user_id INT  NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    reported_user_id INT  NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    complaint_type   TEXT NOT NULL,
+    report_status    SMALLINT    DEFAULT 0,
+    created_at       TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (reporter_user_id, reported_user_id),
     CHECK (reporter_user_id != reported_user_id)
 );
@@ -162,7 +163,10 @@ CREATE OR REPLACE FUNCTION update_banned_dialog()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    UPDATE dialog SET banned = TRUE WHERE user1_id = LEAST(NEW.reporter_user_id, NEW.reported_user_id) AND user2_id = GREATEST(NEW.reporter_user_id, NEW.reported_user_id);
+    UPDATE dialog
+    SET banned = TRUE
+    WHERE user1_id = LEAST(NEW.reporter_user_id, NEW.reported_user_id)
+      AND user2_id = GREATEST(NEW.reporter_user_id, NEW.reported_user_id);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
