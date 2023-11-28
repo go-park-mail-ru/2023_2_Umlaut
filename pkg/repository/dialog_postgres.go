@@ -52,7 +52,7 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
 	query, args, err := psql.
-		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.created_at").
+		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
 		From(dialogTable + " d").
 		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
 		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
@@ -97,6 +97,7 @@ func scanDialogs(rows pgx.Rows, userId int) ([]model.Dialog, error) {
 			&lastMessage.SenderId,
 			&lastMessage.DialogId,
 			&lastMessage.Text,
+			&lastMessage.IsRead,
 			&lastMessage.CreatedAt,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {

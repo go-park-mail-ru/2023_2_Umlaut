@@ -72,18 +72,19 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			SenderId: &receivedMessage.SenderId,
 			DialogId: &receivedMessage.DialogId,
 			Text:     &receivedMessage.Text,
-			IsRead:   receivedMessage.IsRead,
+			IsRead:   &receivedMessage.IsRead,
 		})
 		if err != nil {
 			//TODO: do something
 		} else if !isEdit {
 			hub.Broadcast <- &Message{
-				Id:        *newMessage.Id,
-				SenderId:  *newMessage.SenderId,
-				DialogId:  *newMessage.DialogId,
-				Text:      *newMessage.Text,
-				IsRead:    newMessage.IsRead,
-				CreatedAt: *newMessage.CreatedAt,
+				Id:          *newMessage.Id,
+				SenderId:    *newMessage.SenderId,
+				RecipientId: receivedMessage.RecipientId,
+				DialogId:    *newMessage.DialogId,
+				Text:        *newMessage.Text,
+				IsRead:      *newMessage.IsRead,
+				CreatedAt:   *newMessage.CreatedAt,
 			}
 		}
 	}
