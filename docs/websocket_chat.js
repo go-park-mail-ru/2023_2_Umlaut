@@ -27,12 +27,19 @@ socket.onerror = error => {
 // 	CreatedAt   time.Time `json:"created_at"`
 // }
 
-// примеры использования:
+// примеры создания сообщения:
+socket.send(`{
+    "sender_id": 101,
+    "recipient_id": 201,
+    "dialog_id": 123,
+    "message_text": "Привет, как дела?"
+}`)
+// примеры редактирования:
 socket.send(`{
     "id": 1,
     "sender_id": 101,
     "recipient_id": 201,
     "dialog_id": 123,
     "message_text": "Привет, как дела?",
-    "created_at": "2023-11-24T12:00:00Z"
+    "is_read": true
 }`)
