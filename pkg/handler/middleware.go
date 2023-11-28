@@ -106,10 +106,12 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, static.KeyRequestId, uuid.NewString())
 		ctx = context.WithValue(ctx, static.KeyRequestInfo, requestInfo)
 
-		next.ServeHTTP(w, r.WithContext(ctx))
-
 		method := r.Method
 		path := r.RequestURI
+		h.metrics.Hits.WithLabelValues(path, method).Inc()
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+
 		timing := time.Since(start)
 
 		childLogger.Info("Request handled",
@@ -121,7 +123,6 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 		re := regexp.MustCompile(`\d+`)
 		path = strings.Split(re.ReplaceAllString(path, "1"), "?")[0]
 
-		h.metrics.Hits.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Inc()
 		h.metrics.Duration.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Observe(timing.Seconds())
 	})
 }
