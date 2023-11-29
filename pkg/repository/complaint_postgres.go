@@ -7,18 +7,16 @@ import (
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
 type ComplaintPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewComplaintPostgres(db *pgxpool.Pool) *ComplaintPostgres {
+func NewComplaintPostgres(db PgxPoolInterface) *ComplaintPostgres {
 	return &ComplaintPostgres{db: db}
 }
 
@@ -94,7 +92,7 @@ func (r *ComplaintPostgres) DeleteComplaint(ctx context.Context, complaintId int
 	if err != nil {
 		return fmt.Errorf("failed to delete complaint. err: %w", err)
 	}
-	
+
 	r.db.QueryRow(ctx, query, args...)
 
 	return nil

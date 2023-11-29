@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
@@ -17,10 +15,10 @@ import (
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewUserPostgres(db *pgxpool.Pool) *UserPostgres {
+func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
@@ -97,7 +95,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params 
 	queryBuilder := psql.Select(static.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
-		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)). 
+		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)).
 		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = %d)", likeTable, user.Id))
 
 	if user.PreferGender != nil && user.UserGender != nil {
@@ -200,7 +198,7 @@ func (r *UserPostgres) ShowCSAT(ctx context.Context, userId int) (bool, error) {
 		sq.And{
 			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "1"},
 			sq.Eq{"id": userId},
-	}).ToSql()
+		}).ToSql()
 
 	if err != nil {
 		return false, fmt.Errorf("failed to check can show csat. err: %w", err)

@@ -4,16 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	"github.com/jackc/pgx/v5"
 )
 
 type TagPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewTagPostgres(db *pgxpool.Pool) *TagPostgres {
+func NewTagPostgres(db PgxPoolInterface) *TagPostgres {
 	return &TagPostgres{db: db}
 }
 

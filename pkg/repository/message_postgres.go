@@ -8,14 +8,13 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type MessagePostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewMessagePostgres(db *pgxpool.Pool) *MessagePostgres {
+func NewMessagePostgres(db PgxPoolInterface) *MessagePostgres {
 	return &MessagePostgres{db: db}
 }
 

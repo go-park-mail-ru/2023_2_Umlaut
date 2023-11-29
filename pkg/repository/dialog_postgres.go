@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
@@ -15,10 +13,10 @@ import (
 )
 
 type DialogPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewDialogPostgres(db *pgxpool.Pool) *DialogPostgres {
+func NewDialogPostgres(db PgxPoolInterface) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 

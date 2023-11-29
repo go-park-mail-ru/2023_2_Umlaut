@@ -7,8 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"strings"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -16,10 +14,10 @@ import (
 )
 
 type LikePostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewLikePostgres(db *pgxpool.Pool) *LikePostgres {
+func NewLikePostgres(db PgxPoolInterface) *LikePostgres {
 	return &LikePostgres{db: db}
 }
 

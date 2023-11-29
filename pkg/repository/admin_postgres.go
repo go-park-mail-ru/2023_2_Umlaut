@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
@@ -13,10 +11,10 @@ import (
 )
 
 type AdminPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewAdminPostgres(db *pgxpool.Pool) *AdminPostgres {
+func NewAdminPostgres(db PgxPoolInterface) *AdminPostgres {
 	return &AdminPostgres{db: db}
 }
 
