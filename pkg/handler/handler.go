@@ -80,7 +80,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/user", h.updateUser).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/user/{id}", h.userById).Methods("GET")
 	apiRouter.HandleFunc("/user/photo", h.updateUserPhoto).Methods("POST", "OPTIONS")
-	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE")
+	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE", "OPTIONS")
 	apiRouter.HandleFunc("/like", h.createLike).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
