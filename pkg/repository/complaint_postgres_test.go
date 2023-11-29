@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/stretchr/testify/assert"
@@ -158,38 +159,48 @@ func TestComplaintPostgres_AcceptComplaint(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-// func TestComplaintPostgres_GetNextComplaint(t *testing.T) {
-// 	mock, err := pgxmock.NewPool()
-// 	if err != nil {
-// 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-// 	}
-// 	defer mock.Close()
+func TestComplaintPostgres_GetNextComplaint(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mock.Close()
 
-// 	complaintRepo := NewComplaintPostgres(mock)
+	complaintRepo := NewComplaintPostgres(mock)
 
-// 	testComplaint := model.Complaint{
-// 		ReporterUserId: 1,
-// 		ReportedUserId: 2,
-// 		ComplaintType: "complaint",
-// 		CreatedAt: &time.Time{},
-// 	}
+	testComplaint := model.Complaint{
+		Id: 1,
+		ReporterUserId: 1,
+		ReportedUserId: 2,
+		ComplaintType: "type1",
+		CreatedAt: &time.Time{},
+	}
+	mock.ExpectQuery(`SELECT`).
+		WithArgs(0).
+		WillReturnRows(pgxmock.NewRows([]string{"id", "reporter_user_id", "reported_user_id", "complaint_type", "created_at"}).
+		AddRow(1, 1, 2, "type1", &time.Time{}))
 
-// 	// Проверяем ситуацию с дубликатом
-// 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "complaint" WHERE report_status = 1 LIMIT 1`, static.ComplaintDbFiend)).
-// 		WillReturnError(pgx.ErrNoRows)
+	complaint, _ := complaintRepo.GetNextComplaint(context.Background())
+	assert.Equal(t, testComplaint, complaint)
 
-// 	_, err = complaintRepo.GetNextComplaint(context.Background())
+	// Проверяем ситуацию с дубликатом
+	mock.ExpectQuery(`SELECT`).
+		WithArgs(0).
+		WillReturnError(pgx.ErrNoRows)
 
-// 	assert.ErrorIs(t, err, static.ErrNoData)
+	_, err = complaintRepo.GetNextComplaint(context.Background())
 
-// 	// Проверка других случаев ошибок
-// 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "complaint"`, static.ComplaintDbFiend)).
-// 		WillReturnError(errors.New("some error"))
+	assert.ErrorIs(t, err, static.ErrNoData)
 
-// 	_, err = complaintRepo.GetNextComplaint(context.Background())
+	// Проверка других случаев ошибок
+	mock.ExpectQuery(`SELECT`).
+		WithArgs(0).
+		WillReturnError(errors.New("some error"))
 
-// 	assert.Error(t, err)
+	_, err = complaintRepo.GetNextComplaint(context.Background())
 
-// 	// Проверяем, что не остались ожидающие запросы
-// 	assert.NoError(t, mock.ExpectationsWereMet())
-// }
+	assert.Error(t, err)
+
+	// Проверяем, что не остались ожидающие запросы
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
