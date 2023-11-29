@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -14,10 +13,10 @@ import (
 )
 
 type DialogPostgres struct {
-	db mock_repository.PgxPoolInterface
+	db PgxPoolInterface
 }
 
-func NewDialogPostgres(db mock_repository.PgxPoolInterface) *DialogPostgres {
+func NewDialogPostgres(db PgxPoolInterface) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 

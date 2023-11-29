@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"strings"
 
@@ -15,10 +14,10 @@ import (
 )
 
 type LikePostgres struct {
-	db mock_repository.PgxPoolInterface
+	db PgxPoolInterface
 }
 
-func NewLikePostgres(db mock_repository.PgxPoolInterface) *LikePostgres {
+func NewLikePostgres(db PgxPoolInterface) *LikePostgres {
 	return &LikePostgres{db: db}
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -16,10 +15,10 @@ import (
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db mock_repository.PgxPoolInterface
+	db PgxPoolInterface
 }
 
-func NewUserPostgres(db mock_repository.PgxPoolInterface) *UserPostgres {
+func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
