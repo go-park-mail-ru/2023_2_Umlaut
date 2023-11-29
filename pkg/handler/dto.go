@@ -82,15 +82,17 @@ func sendData(ctx context.Context, w http.ResponseWriter, response interface{}, 
 	logger, ok := ctx.Value(static.KeyLogger).(*zap.Logger)
 	if !ok {
 		log.Println("Logger not found in context")
+	} else {
+		*logger = *logger.With(zap.Any("Status", statusCode), zap.Any("Message", message))
 	}
-	*logger = *logger.With(zap.Any("Status", statusCode), zap.Any("Message", message))
 
 	requestInfo, ok := ctx.Value(static.KeyRequestInfo).(*RequestInfo)
 	if !ok {
-		log.Println("Logger not found in context")
+		log.Println("Request info not found in context")
+	} else {
+		requestInfo.Status = statusCode
+		requestInfo.Message = message
 	}
-	requestInfo.Status = statusCode
-	requestInfo.Message = message
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
