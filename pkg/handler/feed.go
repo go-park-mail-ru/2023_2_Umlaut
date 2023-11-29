@@ -2,12 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/golang/protobuf/ptypes"
 )
@@ -26,7 +22,7 @@ import (
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	user, err := h.feedMicroservice.Feed(
 		r.Context(),
-		parseQueryParams(r),
+		utils.ParseQueryParams(r),
 	)
 
 	if err != nil {
@@ -41,30 +37,18 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	}
 	preferGender := int(user.PreferGender)
 	age := int(user.Age)
-	
-	NewSuccessClientResponseDto(r.Context(), w, model.User{
-		Id: int(user.Id),
-		Name: user.Name,
-		PreferGender: &preferGender,
-		Description: &user.Description,
-		Age: &age,
-		Looking: &user.Looking,
-		Education: &user.Education,
-		Hobbies: &user.Hobbies,
-		Birthday: &birthday,
-		Tags: &user.Tags,
-		ImagePaths: &user.ImagePaths,
-	})
-}
 
-func parseQueryParams(r *http.Request) *proto.FilterParams {
-	minAge, _ := strconv.Atoi(r.URL.Query().Get("min_age"))
-	maxAge, _ := strconv.Atoi(r.URL.Query().Get("max_age"))
-	tags := strings.Split(r.URL.Query().Get("tags"), ",")
-	return &proto.FilterParams{
-		UserId: int32(r.Context().Value(static.KeyUserID).(int)),
-		MinAge: int32(minAge),
-		MaxAge: int32(maxAge),
-		Tags:   tags,
-	}
+	NewSuccessClientResponseDto(r.Context(), w, model.User{
+		Id:           int(user.Id),
+		Name:         user.Name,
+		PreferGender: &preferGender,
+		Description:  &user.Description,
+		Age:          &age,
+		Looking:      &user.Looking,
+		Education:    &user.Education,
+		Hobbies:      &user.Hobbies,
+		Birthday:     &birthday,
+		Tags:         &user.Tags,
+		ImagePaths:   &user.ImagePaths,
+	})
 }

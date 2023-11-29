@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 )
 
 // @Summary create statistic
@@ -70,7 +70,6 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 			Recommend: utils.ModifyInt(rec.Recommend),
 			Show:      rec.Show,
 		})
-
 	if err != nil {
 		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)

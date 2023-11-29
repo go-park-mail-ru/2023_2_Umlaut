@@ -86,10 +86,10 @@ func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	NewSuccessClientResponseDto(r.Context(), w, model.Complaint{
-		Id: int(complaint.Id),
+		Id:             int(complaint.Id),
 		ReporterUserId: int(complaint.ReporterUserId),
 		ReportedUserId: int(complaint.ReportedUserId),
-		CreatedAt: &createdAt,
+		CreatedAt:      &createdAt,
 	})
 }
 
