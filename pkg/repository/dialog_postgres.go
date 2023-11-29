@@ -6,18 +6,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
 type DialogPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewDialogPostgres(db *pgxpool.Pool) *DialogPostgres {
+func NewDialogPostgres(db PgxPoolInterface) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 
@@ -43,65 +42,86 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, model.AlreadyExists
+			return 0, static.ErrAlreadyExists
 		}
 	}
 	return id, err
 }
 
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
-	query, args, err := psql.Select(dialogTable+".id", "user1_id", "user2_id", userTable+".name").From(dialogTable).
-		InnerJoin(userTable + " ON " +
-			dialogTable + ".user1_id =" + userTable + ".id OR " +
-			dialogTable + ".user2_id =" + userTable + ".id").
-		Where(sq.Or{
-			sq.And{
-				sq.Eq{"user1_id": userId},
-				sq.NotEq{userTable + ".id": userId},
-			},
-			sq.And{
-				sq.Eq{"user2_id": userId},
-				sq.NotEq{userTable + ".id": userId},
-			},
+	query, args, err := psql.
+		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
+		From(dialogTable + " d").
+		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
+		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
+		Where(sq.And{
+			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
+			sq.NotEq{"u.id": userId},
 		}).
 		ToSql()
 
 	if err != nil {
-		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
-
 	if err != nil {
-		return []model.Dialog{}, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+		return nil, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
 	}
 	defer rows.Close()
-	var dialogs []model.Dialog
-	for rows.Next() {
-		var dialog model.Dialog
-		err = scanDialog(rows, &dialog)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return dialogs, fmt.Errorf("dialogs doesn't exists for userId %d", userId)
-		}
-		if dialog.User2Id == userId {
-			dialog.User2Id = dialog.User1Id
-			dialog.User1Id = userId
-		}
-		dialogs = append(dialogs, dialog)
-	}
-	if err = rows.Err(); err != nil {
-		return dialogs, fmt.Errorf("failed to get dialog for userId %d. err: %w", userId, err)
+
+	dialogs, err := scanDialogs(rows, userId)
+	if err != nil {
+		return nil, err
 	}
 
 	return dialogs, nil
 }
 
-func scanDialog(row pgx.Row, dialog *model.Dialog) error {
-	err := row.Scan(
-		&dialog.Id,
-		&dialog.User1Id,
-		&dialog.User2Id,
-		&dialog.Сompanion,
-	)
-	return err
+func scanDialogs(rows pgx.Rows, userId int) ([]model.Dialog, error) {
+	var dialogs []model.Dialog
+	var err error
+	for rows.Next() {
+		var dialog model.Dialog
+		var lastMessage model.Message
+		err = rows.Scan(
+			&dialog.Id,
+			&dialog.User1Id,
+			&dialog.User2Id,
+			&dialog.Banned,
+			&dialog.Сompanion,
+			&dialog.СompanionImagePaths,
+			&lastMessage.Id,
+			&lastMessage.SenderId,
+			&lastMessage.DialogId,
+			&lastMessage.Text,
+			&lastMessage.IsRead,
+			&lastMessage.CreatedAt,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+
+		if lastMessage.Id == nil {
+			dialog.LastMessage = nil
+		} else {
+			dialog.LastMessage = &lastMessage
+		}
+
+		if dialog.User1Id == userId {
+			tmp := dialog.User1Id
+			dialog.User1Id = dialog.User2Id
+			dialog.User2Id = tmp
+		}
+
+		dialogs = append(dialogs, dialog)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("scan error in GetDialogs: %v", err)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows error in GetDialogs: %v", rows.Err())
+	}
+
+	return dialogs, nil
 }

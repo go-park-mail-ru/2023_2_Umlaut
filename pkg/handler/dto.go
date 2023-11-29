@@ -3,7 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+
+	"go.uber.org/zap"
 )
 
 type signInInput struct {
@@ -17,6 +22,10 @@ type signUpInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type deleteLink struct {
+	Link string `json:"link"`
+}
+
 type idResponse struct {
 	Id int `json:"id"`
 }
@@ -27,7 +36,7 @@ type ClientResponseDto[K comparable] struct {
 	Payload K      `json:"payload"`
 }
 
-func NewClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWriter, statusCode int, message string, payload K) {
+func NewClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, statusCode int, message string, payload K) {
 	response := ClientResponseDto[K]{
 		Status:  statusCode,
 		Message: message,
@@ -36,11 +45,11 @@ func NewClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWri
 	sendData(ctx, w, response, statusCode, message)
 }
 
-func NewSuccessClientResponseDto[K comparable](ctx *context.Context, w http.ResponseWriter, payload K) {
+func NewSuccessClientResponseDto[K comparable](ctx context.Context, w http.ResponseWriter, payload K) {
 	NewClientResponseDto[K](ctx, w, 200, "success", payload)
 }
 
-func newErrorClientResponseDto(ctx *context.Context, w http.ResponseWriter, statusCode int, message string) {
+func newErrorClientResponseDto(ctx context.Context, w http.ResponseWriter, statusCode int, message string) {
 	NewClientResponseDto[string](ctx, w, statusCode, message, "")
 }
 
@@ -50,7 +59,7 @@ type ClientResponseArrayDto[K comparable] struct {
 	Payload []K    `json:"payload"`
 }
 
-func NewClientResponseArrayDto[K comparable](ctx *context.Context, w http.ResponseWriter, statusCode int, message string, payload []K) {
+func NewClientResponseArrayDto[K comparable](ctx context.Context, w http.ResponseWriter, statusCode int, message string, payload []K) {
 	response := ClientResponseArrayDto[K]{
 		Status:  statusCode,
 		Message: message,
@@ -59,19 +68,33 @@ func NewClientResponseArrayDto[K comparable](ctx *context.Context, w http.Respon
 	sendData(ctx, w, response, statusCode, message)
 }
 
-func NewSuccessClientResponseArrayDto[K comparable](ctx *context.Context, w http.ResponseWriter, payload []K) {
+func NewSuccessClientResponseArrayDto[K comparable](ctx context.Context, w http.ResponseWriter, payload []K) {
 	NewClientResponseArrayDto[K](ctx, w, 200, "success", payload)
 }
 
-func sendData(ctx *context.Context, w http.ResponseWriter, response interface{}, statusCode int, message string) {
+func sendData(ctx context.Context, w http.ResponseWriter, response interface{}, statusCode int, message string) {
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
 		return
 	}
-	*ctx = context.WithValue(*ctx, keyStatus, statusCode)
-	*ctx = context.WithValue(*ctx, keyMessage, message)
+
+	logger, ok := ctx.Value(static.KeyLogger).(*zap.Logger)
+	if !ok {
+		log.Println("Logger not found in context")
+	} else {
+		*logger = *logger.With(zap.Any("Status", statusCode), zap.Any("Message", message))
+	}
+
+	requestInfo, ok := ctx.Value(static.KeyRequestInfo).(*RequestInfo)
+	if !ok {
+		log.Println("Request info not found in context")
+	} else {
+		requestInfo.Status = statusCode
+		requestInfo.Message = message
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
+	w.WriteHeader(http.StatusOK)
 	w.Write(responseJSON)
 }

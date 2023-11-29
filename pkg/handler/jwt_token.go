@@ -1,19 +1,17 @@
 package handler
 
 import (
-	"context"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
 
 type JwtToken struct {
-	Ctx    *context.Context
 	Secret []byte
 }
 
-func NewJwtToken(ctx *context.Context, secret string) *JwtToken {
-	return &JwtToken{Ctx: ctx, Secret: []byte(secret)}
+func NewJwtToken(secret string) *JwtToken {
+	return &JwtToken{Secret: []byte(secret)}
 }
 
 type JwtCsrfClaims struct {
@@ -52,5 +50,5 @@ func (tk *JwtToken) Check(SID string, inputToken string) (bool, error) {
 	if payload.Valid() != nil {
 		return false, fmt.Errorf("invalid jwt token: %v", err)
 	}
-	return payload.SessionID == SID && payload.UserID == (*tk.Ctx).Value(keyUserID).(int), nil
+	return payload.SessionID == SID, nil
 }

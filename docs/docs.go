@@ -15,6 +15,448 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/admin/complaint": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "get next complaint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_Complaint"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/complaint/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "accept complaint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "complaint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "delete complaint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "complaint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/feedback": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "statistic by feedback",
+                "operationId": "FeedbackStatistic",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_FeedbackStatistic"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/recommendation": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "statistic by recommendation",
+                "operationId": "RecommendationStatistic",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_RecommendationStatistic"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/admin": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "log in to admin",
+                "operationId": "adminLogin",
+                "parameters": [
+                    {
+                        "description": "Sign-in input parameters",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.signInInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "log in to account",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "Sign-in input parameters",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.signInInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "log out of account",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/sign-up": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "sign up account",
+                "operationId": "create-account",
+                "parameters": [
+                    {
+                        "description": "Sign-up input user",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.signUpInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-handler_idResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/complaint": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "create complaint",
+                "operationId": "complaint",
+                "parameters": [
+                    {
+                        "description": "Complaint data to create",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Complaint"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/complaint_types": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "complaint"
+                ],
+                "summary": "get all complaint types",
+                "operationId": "complaintTypes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_ComplaintType"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dialogs": {
             "get": {
                 "consumes": [
@@ -50,6 +492,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/dialogs/{id}/message": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dialog"
+                ],
+                "summary": "get dialog message",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Dialog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/feed": {
             "get": {
                 "consumes": [
@@ -63,6 +548,26 @@ const docTemplate = `{
                 ],
                 "summary": "get user for feed",
                 "operationId": "feed",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Minimum age filter",
+                        "name": "min_age",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Maximum age filter",
+                        "name": "max_age",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tags filter",
+                        "name": "tags",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -79,8 +584,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/feed/users": {
-            "get": {
+        "/api/v1/feed-feedback": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
@@ -88,14 +593,66 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "feed"
+                    "statistic"
                 ],
-                "summary": "get users for feed",
+                "summary": "create feed feedback",
+                "operationId": "FeedFeedback",
+                "parameters": [
+                    {
+                        "description": "feed_feedback data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Recommendation"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/feedback": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "create statistic",
+                "operationId": "Feedback",
+                "parameters": [
+                    {
+                        "description": "Statistic data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Feedback"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "500": {
@@ -147,7 +704,76 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/tags": {
+        "/api/v1/recommendation": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "create recommendation",
+                "operationId": "Recommendation",
+                "parameters": [
+                    {
+                        "description": "Recommendation data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Recommendation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/show-csat": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "show csat for user",
+                "operationId": "CSAT",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-int"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tag": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -317,6 +943,17 @@ const docTemplate = `{
                     "user"
                 ],
                 "summary": "delete user photo",
+                "parameters": [
+                    {
+                        "description": "link for deleting file",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.deleteLink"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -345,19 +982,23 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user/{id}/photo": {
+        "/api/v1/user/{id}": {
             "get": {
                 "consumes": [
+                    "application/json"
+                ],
+                "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "user"
                 ],
-                "summary": "get user photo",
+                "summary": "get user information by id",
+                "operationId": "userById",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "User ID",
+                        "description": "user ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -365,64 +1006,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/login": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "log in to account",
-                "operationId": "login",
-                "parameters": [
-                    {
-                        "description": "Sign-in input parameters",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.signInInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
                         }
                     },
                     "404": {
@@ -430,12 +1016,19 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
                     }
                 }
             }
         },
-        "/auth/logout": {
+        "/api/v1/ws/messenger": {
             "get": {
+                "description": "Registers a user to the WebSocket hub and initiates connection",
                 "consumes": [
                     "application/json"
                 ],
@@ -443,10 +1036,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "websocket"
                 ],
-                "summary": "log out of account",
-                "operationId": "logout",
+                "summary": "register user to WebSocket hub",
+                "operationId": "registerUserToHub",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -454,60 +1047,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/sign-up": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "sign up account",
-                "operationId": "create-account",
-                "parameters": [
-                    {
-                        "description": "Sign-up input user",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.signUpInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-handler_idResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -517,6 +1058,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handler.ClientResponseDto-array_model_ComplaintType": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.ComplaintType"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-array_model_Dialog": {
             "type": "object",
             "properties": {
@@ -534,7 +1092,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.ClientResponseDto-array_model_User": {
+        "handler.ClientResponseDto-array_model_Message": {
             "type": "object",
             "properties": {
                 "message": {
@@ -543,7 +1101,7 @@ const docTemplate = `{
                 "payload": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.User"
+                        "$ref": "#/definitions/model.Message"
                     }
                 },
                 "status": {
@@ -582,6 +1140,62 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.ClientResponseDto-int": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-model_Complaint": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/model.Complaint"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-model_FeedbackStatistic": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/model.FeedbackStatistic"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-model_RecommendationStatistic": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/model.RecommendationStatistic"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "handler.ClientResponseDto-model_User": {
             "type": "object",
             "properties": {
@@ -607,6 +1221,14 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "integer"
+                }
+            }
+        },
+        "handler.deleteLink": {
+            "type": "object",
+            "properties": {
+                "link": {
+                    "type": "string"
                 }
             }
         },
@@ -652,28 +1274,212 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Complaint": {
+            "type": "object",
+            "properties": {
+                "complaint_type": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "reported_user_id": {
+                    "type": "integer"
+                },
+                "reporter_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.ComplaintType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "type_name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Dialog": {
             "type": "object",
             "properties": {
+                "banned": {
+                    "type": "boolean"
+                },
                 "companion": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
+                "last_message": {
+                    "$ref": "#/definitions/model.Message"
+                },
                 "user1_id": {
                     "type": "integer"
                 },
                 "user2_id": {
                     "type": "integer"
+                },
+                "сompanion_image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "model.Feedback": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "comment_fix": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "liked": {
+                    "type": "string"
+                },
+                "need_fix": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "show": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.FeedbackStatistic": {
+            "type": "object",
+            "properties": {
+                "avg-rating": {
+                    "type": "number"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "liked-map": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "need-fix-map": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/model.NeedFixObject"
+                    }
+                },
+                "rating-count": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
         "model.Like": {
             "type": "object",
             "properties": {
+                "is_like": {
+                    "type": "boolean"
+                },
                 "liked_to_user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Message": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "dialog_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "message_text": {
+                    "type": "string"
+                },
+                "sender_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.NeedFixObject": {
+            "type": "object",
+            "properties": {
+                "comment_fix": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Recommendation": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "recommend": {
+                    "type": "integer"
+                },
+                "show": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.RecommendationStatistic": {
+            "type": "object",
+            "properties": {
+                "avg-recommend": {
+                    "type": "number"
+                },
+                "nps": {
+                    "type": "number"
+                },
+                "recommend-count": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -703,8 +1509,11 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "image_path": {
-                    "type": "string"
+                "image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "looking": {
                     "type": "string"
@@ -741,7 +1550,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "umlaut-bmstu.me:8000",
+	Host:             "umlaut-bmstu.me",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",

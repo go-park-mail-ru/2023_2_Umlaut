@@ -4,21 +4,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 type UserPostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewUserPostgres(db *pgxpool.Pool) *UserPostgres {
+func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
@@ -38,7 +38,7 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, model.AlreadyExists
+			return 0, static.ErrAlreadyExists
 		}
 		return 0, err
 	}
@@ -48,7 +48,7 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
 	var user model.User
 
-	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
+	query, args, err := psql.Select(static.UserDbField).From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -60,6 +60,9 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("user with mail: %s not found", mail)
 	}
+	if user.Banned {
+		return model.User{}, static.ErrBannedUser
+	}
 
 	return user, err
 }
@@ -67,7 +70,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, error) {
 	var user model.User
 
-	query, args, err := psql.Select("*").From(userTable).Where(sq.Eq{"id": id}).ToSql()
+	query, args, err := psql.Select(static.UserDbField).From(userTable).Where(sq.Eq{"id": id}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -79,15 +82,33 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("user with id: %d not found", id)
 	}
+	if user.Banned {
+		return model.User{}, static.ErrBannedUser
+	}
 
 	return user, err
 }
 
-func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
+func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params model.FilterParams) (model.User, error) {
 	var nextUser model.User
-	queryBuilder := psql.Select("*").From(userTable).Where(sq.NotEq{"id": user.Id})
-	if user.PreferGender != nil {
-		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
+
+	queryBuilder := psql.Select(static.UserDbField).
+		From(userTable).
+		Where(sq.NotEq{"id": user.Id}).
+		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)).
+		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = %d)", likeTable, user.Id))
+
+	if user.PreferGender != nil && user.UserGender != nil {
+		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender, "prefer_gender": user.UserGender})
+	}
+	if params.MinAge > 0 {
+		queryBuilder = queryBuilder.Where(sq.GtOrEq{"age": params.MinAge})
+	}
+	if params.MaxAge > 0 {
+		queryBuilder = queryBuilder.Where(sq.LtOrEq{"age": params.MaxAge})
+	}
+	if len(params.Tags) > 0 && len(params.Tags[0]) > 1 {
+		queryBuilder = queryBuilder.Where("ARRAY[" + buildTagArray(params.Tags) + "]::TEXT[] <@ tags")
 	}
 	queryBuilder = queryBuilder.OrderBy("RANDOM()").Limit(1)
 
@@ -99,11 +120,22 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User) (model.
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &nextUser)
 
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) || nextUser.Id == 0 {
 		return model.User{}, fmt.Errorf("user for: %s not found", user.Mail)
 	}
 
 	return nextUser, err
+}
+
+func buildTagArray(tags []string) string {
+	arrayString := ""
+	for i, tag := range tags {
+		if i > 0 {
+			arrayString += ", "
+		}
+		arrayString += "'" + tag + "'"
+	}
+	return arrayString
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
@@ -115,6 +147,7 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		Set("description", user.Description).
 		Set("birthday", user.Birthday).
 		Set("looking", user.Looking).
+		Set("image_paths", user.ImagePaths).
 		Set("education", user.Education).
 		Set("hobbies", user.Hobbies).
 		Set("tags", user.Tags).
@@ -125,14 +158,14 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		return model.User{}, err
 	}
 
-	query += " RETURNING *"
+	query += fmt.Sprintf(" RETURNING %s", static.UserDbField)
 	var updatedUser model.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return updatedUser, model.AlreadyExists
+			return updatedUser, static.ErrAlreadyExists
 		}
 	}
 
@@ -150,7 +183,7 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) 
 		return err
 	}
 
-	query += " RETURNING *"
+	query += fmt.Sprintf(" RETURNING %s", static.UserDbField)
 	var updatedUser model.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
@@ -158,59 +191,27 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) 
 	return err
 }
 
-func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, userId int, imagePath *string) (*string, error) {
-	query, args, err := psql.Update(userTable).
-		Set("image_path", imagePath).
-		Where(sq.Eq{"id": userId}).
-		ToSql()
+func (r *UserPostgres) ShowCSAT(ctx context.Context, userId int) (bool, error) {
+	var id int
+
+	query, args, err := psql.Select("id").From(userTable).Where(
+		sq.And{
+			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "1"},
+			sq.Eq{"id": userId},
+		}).ToSql()
+
 	if err != nil {
-		return nil, err
+		return false, fmt.Errorf("failed to check can show csat. err: %w", err)
 	}
 
-	query += " RETURNING image_path"
-	var updatedImgPath *string
 	row := r.db.QueryRow(ctx, query, args...)
-	err = row.Scan(&updatedImgPath)
+	err = row.Scan(&id)
 
-	return updatedImgPath, err
-}
-
-func (r *UserPostgres) GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error) {
-	var exp sq.And
-	exp = append(exp, sq.NotEq{"id": user.Id})
-	for _, id := range usedUsersId {
-		exp = append(exp, sq.NotEq{"id": id})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return true, nil
 	}
 
-	queryBuilder := psql.Select("*").From(userTable).Where(exp)
-	if user.PreferGender != nil {
-		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender})
-	}
-
-	query, args, err := queryBuilder.OrderBy("RANDOM()").Limit(5).ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
-	}
-
-	rows, err := r.db.Query(ctx, query, args...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
-	}
-	defer rows.Close()
-	var users []model.User
-	for rows.Next() {
-		var user model.User
-		err = scanUser(rows, &user)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return users, fmt.Errorf("there are no suitable users for userId %d", user.Id)
-		}
-		users = append(users, user)
-	}
-	if err = rows.Err(); err != nil {
-		return users, fmt.Errorf("failed to get next usersfor userId: %d. err: %w", user.Id, err)
-	}
-
-	return users, nil
+	return false, err
 }
 
 func scanUser(row pgx.Row, user *model.User) error {
@@ -224,10 +225,11 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.PreferGender,
 		&user.Description,
 		&user.Looking,
-		&user.ImagePath,
+		&user.ImagePaths,
 		&user.Education,
 		&user.Hobbies,
 		&user.Birthday,
+		&user.Banned,
 		&user.Online,
 		&user.Tags,
 	)

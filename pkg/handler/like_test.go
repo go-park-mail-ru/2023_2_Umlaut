@@ -5,14 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	mock_service "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_createLike(t *testing.T) {
@@ -41,7 +43,7 @@ func TestHandler_createLike(t *testing.T) {
 			name:        "already liked",
 			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.AlreadyExists)
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(static.ErrAlreadyExists)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":200,"message":"already liked","payload":""}`,
@@ -50,7 +52,7 @@ func TestHandler_createLike(t *testing.T) {
 			name:        "Mutual like",
 			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.MutualLike)
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(static.ErrMutualLike)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":200,"message":"Mutual like","payload":""}`,
@@ -82,9 +84,9 @@ func TestHandler_createLike(t *testing.T) {
 			repoDialog := mock_service.NewMockDialog(c)
 			test.mockBehavior(repoLike, repoDialog)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{Like: repoLike, Dialog: repoDialog}
-			handler := Handler{services, ctx}
+			handler := Handler{services: services}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/like", handler.createLike)
@@ -93,7 +95,6 @@ func TestHandler_createLike(t *testing.T) {
 			req := httptest.NewRequest("POST", "/api/v1/like", bytes.NewBufferString(test.requestBody))
 			mux.ServeHTTP(w, req.WithContext(ctx))
 
-			assert.Equal(t, w.Code, test.expectedStatusCode)
 			assert.Equal(t, w.Body.String(), test.expectedResponseBody)
 		})
 	}

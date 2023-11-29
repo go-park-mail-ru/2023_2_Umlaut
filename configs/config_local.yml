@@ -1,9 +1,29 @@
 port: "8000"
 
-postgres:
+authorization:
+  host: "localhost"
+  port: "8001"
+
+feed:
+  host: "localhost"
+  port: "8002"
+
+admin:
+  host: "localhost"
+  port: "8003"
+
+db_umlaut:
   username: "postgres"
   host: "localhost"
   port: "5433"
+  dbname: "postgres"
+  sslmode: "disable"
+  password: "1474"
+
+db_admin:
+  username: "postgres"
+  host: "localhost"
+  port: "5434"
   dbname: "postgres"
   sslmode: "disable"
   password: "1474"
@@ -27,7 +47,8 @@ cors:
     "http://127.0.0.1:8000",
     "http://umlaut-bmstu.me",
     "http://umlaut-bmstu.me:8000",
-    "http://localhost:8001"
+    "http://localhost:8001",
+    "http://localhost:8002",
   ]
   methods: [
     "GET",
@@ -36,4 +57,7 @@ cors:
     "DELETE",
     "HEAD",
     "OPTIONS"
+  ]
+  headers: [
+    "*"
   ]

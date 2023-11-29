@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/mux"
 )
 
@@ -20,24 +21,58 @@ import (
 // @Failure 404,500 {object} ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(keyUserID).(int)
+	id := r.Context().Value(static.KeyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	session, _ := r.Cookie("session_id")
-	jwtToken := NewJwtToken(&h.ctx, secret)
+	jwtToken := NewJwtToken(static.Secret)
 	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, "csrf token creation error")
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "csrf token creation error")
 		return
 	}
 	w.Header().Set("X-Csrf-Token", token)
-	w.Header().Set("Access-Control-Expose-Headers", "*")
+	w.Header().Set("Access-Control-Expose-Headers", "X-Csrf-Token")
 
-	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
+	NewSuccessClientResponseDto(r.Context(), w, currentUser)
+}
+
+// @Summary get user information by id
+// @Tags user
+// @ID userById
+// @Accept  json
+// @Param id path integer true "user ID"
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[model.User]
+// @Failure 404,500 {object} ClientResponseDto[string]
+// @Router /api/v1/user/{id} [get]
+func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
+		return
+	}
+
+	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	currentUser.Mail = ""
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, currentUser)
 }
 
 // @Summary update user
@@ -53,26 +88,26 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user model.User
 	if err := decoder.Decode(&user); err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	user.Id = r.Context().Value(keyUserID).(int)
+	user.Id = r.Context().Value(static.KeyUserID).(int)
 	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
-		if errors.Is(err, model.AlreadyExists) {
-			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "account with this email already exists")
+		if errors.Is(err, static.ErrAlreadyExists) {
+			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "account with this email already exists")
 			return
 		}
-		if errors.Is(err, model.InvalidUser) {
-			newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid field for update")
+		if errors.Is(err, static.ErrInvalidUser) {
+			newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid field for update")
 			return
 		}
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	NewSuccessClientResponseDto(&h.ctx, w, currentUser)
+	NewSuccessClientResponseDto(r.Context(), w, currentUser)
 }
 
 // @Summary update user photo
@@ -84,93 +119,56 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [post]
 func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(keyUserID).(int)
+	id := r.Context().Value(static.KeyUserID).(int)
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 	defer file.Close()
 
-	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
+	link, err := h.services.User.CreateFile(r.Context(), id, file, head.Size)
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
+		return
+	}
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if currentUser.ImagePath != nil {
-		err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
-		if err != nil {
-			newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-			return
-		}
-	} //На время, пока только одна фотка в бд
-
-	_, err = h.services.User.CreateFile(r.Context(), id, file, head.Size)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	NewSuccessClientResponseDto(&h.ctx, w, "")
-}
-
-// @Summary get user photo
-// @Tags user
-// @Accept  json
-// @Param id path integer true "User ID"
-// @Success 200
-// @Failure 400,401,404 {object} ClientResponseDto[string]
-// @Router /api/v1/user/{id}/photo [get]
-func (h *Handler) getUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid params")
-		return
-	}
-
-	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, "This user has no photos")
-		return
-	}
-	buffer, contentType, err := h.services.User.GetFile(r.Context(), id, *currentUser.ImagePath)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusNotFound, err.Error())
-		return
-	}
-
-	w.Header().Set("Content-Type", contentType)
-	w.WriteHeader(http.StatusOK)
-	w.Write(buffer)
+	NewSuccessClientResponseDto(r.Context(), w, link)
 }
 
 // @Summary delete user photo
 // @Tags user
 // @Accept  json
+// @Param input body deleteLink true "link for deleting file"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(keyUserID).(int)
-	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+	decoder := json.NewDecoder(r.Body)
+	var link deleteLink
+	if err := decoder.Decode(&link); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
-	if currentUser.ImagePath == nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "This user has no photos")
+	id := r.Context().Value(static.KeyUserID).(int)
+
+	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
+	if errors.Is(err, static.ErrBannedUser) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
 		return
 	}
-	err = h.services.User.DeleteFile(r.Context(), id, *currentUser.ImagePath)
+	if errors.Is(err, static.ErrNoFiles) {
+		newErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "This user has no photos")
+		return
+	}
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(&h.ctx, w, "")
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }

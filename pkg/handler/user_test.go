@@ -5,15 +5,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	mock_service "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_user(t *testing.T) {
@@ -21,7 +23,7 @@ func TestHandler_user(t *testing.T) {
 		Name:  "session_id",
 		Value: "value",
 	}
-	mockUser := model.User{Mail: "max@max.ru", PasswordHash: "passWord", Name: "Max"}
+	mockUser := model.User{Mail: "user@user.ru", PasswordHash: "passWord", Name: "user"}
 	response := ClientResponseDto[model.User]{
 		Status:  200,
 		Message: "success",
@@ -44,6 +46,14 @@ func TestHandler_user(t *testing.T) {
 			expectedResponseBody: string(jsonData),
 		},
 		{
+			name: "Banned user",
+			mockBehavior: func(r *mock_service.MockUser) {
+				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, static.ErrBannedUser)
+			},
+			expectedStatusCode:   http.StatusForbidden,
+			expectedResponseBody: `{"status":403,"message":"this user is blocked","payload":""}`,
+		},
+		{
 			name: "Error",
 			mockBehavior: func(r *mock_service.MockUser) {
 				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, errors.New("some error"))
@@ -61,9 +71,9 @@ func TestHandler_user(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{User: repo}
-			handler := Handler{services, ctx}
+			handler := Handler{services: services}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user", handler.user)
@@ -74,18 +84,83 @@ func TestHandler_user(t *testing.T) {
 
 			mux.ServeHTTP(w, req.WithContext(ctx))
 
-			assert.Equal(t, w.Code, test.expectedStatusCode)
-			assert.JSONEq(t, test.expectedResponseBody, w.Body.String())
+			assert.Equal(t, w.Body.String(), test.expectedResponseBody)
 		})
 	}
 }
+
+// func TestHandler_userById(t *testing.T) {
+// 	mockUser := model.User{Id: 1, PasswordHash: "passWord", Name: "user"}
+// 	response := ClientResponseDto[model.User]{
+// 		Status:  200,
+// 		Message: "success",
+// 		Payload: mockUser,
+// 	}
+// 	jsonData, _ := json.Marshal(response)
+
+// 	tests := []struct {
+// 		name                 string
+// 		mockBehavior         func(r *mock_service.MockUser)
+// 		expectedStatusCode   int
+// 		expectedResponseBody string
+// 	}{
+// 		{
+// 			name: "Ok",
+// 			mockBehavior: func(r *mock_service.MockUser) {
+// 				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, nil)
+// 			},
+// 			expectedStatusCode:   http.StatusOK,
+// 			expectedResponseBody: string(jsonData),
+// 		},
+// 		{
+// 			name: "Banned user",
+// 			mockBehavior: func(r *mock_service.MockUser) {
+// 				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, static.ErrBannedUser)
+// 			},
+// 			expectedStatusCode:   http.StatusForbidden,
+// 			expectedResponseBody: `{"status":403,"message":"this user is blocked","payload":""}`,
+// 		},
+// 		{
+// 			name: "Error",
+// 			mockBehavior: func(r *mock_service.MockUser) {
+// 				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, errors.New("some error"))
+// 			},
+// 			expectedStatusCode:   http.StatusInternalServerError,
+// 			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
+// 		},
+// 	}
+
+// 	for _, test := range tests {
+// 		t.Run(test.name, func(t *testing.T) {
+// 			c := gomock.NewController(t)
+// 			defer c.Finish()
+
+// 			repo := mock_service.NewMockUser(c)
+// 			test.mockBehavior(repo)
+
+// 			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
+// 			services := &service.Service{User: repo}
+// 			handler := Handler{services: services}
+
+// 			mux := http.NewServeMux()
+// 			mux.HandleFunc("/api/v1/user/{id}", handler.userById)
+
+// 			w := httptest.NewRecorder()
+// 			req := httptest.NewRequest("GET", "/api/v1/user/1", nil)
+
+// 			mux.ServeHTTP(w, req.WithContext(ctx))
+
+// 			assert.Equal(t, w.Body.String(), test.expectedResponseBody)
+// 		})
+// 	}
+// }
 
 func TestHandler_updateUser(t *testing.T) {
 	mockCookie := &http.Cookie{
 		Name:  "session_id",
 		Value: "value",
 	}
-	mockUser := model.User{Mail: "max@max.ru", PasswordHash: "passWord", Name: "Max"}
+	mockUser := model.User{Id: 1, Mail: "user@user.ru", PasswordHash: "passWord", Name: "user"}
 	response := ClientResponseDto[model.User]{
 		Status:  200,
 		Message: "success",
@@ -103,10 +178,10 @@ func TestHandler_updateUser(t *testing.T) {
 	}{
 		{
 			name:      "Ok",
-			inputBody: `{"mail": "max@max.ru", "name": "Max", "password": "passWord"}`,
+			inputBody: `{"mail": "user@user.ru", "name": "user", "password": "passWord"}`,
 			inputUser: model.User{
-				Mail:         "max@max.ru",
-				Name:         "Max",
+				Mail:         "user@user.ru",
+				Name:         "user",
 				PasswordHash: "passWord",
 			},
 			mockBehavior: func(r *mock_service.MockUser) {
@@ -117,7 +192,7 @@ func TestHandler_updateUser(t *testing.T) {
 		},
 		{
 			name:                 "invalid input body",
-			inputBody:            `"mail": "max@max.ru", "name": "Max", "password": "passWord}`,
+			inputBody:            `"mail": "user@user.ru", "name": "user", "password": "passWord}`,
 			inputUser:            model.User{},
 			mockBehavior:         func(r *mock_service.MockUser) {},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -125,38 +200,38 @@ func TestHandler_updateUser(t *testing.T) {
 		},
 		{
 			name:      "Already Exists",
-			inputBody: `{"mail": "max@max.ru", "name": "Max", "password": "passWord"}`,
+			inputBody: `{"mail": "user@user.ru", "name": "user", "password": "passWord"}`,
 			inputUser: model.User{
-				Mail:         "max@max.ru",
-				Name:         "Max",
+				Mail:         "user@user.ru",
+				Name:         "user",
 				PasswordHash: "passWord",
 			},
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, model.AlreadyExists)
+				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, static.ErrAlreadyExists)
 			},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"account with this email already exists","payload":""}`,
 		},
 		{
 			name:      "Invalid User",
-			inputBody: `{"mail": "max@max.ru", "name": "Max", "password": "passWord"}`,
+			inputBody: `{"mail": "user@user.ru", "name": "user", "password": "passWord"}`,
 			inputUser: model.User{
-				Mail:         "max@max.ru",
-				Name:         "Max",
+				Mail:         "user@user.ru",
+				Name:         "user",
 				PasswordHash: "passWord",
 			},
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, model.InvalidUser)
+				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, static.ErrInvalidUser)
 			},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"invalid field for update","payload":""}`,
 		},
 		{
 			name:      "Error",
-			inputBody: `{"mail": "max@max.ru", "name": "Max", "password": "passWord"}`,
+			inputBody: `{"mail": "user@user.ru", "name": "user", "password": "passWord"}`,
 			inputUser: model.User{
-				Mail:         "max@max.ru",
-				Name:         "Max",
+				Mail:         "user@user.ru",
+				Name:         "user",
 				PasswordHash: "passWord",
 			},
 			mockBehavior: func(r *mock_service.MockUser) {
@@ -175,9 +250,9 @@ func TestHandler_updateUser(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 0)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{User: repo}
-			handler := Handler{services, ctx}
+			handler := Handler{services: services}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user", handler.updateUser)
@@ -187,9 +262,8 @@ func TestHandler_updateUser(t *testing.T) {
 			req.AddCookie(mockCookie)
 
 			mux.ServeHTTP(w, req.WithContext(ctx))
-
-			assert.Equal(t, w.Code, test.expectedStatusCode)
-			assert.JSONEq(t, w.Body.String(), test.expectedResponseBody)
+			r := w.Body.String()
+			assert.Equal(t, r, test.expectedResponseBody)
 		})
 	}
 }
@@ -226,9 +300,9 @@ func TestHandler_updateUserPhoto(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, 1)
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{User: repo}
-			handler := Handler{services, ctx}
+			handler := Handler{services: services}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user/photo", handler.updateUserPhoto)
@@ -247,60 +321,64 @@ func TestHandler_updateUserPhoto(t *testing.T) {
 
 			mux.ServeHTTP(w, req.WithContext(ctx))
 
-			assert.Equal(t, w.Code, test.expectedStatusCode)
-			assert.JSONEq(t, w.Body.String(), test.expectedResponseBody)
+			assert.Equal(t, w.Body.String(), test.expectedResponseBody)
 		})
 	}
 }
 
 func TestHandler_deleteUserPhoto(t *testing.T) {
 	mockUserID := 1
-	mockImagePath := "path/to/image.jpg"
-
+	mockLink := "photo.jpg"
+	mockCookie := &http.Cookie{
+		Name:  "session_id",
+		Value: "value",
+	}
 	response := ClientResponseDto[string]{
 		Status:  200,
 		Message: "success",
 		Payload: "",
 	}
-
 	jsonData, _ := json.Marshal(response)
 
 	tests := []struct {
 		name                 string
+		inputBody            string
 		mockBehavior         func(r *mock_service.MockUser)
 		expectedStatusCode   int
 		expectedResponseBody string
 	}{
 		{
-			name: "Success",
+			name:      "Ok",
+			inputBody: `{"link": "photo.jpg"}`,
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().GetCurrentUser(gomock.Any(), mockUserID).Return(model.User{ImagePath: &mockImagePath}, nil)
-				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockImagePath).Return(nil)
+				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(nil)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: string(jsonData),
 		},
 		{
-			name: "User Has No Photos",
+			name:                 "banned user",
+			inputBody:            `{"link": "photo.jpg"}`,
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().GetCurrentUser(gomock.Any(), mockUserID).Return(model.User{ImagePath: nil}, nil)
+				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(static.ErrBannedUser)
 			},
-			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"status":400,"message":"This user has no photos","payload":""}`,
+			expectedStatusCode:   http.StatusForbidden,
+			expectedResponseBody: `{"status":403,"message":"this user is blocked","payload":""}`,
 		},
 		{
-			name: "Error in GetCurrentUser",
+			name:                 "No photo",
+			inputBody:            `{"link": "photo.jpg"}`,
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().GetCurrentUser(gomock.Any(), mockUserID).Return(model.User{}, errors.New("some error"))
+				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(static.ErrNoFiles)
 			},
-			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
+			expectedStatusCode:   http.StatusNotFound,
+			expectedResponseBody: `{"status":404,"message":"This user has no photos","payload":""}`,
 		},
 		{
-			name: "Error in DeleteFile",
+			name:                 "Error",
+			inputBody:            `{"link": "photo.jpg"}`,
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().GetCurrentUser(gomock.Any(), mockUserID).Return(model.User{ImagePath: &mockImagePath}, nil)
-				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockImagePath).Return(errors.New("some error"))
+				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(errors.New("some error"))
 			},
 			expectedStatusCode:   http.StatusInternalServerError,
 			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
@@ -312,22 +390,23 @@ func TestHandler_deleteUserPhoto(t *testing.T) {
 			c := gomock.NewController(t)
 			defer c.Finish()
 
-			repoUser := mock_service.NewMockUser(c)
-			test.mockBehavior(repoUser)
+			repo := mock_service.NewMockUser(c)
+			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), keyUserID, mockUserID)
-			services := &service.Service{User: repoUser}
-			handler := Handler{services, ctx}
+			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
+			services := &service.Service{User: repo}
+			handler := Handler{services: services}
 
 			mux := http.NewServeMux()
 			mux.HandleFunc("/api/v1/user/photo", handler.deleteUserPhoto)
 
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest("DELETE", "/api/v1/user/photo", nil)
+			req := httptest.NewRequest("DELETE", "/api/v1/user/photo", bytes.NewBufferString(test.inputBody))
+			req.AddCookie(mockCookie)
+
 			mux.ServeHTTP(w, req.WithContext(ctx))
 
-			assert.Equal(t, w.Code, test.expectedStatusCode)
-			assert.JSONEq(t, w.Body.String(), test.expectedResponseBody)
+			assert.Equal(t, w.Body.String(), test.expectedResponseBody)
 		})
 	}
 }

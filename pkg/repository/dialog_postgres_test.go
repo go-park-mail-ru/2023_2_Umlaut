@@ -1,60 +1,84 @@
 package repository
 
-// import (
-// 	"context"
-// 	"testing"
+import (
+	"context"
+	"errors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"testing"
+	time2 "time"
 
-// 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/stretchr/testify/assert"
 
-// func TestDialogPostgres_CreateDialog(t *testing.T) {
-// 	pool, err := initPostgres()
-// 	if err != nil {
-// 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
-// 	}
+	"github.com/pashagolub/pgxmock/v3"
+)
 
-// 	repo := NewDialogPostgres(pool)
+func TestDialogPostgres_CreateDialog(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mock.Close()
 
-// 	ctx := context.Background()
+	dialogRepo := NewDialogPostgres(mock)
 
-// 	tests := []struct {
-// 		name        string
-// 		dialog      model.Dialog
-// 		expectedID  int
-// 		expectedErr bool
-// 	}{
-// 		{
-// 			name: "Ok",
-// 			dialog: model.Dialog{
-// 				User1Id: 1,
-// 				User2Id: 2,
-// 			},
-// 			expectedID:  1,
-// 			expectedErr: false,
-// 		},
-// 		{
-// 			name: "Repeat dialog",
-// 			dialog: model.Dialog{
-// 				User1Id: 2,
-// 				User2Id: 1,
-// 			},
-// 			expectedID:  2,
-// 			expectedErr: true,
-// 		},
-// 	}
-// 	for _, test := range tests {
-// 		t.Run(test.name, func(t *testing.T) {
+	testDialog := model.Dialog{
+		User1Id: 1,
+		User2Id: 2,
+	}
 
-// 			id, err := repo.CreateDialog(ctx, test.dialog)
+	mock.ExpectQuery(`INSERT INTO "dialog"`).
+		WithArgs(testDialog.User1Id, testDialog.User2Id).
+		WillReturnRows(pgxmock.NewRows([]string{"id"}).AddRow(1))
 
-// 			if test.expectedErr {
-// 				assert.Error(t, err)
-// 			} else {
-// 				assert.NoError(t, err)
-// 				assert.Equal(t, test.expectedID, id)
-// 			}
-// 		})
-// 	}
+	createdID, err := dialogRepo.CreateDialog(context.Background(), testDialog)
 
-// }
+	assert.NoError(t, err)
+	assert.Equal(t, 1, createdID)
+
+	mock.ExpectQuery(`INSERT INTO "dialog"`).
+		WithArgs(testDialog.User1Id, testDialog.User2Id).
+		WillReturnError(static.ErrAlreadyExists)
+
+	_, err = dialogRepo.CreateDialog(context.Background(), testDialog)
+
+	assert.ErrorIs(t, err, static.ErrAlreadyExists)
+
+	mock.ExpectQuery(`INSERT INTO "dialog"`).
+		WithArgs(testDialog.User1Id, testDialog.User2Id).
+		WillReturnError(errors.New("some other error"))
+
+	_, err = dialogRepo.CreateDialog(context.Background(), testDialog)
+
+	assert.Error(t, err)
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestDialogPostgres_GetDialogs(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mock.Close()
+
+	dialogRepo := NewDialogPostgres(mock)
+
+	id := 1
+	m := "Test message"
+	b := false
+	time := time2.Now()
+
+	mock.ExpectQuery(`SELECT`).WithArgs(id, id, id).
+		WillReturnRows(pgxmock.NewRows([]string{
+			"id", "user1_id", "user2_id", "banned", "name", "image_paths",
+			"message_id", "sender_id", "dialog_id", "message_text", "is_read", "created_at",
+		}).AddRow(1, 1, 2, false, "User2", nil, &id, &id, &id, &m, &b, &time))
+
+	dialogs, err := dialogRepo.GetDialogs(context.Background(), id)
+
+	assert.NoError(t, err)
+	assert.Len(t, dialogs, 1)
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
