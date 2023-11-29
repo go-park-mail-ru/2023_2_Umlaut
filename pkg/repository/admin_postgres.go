@@ -6,16 +6,15 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
 type AdminPostgres struct {
-	db mock_repository.PgxPoolInterface
+	db PgxPoolInterface
 }
 
-func NewAdminPostgres(db mock_repository.PgxPoolInterface) *AdminPostgres {
+func NewAdminPostgres(db PgxPoolInterface) *AdminPostgres {
 	return &AdminPostgres{db: db}
 }
 
