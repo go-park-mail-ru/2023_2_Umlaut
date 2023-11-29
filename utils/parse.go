@@ -2,7 +2,11 @@ package utils
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
+	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -28,4 +32,16 @@ func ParseError(err error) (int, string) {
 	}
 
 	return 200, ""
+}
+
+func ParseQueryParams(r *http.Request) *feedProto.FilterParams {
+	minAge, _ := strconv.Atoi(r.URL.Query().Get("min_age"))
+	maxAge, _ := strconv.Atoi(r.URL.Query().Get("max_age"))
+	tags := strings.Split(r.URL.Query().Get("tags"), ",")
+	return &feedProto.FilterParams{
+		UserId: int32(r.Context().Value(static.KeyUserID).(int)),
+		MinAge: int32(minAge),
+		MaxAge: int32(maxAge),
+		Tags:   tags,
+	}
 }

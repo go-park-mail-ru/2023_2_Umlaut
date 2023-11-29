@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/utils.go"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
-	"github.com/google/uuid"
 )
 
 type UserService struct {
@@ -41,8 +41,8 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 		if !user.IsValid() {
 			return user, static.ErrInvalidUser
 		}
-		user.Salt = generateUuid()
-		user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
+		user.Salt = utils.GenerateUuid()
+		user.PasswordHash = utils.GeneratePasswordHash(user.PasswordHash, user.Salt)
 		err := s.repoUser.UpdateUserPassword(ctx, user)
 		if err != nil {
 			return model.User{}, err
@@ -58,8 +58,8 @@ func (s *UserService) UpdateUser(ctx context.Context, user model.User) (model.Us
 }
 
 func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error) {
-	fileName := generateImageName()
-	bucketName := getBucketName(userId)
+	fileName := utils.GenerateUuid()
+	bucketName := utils.GetBucketName(userId)
 	err := s.repoMinio.CreateBucket(ctx, bucketName)
 	if err != nil {
 		return fileName, fmt.Errorf("CreateFile error: %v", err)
@@ -110,11 +110,11 @@ func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) e
 		return static.ErrNoFiles
 	}
 
-	err = s.repoMinio.DeleteFile(ctx, getBucketName(userId), link)
+	err = s.repoMinio.DeleteFile(ctx, utils.GetBucketName(userId), link)
 	if err != nil {
 		return fmt.Errorf("DeleteFile error: %v", err)
 	}
-	*currentUser.ImagePaths = remove(*currentUser.ImagePaths, link)
+	*currentUser.ImagePaths = utils.Remove(*currentUser.ImagePaths, link)
 
 	_, err = s.repoUser.UpdateUser(ctx, currentUser)
 	if err != nil {
@@ -122,24 +122,4 @@ func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) e
 	}
 
 	return err
-}
-
-func generateImageName() string {
-	return uuid.NewString()
-}
-
-func remove(data []string, value string) []string {
-	for i, item := range data {
-		if item != value {
-			continue
-		}
-		data[i] = data[len(data)-1]
-		data = data[:len(data)-1]
-		break
-	}
-	return data
-}
-
-func getBucketName(userId int) string {
-	return fmt.Sprintf("user-id-%d", userId)
 }
