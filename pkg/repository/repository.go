@@ -21,6 +21,7 @@ type User interface {
 	GetNextUser(ctx context.Context, user model.User, params model.FilterParams) (model.User, error)
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 	UpdateUserPassword(ctx context.Context, user model.User) error
+	ShowCSAT(ctx context.Context, userId int) (bool, error)
 }
 
 type Like interface {

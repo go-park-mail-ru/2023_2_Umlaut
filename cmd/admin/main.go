@@ -58,7 +58,10 @@ func main() {
 	}
 	defer sessionStore.Close()
 
-	adminService := service.NewAdminService(repository.NewAdminPostgres(db_admin))
+	adminService := service.NewAdminService(
+		repository.NewAdminPostgres(db_admin),
+		repository.NewUserPostgres(db_umlaut),
+	)
 	complaintService := service.NewComplaintService(repository.NewComplaintPostgres(db_umlaut))
 
 	adminServer := server.NewAdminServer(adminService, complaintService)

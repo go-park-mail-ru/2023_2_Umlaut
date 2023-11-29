@@ -84,7 +84,7 @@ func NewService(repo *repository.Repository) *Service {
 		Dialog:        NewDialogService(repo.Dialog),
 		Message:       NewMessageService(repo.Message),
 		Tag:           NewTagService(repo.Tag),
-		Admin:         NewAdminService(repo.Admin),
+		Admin:         NewAdminService(repo.Admin, repo.User),
 		Complaint:     NewComplaintService(repo.Complaint),
 	}
 }

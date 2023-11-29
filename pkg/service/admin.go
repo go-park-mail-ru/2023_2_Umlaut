@@ -10,10 +10,11 @@ import (
 
 type AdminService struct {
 	repoAdmin repository.Admin
+	repoUser  repository.User
 }
 
-func NewAdminService(repoAdmin repository.Admin) *AdminService {
-	return &AdminService{repoAdmin: repoAdmin}
+func NewAdminService(repoAdmin repository.Admin, repoUser repository.User) *AdminService {
+	return &AdminService{repoAdmin: repoAdmin, repoUser: repoUser}
 }
 
 func (s *AdminService) GetStatistic(ctx context.Context) (int, error) {
@@ -33,7 +34,15 @@ func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) 
 }
 
 func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error) {
-	ok, err := s.repoAdmin.ShowFeedback(ctx, userId)
+	ok, err := s.repoUser.ShowCSAT(ctx, userId)
+	if err != nil {
+		return 0, fmt.Errorf("GetCSATType error: %v", err)
+	}
+	if !ok {
+		return 0, nil
+	}
+
+	ok, err = s.repoAdmin.ShowFeedback(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}

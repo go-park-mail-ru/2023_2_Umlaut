@@ -193,6 +193,29 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) 
 	return err
 }
 
+func (r *UserPostgres) ShowCSAT(ctx context.Context, userId int) (bool, error) {
+	var id int
+
+	query, args, err := psql.Select("id").From(userTable).Where(
+		sq.And{
+			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "1"},
+			sq.Eq{"id": userId},
+	}).ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check can show csat. err: %w", err)
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return true, nil
+	}
+
+	return false, err
+}
+
 func scanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,
