@@ -64,7 +64,7 @@ func (h *Handler) InitRoutes() http.Handler {
 		h.authAdminMiddleware,
 	)
 	adminRouter.HandleFunc("/complaint", h.getNextComplaint).Methods("GET")
-	adminRouter.HandleFunc("/complaint/{id}", h.deleteComplaint).Methods("DELETE")
+	adminRouter.HandleFunc("/complaint/{id}", h.deleteComplaint).Methods("DELETE", "OPTIONS")
 	adminRouter.HandleFunc("/complaint/{id}", h.acceptComplaint).Methods("GET")
 	adminRouter.HandleFunc("/feedback", h.getFeedbackStatistic).Methods("GET")
 	//adminRouter.HandleFunc("/feed-feedback", h.get).Methods("GET")
