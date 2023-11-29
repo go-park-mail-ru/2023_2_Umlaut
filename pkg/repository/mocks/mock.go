@@ -53,33 +53,18 @@ func (mr *MockUserMockRecorder) CreateUser(ctx, user interface{}) *gomock.Call {
 }
 
 // GetNextUser mocks base method.
-func (m *MockUser) GetNextUser(ctx context.Context, user model.User) (model.User, error) {
+func (m *MockUser) GetNextUser(ctx context.Context, user model.User, params model.FilterParams) (model.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNextUser", ctx, user)
+	ret := m.ctrl.Call(m, "GetNextUser", ctx, user, params)
 	ret0, _ := ret[0].(model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetNextUser indicates an expected call of GetNextUser.
-func (mr *MockUserMockRecorder) GetNextUser(ctx, user interface{}) *gomock.Call {
+func (mr *MockUserMockRecorder) GetNextUser(ctx, user, params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextUser", reflect.TypeOf((*MockUser)(nil).GetNextUser), ctx, user)
-}
-
-// GetNextUsers mocks base method.
-func (m *MockUser) GetNextUsers(ctx context.Context, user model.User, usedUsersId []int) ([]model.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNextUsers", ctx, user, usedUsersId)
-	ret0, _ := ret[0].([]model.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNextUsers indicates an expected call of GetNextUsers.
-func (mr *MockUserMockRecorder) GetNextUsers(ctx, user, usedUsersId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextUsers", reflect.TypeOf((*MockUser)(nil).GetNextUsers), ctx, user, usedUsersId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextUser", reflect.TypeOf((*MockUser)(nil).GetNextUser), ctx, user, params)
 }
 
 // GetUser mocks base method.
@@ -110,6 +95,21 @@ func (m *MockUser) GetUserById(ctx context.Context, id int) (model.User, error) 
 func (mr *MockUserMockRecorder) GetUserById(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockUser)(nil).GetUserById), ctx, id)
+}
+
+// ShowCSAT mocks base method.
+func (m *MockUser) ShowCSAT(ctx context.Context, userId int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShowCSAT", ctx, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ShowCSAT indicates an expected call of ShowCSAT.
+func (mr *MockUserMockRecorder) ShowCSAT(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowCSAT", reflect.TypeOf((*MockUser)(nil).ShowCSAT), ctx, userId)
 }
 
 // UpdateUser mocks base method.
@@ -232,21 +232,6 @@ func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockDialog)(nil).CreateDialog), ctx, dialog)
 }
 
-// GetDialogMessages mocks base method.
-func (m *MockDialog) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, dialogId)
-	ret0, _ := ret[0].([]model.Message)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDialogMessages indicates an expected call of GetDialogMessages.
-func (mr *MockDialogMockRecorder) GetDialogMessages(ctx, dialogId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockDialog)(nil).GetDialogMessages), ctx, dialogId)
-}
-
 // GetDialogs mocks base method.
 func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
 	m.ctrl.T.Helper()
@@ -260,6 +245,74 @@ func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]model.Dialog
 func (mr *MockDialogMockRecorder) GetDialogs(ctx, userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogs", reflect.TypeOf((*MockDialog)(nil).GetDialogs), ctx, userId)
+}
+
+// MockMessage is a mock of Message interface.
+type MockMessage struct {
+	ctrl     *gomock.Controller
+	recorder *MockMessageMockRecorder
+}
+
+// MockMessageMockRecorder is the mock recorder for MockMessage.
+type MockMessageMockRecorder struct {
+	mock *MockMessage
+}
+
+// NewMockMessage creates a new mock instance.
+func NewMockMessage(ctrl *gomock.Controller) *MockMessage {
+	mock := &MockMessage{ctrl: ctrl}
+	mock.recorder = &MockMessageMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMessage) EXPECT() *MockMessageMockRecorder {
+	return m.recorder
+}
+
+// CreateMessage mocks base method.
+func (m *MockMessage) CreateMessage(ctx context.Context, message model.Message) (model.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMessage", ctx, message)
+	ret0, _ := ret[0].(model.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateMessage indicates an expected call of CreateMessage.
+func (mr *MockMessageMockRecorder) CreateMessage(ctx, message interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMessage", reflect.TypeOf((*MockMessage)(nil).CreateMessage), ctx, message)
+}
+
+// GetDialogMessages mocks base method.
+func (m *MockMessage) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, dialogId)
+	ret0, _ := ret[0].([]model.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDialogMessages indicates an expected call of GetDialogMessages.
+func (mr *MockMessageMockRecorder) GetDialogMessages(ctx, dialogId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockMessage)(nil).GetDialogMessages), ctx, dialogId)
+}
+
+// UpdateMessage mocks base method.
+func (m *MockMessage) UpdateMessage(ctx context.Context, message model.Message) (model.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMessage", ctx, message)
+	ret0, _ := ret[0].(model.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateMessage indicates an expected call of UpdateMessage.
+func (mr *MockMessageMockRecorder) UpdateMessage(ctx, message interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMessage", reflect.TypeOf((*MockMessage)(nil).UpdateMessage), ctx, message)
 }
 
 // MockTag is a mock of Tag interface.
@@ -298,6 +351,149 @@ func (m *MockTag) GetAllTags(ctx context.Context) ([]string, error) {
 func (mr *MockTagMockRecorder) GetAllTags(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTags", reflect.TypeOf((*MockTag)(nil).GetAllTags), ctx)
+}
+
+// MockAdmin is a mock of Admin interface.
+type MockAdmin struct {
+	ctrl     *gomock.Controller
+	recorder *MockAdminMockRecorder
+}
+
+// MockAdminMockRecorder is the mock recorder for MockAdmin.
+type MockAdminMockRecorder struct {
+	mock *MockAdmin
+}
+
+// NewMockAdmin creates a new mock instance.
+func NewMockAdmin(ctrl *gomock.Controller) *MockAdmin {
+	mock := &MockAdmin{ctrl: ctrl}
+	mock.recorder = &MockAdminMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockAdmin) EXPECT() *MockAdminMockRecorder {
+	return m.recorder
+}
+
+// CreateFeedFeedback mocks base method.
+func (m *MockAdmin) CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFeedFeedback", ctx, rec)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateFeedFeedback indicates an expected call of CreateFeedFeedback.
+func (mr *MockAdminMockRecorder) CreateFeedFeedback(ctx, rec interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeedFeedback", reflect.TypeOf((*MockAdmin)(nil).CreateFeedFeedback), ctx, rec)
+}
+
+// CreateFeedback mocks base method.
+func (m *MockAdmin) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateFeedback", ctx, stat)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateFeedback indicates an expected call of CreateFeedback.
+func (mr *MockAdminMockRecorder) CreateFeedback(ctx, stat interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFeedback", reflect.TypeOf((*MockAdmin)(nil).CreateFeedback), ctx, stat)
+}
+
+// CreateRecommendation mocks base method.
+func (m *MockAdmin) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRecommendation", ctx, rec)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRecommendation indicates an expected call of CreateRecommendation.
+func (mr *MockAdminMockRecorder) CreateRecommendation(ctx, rec interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRecommendation", reflect.TypeOf((*MockAdmin)(nil).CreateRecommendation), ctx, rec)
+}
+
+// GetAdmin mocks base method.
+func (m *MockAdmin) GetAdmin(ctx context.Context, mail string) (model.Admin, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAdmin", ctx, mail)
+	ret0, _ := ret[0].(model.Admin)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAdmin indicates an expected call of GetAdmin.
+func (mr *MockAdminMockRecorder) GetAdmin(ctx, mail interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAdmin", reflect.TypeOf((*MockAdmin)(nil).GetAdmin), ctx, mail)
+}
+
+// GetFeedbacks mocks base method.
+func (m *MockAdmin) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFeedbacks", ctx)
+	ret0, _ := ret[0].([]model.Feedback)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFeedbacks indicates an expected call of GetFeedbacks.
+func (mr *MockAdminMockRecorder) GetFeedbacks(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeedbacks", reflect.TypeOf((*MockAdmin)(nil).GetFeedbacks), ctx)
+}
+
+// GetRecommendations mocks base method.
+func (m *MockAdmin) GetRecommendations(ctx context.Context) ([]model.Recommendation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRecommendations", ctx)
+	ret0, _ := ret[0].([]model.Recommendation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRecommendations indicates an expected call of GetRecommendations.
+func (mr *MockAdminMockRecorder) GetRecommendations(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecommendations", reflect.TypeOf((*MockAdmin)(nil).GetRecommendations), ctx)
+}
+
+// ShowFeedback mocks base method.
+func (m *MockAdmin) ShowFeedback(ctx context.Context, userId int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShowFeedback", ctx, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ShowFeedback indicates an expected call of ShowFeedback.
+func (mr *MockAdminMockRecorder) ShowFeedback(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowFeedback", reflect.TypeOf((*MockAdmin)(nil).ShowFeedback), ctx, userId)
+}
+
+// ShowRecommendation mocks base method.
+func (m *MockAdmin) ShowRecommendation(ctx context.Context, userId int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ShowRecommendation", ctx, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ShowRecommendation indicates an expected call of ShowRecommendation.
+func (mr *MockAdminMockRecorder) ShowRecommendation(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowRecommendation", reflect.TypeOf((*MockAdmin)(nil).ShowRecommendation), ctx, userId)
 }
 
 // MockStore is a mock of Store interface.
@@ -404,29 +600,127 @@ func (mr *MockFileServerMockRecorder) CreateBucket(ctx, bucketName interface{}) 
 }
 
 // DeleteFile mocks base method.
-func (m *MockFileServer) DeleteFile(ctx context.Context, bucketName, fileName string) error {
+func (m *MockFileServer) DeleteFile(ctx context.Context, bucketName, link string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteFile", ctx, bucketName, fileName)
+	ret := m.ctrl.Call(m, "DeleteFile", ctx, bucketName, link)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteFile indicates an expected call of DeleteFile.
-func (mr *MockFileServerMockRecorder) DeleteFile(ctx, bucketName, fileName interface{}) *gomock.Call {
+func (mr *MockFileServerMockRecorder) DeleteFile(ctx, bucketName, link interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockFileServer)(nil).DeleteFile), ctx, bucketName, fileName)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFile", reflect.TypeOf((*MockFileServer)(nil).DeleteFile), ctx, bucketName, link)
 }
 
 // UploadFile mocks base method.
-func (m *MockFileServer) UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) error {
+func (m *MockFileServer) UploadFile(ctx context.Context, bucketName, fileName, contentType string, file io.Reader, size int64) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UploadFile", ctx, bucketName, fileName, contentType, file, size)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // UploadFile indicates an expected call of UploadFile.
 func (mr *MockFileServerMockRecorder) UploadFile(ctx, bucketName, fileName, contentType, file, size interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockFileServer)(nil).UploadFile), ctx, bucketName, fileName, contentType, file, size)
+}
+
+// MockComplaint is a mock of Complaint interface.
+type MockComplaint struct {
+	ctrl     *gomock.Controller
+	recorder *MockComplaintMockRecorder
+}
+
+// MockComplaintMockRecorder is the mock recorder for MockComplaint.
+type MockComplaintMockRecorder struct {
+	mock *MockComplaint
+}
+
+// NewMockComplaint creates a new mock instance.
+func NewMockComplaint(ctrl *gomock.Controller) *MockComplaint {
+	mock := &MockComplaint{ctrl: ctrl}
+	mock.recorder = &MockComplaintMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockComplaint) EXPECT() *MockComplaintMockRecorder {
+	return m.recorder
+}
+
+// AcceptComplaint mocks base method.
+func (m *MockComplaint) AcceptComplaint(ctx context.Context, complaintId int) (model.Complaint, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AcceptComplaint", ctx, complaintId)
+	ret0, _ := ret[0].(model.Complaint)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AcceptComplaint indicates an expected call of AcceptComplaint.
+func (mr *MockComplaintMockRecorder) AcceptComplaint(ctx, complaintId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AcceptComplaint", reflect.TypeOf((*MockComplaint)(nil).AcceptComplaint), ctx, complaintId)
+}
+
+// CreateComplaint mocks base method.
+func (m *MockComplaint) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateComplaint", ctx, complaint)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateComplaint indicates an expected call of CreateComplaint.
+func (mr *MockComplaintMockRecorder) CreateComplaint(ctx, complaint interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateComplaint", reflect.TypeOf((*MockComplaint)(nil).CreateComplaint), ctx, complaint)
+}
+
+// DeleteComplaint mocks base method.
+func (m *MockComplaint) DeleteComplaint(ctx context.Context, complaintId int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteComplaint", ctx, complaintId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteComplaint indicates an expected call of DeleteComplaint.
+func (mr *MockComplaintMockRecorder) DeleteComplaint(ctx, complaintId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteComplaint", reflect.TypeOf((*MockComplaint)(nil).DeleteComplaint), ctx, complaintId)
+}
+
+// GetComplaintTypes mocks base method.
+func (m *MockComplaint) GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetComplaintTypes", ctx)
+	ret0, _ := ret[0].([]model.ComplaintType)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetComplaintTypes indicates an expected call of GetComplaintTypes.
+func (mr *MockComplaintMockRecorder) GetComplaintTypes(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComplaintTypes", reflect.TypeOf((*MockComplaint)(nil).GetComplaintTypes), ctx)
+}
+
+// GetNextComplaint mocks base method.
+func (m *MockComplaint) GetNextComplaint(ctx context.Context) (model.Complaint, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNextComplaint", ctx)
+	ret0, _ := ret[0].(model.Complaint)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNextComplaint indicates an expected call of GetNextComplaint.
+func (mr *MockComplaintMockRecorder) GetNextComplaint(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextComplaint", reflect.TypeOf((*MockComplaint)(nil).GetNextComplaint), ctx)
 }
