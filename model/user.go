@@ -20,11 +20,12 @@ type User struct {
 	Description  *string    `json:"description" db:"description"`
 	Age          *int       `json:"age"`
 	Looking      *string    `json:"looking" db:"looking"`
-	ImagePath    *string    `json:"image_path" db:"image_path"`
+	ImagePaths   *[]string  `json:"image_paths" db:"image_paths"`
 	Education    *string    `json:"education" db:"education"`
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
 	Online       bool       `json:"online" db:"online"`
+	Banned       bool       `json:"-" db:"banned" swaggerignore:"true"`
 	Tags         *[]string  `json:"tags" db:"tags"`
 }
 
@@ -53,9 +54,6 @@ func (u *User) Sanitize() {
 	if u.Looking != nil {
 		*u.Looking = policy.Sanitize(*u.Looking)
 	}
-	if u.ImagePath != nil {
-		*u.ImagePath = policy.Sanitize(*u.ImagePath)
-	}
 	if u.Education != nil {
 		*u.Education = policy.Sanitize(*u.Education)
 	}
@@ -67,6 +65,7 @@ func (u *User) Sanitize() {
 			(*u.Tags)[i] = policy.Sanitize((*u.Tags)[i])
 		}
 	}
+	//поправить метод
 	u.Name = policy.Sanitize(u.Name)
 	u.Mail = policy.Sanitize(u.Mail)
 

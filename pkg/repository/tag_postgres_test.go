@@ -1,54 +1,44 @@
 package repository
 
-// import (
-// 	"context"
-// 	"testing"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"testing"
 
-// 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/pashagolub/pgxmock/v3"
+	"github.com/stretchr/testify/assert"
+)
 
-// func TestTagPostgres_GetAllTags(t *testing.T) {
-// 	pool, err := initPostgres()
-// 	if err != nil {
-// 		t.Fatalf("an error '%s' was not expected when opening a test database connection", err)
-// 	}
+func TestComplaintPostgres_GetAllTags(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mock.Close()
 
-// 	repo := NewTagPostgres(pool)
+	tagRepo := NewTagPostgres(mock)
 
-//	ctx := context.Background()
+	testTags := []string{"type1", "type2"}
 
-// 	tests := []struct {
-// 		name         string
-// 		expectedTags []model.Tag
-// 		expectedErr  bool
-// 	}{
-// 		{
-// 			name: "Ok",
-// 			expectedTags: []model.Tag{
-// 				{
-// 					Id:   1,
-// 					Name: "testtag1",
-// 				},
-// 				{
-// 					Id:   2,
-// 					Name: "testtag2",
-// 				},
-// 			},
-// 			expectedErr: false,
-// 		},
-// 	}
-// 	for _, test := range tests {
-// 		t.Run(test.name, func(t *testing.T) {
-// 			tags, err := repo.GetAllTags(ctx)
+	// Ожидаем успешное создание диалога
+	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "tag"`, "name")).
+		WillReturnRows(pgxmock.NewRows([]string{"name"}).
+			AddRow("type1").AddRow("type2"))
 
-// 			if test.expectedErr {
-// 				assert.Error(t, err)
-// 			} else {
-// 				assert.NoError(t, err)
-// 				assert.Equal(t, test.expectedTags, tags)
-// 			}
-// 		})
-// 	}
+	tags, err := tagRepo.GetAllTags(context.Background())
 
-// }
+	assert.NoError(t, err)
+	assert.Equal(t, tags, testTags)
+
+	// Проверка других случаев ошибок
+	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "tag"`, "name")).
+		WillReturnError(errors.New("some other error"))
+
+	_, err = tagRepo.GetAllTags(context.Background())
+
+	assert.Error(t, err)
+
+	// Проверяем, что не остались ожидающие запросы
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

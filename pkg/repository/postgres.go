@@ -7,10 +7,18 @@ import (
 )
 
 const (
-	userTable   = "\"user\""
-	likeTable   = "\"like\""
-	dialogTable = "\"dialog\""
-	tagTable    = "\"tag\""
+	userTable          = "\"user\""
+	likeTable          = "\"like\""
+	dialogTable        = "\"dialog\""
+	tagTable           = "\"tag\""
+	messageTable       = "\"message\""
+	complaintTable     = "\"complaint\""
+	complaintTypeTable = "\"complaint_type\""
+
+	adminTable          = "\"admin\""
+	feedbackTable       = "\"feedback\""
+	recommendationTable = "\"recommendation\""
+	feedFeedbackTable   = "\"feed_feedback\""
 )
 
 type PostgresConfig struct {

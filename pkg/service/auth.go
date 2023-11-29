@@ -2,33 +2,34 @@ package service
 
 import (
 	"context"
-	"crypto/sha1"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"github.com/google/uuid"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/utils.go"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 )
 
 type AuthService struct {
 	repoUser  repository.User
 	repoStore repository.Store
+	repoAdmin repository.Admin
 }
 
-func NewAuthService(repoUser repository.User, repoStore repository.Store) *AuthService {
-	return &AuthService{repoUser: repoUser, repoStore: repoStore}
+func NewAuthService(repoUser repository.User, repoStore repository.Store, repoAdmin repository.Admin) *AuthService {
+	return &AuthService{repoUser: repoUser, repoStore: repoStore, repoAdmin: repoAdmin}
 }
 
 func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, error) {
 	if !user.IsValid() {
 		return 0, errors.New("invalid fields")
 	}
-	user.Salt = generateUuid()
-	user.PasswordHash = generatePasswordHash(user.PasswordHash, user.Salt)
+	user.Salt = utils.GenerateUuid()
+	user.PasswordHash = utils.GeneratePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(ctx, user)
-	if errors.Is(err, model.AlreadyExists) {
+	if errors.Is(err, static.ErrAlreadyExists) {
 		fmt.Println("account with this email already exists")
 	}
 	return id, err
@@ -36,10 +37,13 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, err
 
 func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model.User, error) {
 	user, err := s.repoUser.GetUser(ctx, mail)
+	if errors.Is(err, static.ErrBannedUser) {
+		return model.User{}, err
+	}
 	if err != nil {
 		return user, err
 	}
-	if generatePasswordHash(password, user.Salt) != user.PasswordHash {
+	if utils.GeneratePasswordHash(password, user.Salt) != user.PasswordHash {
 		return user, errors.New("invalid")
 	}
 	user.Sanitize()
@@ -47,8 +51,21 @@ func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model
 	return user, nil
 }
 
+func (s *AuthService) GetAdmin(ctx context.Context, mail, password string) (model.Admin, error) {
+	admin, err := s.repoAdmin.GetAdmin(ctx, mail)
+	if err != nil {
+		return admin, err
+	}
+	if utils.GeneratePasswordHash(password, admin.Salt) != admin.PasswordHash {
+		return admin, errors.New("invalid")
+	}
+	admin.Sanitize()
+
+	return admin, nil
+}
+
 func (s *AuthService) GenerateCookie(ctx context.Context, id int) (string, error) {
-	SID := generateUuid()
+	SID := utils.GenerateUuid()
 	if err := s.repoStore.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
 		return SID, err
 	}
@@ -71,15 +88,4 @@ func (s *AuthService) GetSessionValue(ctx context.Context, session string) (int,
 	}
 
 	return id, nil
-}
-
-func generatePasswordHash(password, salt string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
-}
-
-func generateUuid() string {
-	return uuid.NewString()
 }

@@ -3,10 +3,43 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 )
+
+// @Summary log in to admin
+// @Tags auth
+// @ID adminLogin
+// @Accept  json
+// @Produce  json
+// @Param input body signInInput true "Sign-in input parameters"
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,404 {object} ClientResponseDto[string]
+// @Router /api/v1/auth/admin [post]
+func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var input signInInput
+	if err := decoder.Decode(&input); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	cookie, err := h.authMicroservice.LogInAdmin(
+		r.Context(),
+		&proto.SignInInput{Mail: input.Mail, Password: input.Password},
+	)
+
+	if err != nil {
+		statusCode, message := utils.ParseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
+		return
+	}
+
+	http.SetCookie(w, createCookie("admin_session_id", cookie.Cookie))
+	NewSuccessClientResponseDto(r.Context(), w, "")
+}
 
 // @Summary log in to account
 // @Tags auth
@@ -16,32 +49,27 @@ import (
 // @Param input body signInInput true "Sign-in input parameters"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,404 {object} ClientResponseDto[string]
-// @Router /auth/login [post]
+// @Router /api/v1/auth/login [post]
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signInInput
 	if err := decoder.Decode(&input); err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	cookie, err := h.authMicroservice.SignIn(
+		r.Context(),
+		&proto.SignInInput{Mail: input.Mail, Password: input.Password},
+	)
+
+	if err != nil {
+		statusCode, message := utils.ParseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
 
-	if input.Mail == "" || input.Password == "" {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "missing required fields")
-		return
-	}
-
-	user, err := h.services.Authorization.GetUser(r.Context(), input.Mail, input.Password)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusUnauthorized, "invalid mail or password")
-		return
-	}
-	SID, err := h.services.Authorization.GenerateCookie(r.Context(), user.Id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	http.SetCookie(w, createCookie(SID))
-	NewSuccessClientResponseDto(&h.ctx, w, "")
+	http.SetCookie(w, createCookie("session_id", cookie.Cookie))
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }
 
 // @Summary log out of account
@@ -51,22 +79,29 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 400,404 {object} ClientResponseDto[string]
-// @Router /auth/logout [get]
+// @Router /api/v1/auth/logout [get]
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
 	if errors.Is(err, http.ErrNoCookie) {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusUnauthorized, "no session")
+		newErrorClientResponseDto(r.Context(), w, http.StatusUnauthorized, "no session")
 		return
 	}
-	if err = h.services.Authorization.DeleteCookie(r.Context(), session.Value); err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, "Invalid cookie deletion")
+	_, err = h.authMicroservice.LogOut(
+		r.Context(),
+		&proto.Cookie{Cookie: session.Value},
+	)
+
+	if err != nil {
+		statusCode, message := utils.ParseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
+
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	session.Path = "/"
 
 	http.SetCookie(w, session)
-	NewSuccessClientResponseDto(&h.ctx, w, "")
+	NewSuccessClientResponseDto(r.Context(), w, "")
 }
 
 // @Summary sign up account
@@ -77,41 +112,33 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @Param input body signUpInput true "Sign-up input user"
 // @Success 200 {object} ClientResponseDto[idResponse]
 // @Failure 400,404 {object} ClientResponseDto[string]
-// @Router /auth/sign-up [post]
+// @Router /api/v1/auth/sign-up [post]
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input signUpInput
 	if err := decoder.Decode(&input); err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "invalid input body")
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	userId, err := h.authMicroservice.SignUp(
+		r.Context(),
+		&proto.SignUpInput{Mail: input.Mail, Password: input.Password, Name: input.Name},
+	)
 
-	if input.Name == "" || input.Mail == "" || input.Password == "" {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, "missing required fields")
-		return
-	}
-
-	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
-
-	id, err := h.services.Authorization.CreateUser(r.Context(), user)
 	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusBadRequest, err.Error())
+		statusCode, message := utils.ParseError(err)
+		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
 
-	SID, err := h.services.Authorization.GenerateCookie(r.Context(), id)
-	if err != nil {
-		newErrorClientResponseDto(&h.ctx, w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	http.SetCookie(w, createCookie(SID))
+	http.SetCookie(w, createCookie("session_id", userId.Cookie.Cookie))
 
-	NewSuccessClientResponseDto(&h.ctx, w, idResponse{Id: id})
+	NewSuccessClientResponseDto(r.Context(), w, idResponse{Id: int(userId.Id)})
 }
 
-func createCookie(SID string) *http.Cookie {
+func createCookie(name, SID string) *http.Cookie {
 	return &http.Cookie{
-		Name:     "session_id",
+		Name:     name,
 		Value:    SID,
 		Expires:  time.Now().Add(10 * time.Hour),
 		Path:     "/",

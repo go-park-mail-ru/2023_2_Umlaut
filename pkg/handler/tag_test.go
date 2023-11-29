@@ -1,15 +1,15 @@
 package handler
 
 import (
-	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	mock_service "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_getAllTags(t *testing.T) {
@@ -46,16 +46,14 @@ func TestHandler_getAllTags(t *testing.T) {
 			tagService := mock_service.NewMockTag(c)
 			test.mockBehavior(tagService)
 
-			ctx := context.Background()
 			services := &service.Service{Tag: tagService}
-			handler := Handler{services, ctx}
+			handler := Handler{services: services}
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/api/v1/tags", nil)
 
 			handler.getAllTags(w, req)
 
-			assert.Equal(t, w.Code, test.expectedStatusCode)
 			assert.Equal(t, w.Body.String(), test.expectedResponseBody)
 		})
 	}

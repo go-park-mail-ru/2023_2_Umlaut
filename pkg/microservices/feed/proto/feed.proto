@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "./;proto";
+
+package proto;
+
+//protoc --go_out=. --go-grpc_out=. --go-grpc_opt=paths=source_relative --go_opt=paths=source_relative *.proto
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  int32 user_gender = 6;
+  int32 prefer_gender = 7;
+  string description = 8;
+  int32 age = 9;
+  string looking = 10;
+  repeated string image_paths = 11;
+  string education = 12;
+  string hobbies = 13;
+  google.protobuf.Timestamp birthday = 14;
+  bool online = 15;
+  repeated string tags = 16;
+}
+
+message FilterParams {
+  int32 user_id = 1;
+  int32 min_age = 2;
+  int32 max_age = 3;
+  repeated string tags = 4;
+}
+
+service Feed {
+  rpc Feed(FilterParams) returns(User) {}
+}

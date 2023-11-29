@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -14,36 +14,30 @@ import (
 )
 
 type LikePostgres struct {
-	db *pgxpool.Pool
+	db PgxPoolInterface
 }
 
-func NewLikePostgres(db *pgxpool.Pool) *LikePostgres {
+func NewLikePostgres(db PgxPoolInterface) *LikePostgres {
 	return &LikePostgres{db: db}
 }
 
 func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.Like, error) {
-	if like.LikedToUserId < like.LikedByUserId {
-		tmp := like.LikedToUserId
-		like.LikedToUserId = like.LikedByUserId
-		like.LikedByUserId = tmp
-	}
-
 	query, args, err := psql.Insert(likeTable).
-		Columns("liked_by_user_id", "liked_to_user_id").
-		Values(like.LikedByUserId, like.LikedToUserId).
+		Columns("liked_by_user_id", "liked_to_user_id", "is_like").
+		Values(like.LikedByUserId, like.LikedToUserId, like.IsLike).
 		ToSql()
 
 	if err != nil {
 		return model.Like{}, fmt.Errorf("failed to create like. err: %w", err)
 	}
 
-	query += " RETURNING *"
+	query += fmt.Sprintf(" RETURNING %s", static.LikeDbField)
 	var newLike model.Like
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanLike(row, &newLike)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return newLike, model.AlreadyExists
+			return newLike, static.ErrAlreadyExists
 		}
 	}
 
@@ -51,15 +45,13 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like model.Like) (model.L
 }
 
 func (r *LikePostgres) IsMutualLike(ctx context.Context, like model.Like) (bool, error) {
-	if like.LikedToUserId < like.LikedByUserId {
-		tmp := like.LikedToUserId
-		like.LikedToUserId = like.LikedByUserId
-		like.LikedByUserId = tmp
-	}
+	tmp := like.LikedToUserId
+	like.LikedToUserId = like.LikedByUserId
+	like.LikedByUserId = tmp
 
-	query, args, err := psql.Select("*").
+	query, args, err := psql.Select(static.LikeDbField).
 		From(likeTable).
-		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId}).
+		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId, "is_like": like.IsLike}).
 		ToSql()
 	if err != nil {
 		return false, fmt.Errorf("failed to check is like exists. err: %w", err)
@@ -78,7 +70,6 @@ func scanLike(row pgx.Row, like *model.Like) error {
 	err := row.Scan(
 		&like.LikedByUserId,
 		&like.LikedToUserId,
-		&like.CommittedAt,
 	)
 	return err
 }
