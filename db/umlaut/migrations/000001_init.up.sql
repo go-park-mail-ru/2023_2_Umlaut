@@ -183,6 +183,7 @@ $$
 BEGIN
     UPDATE "user" SET banned = TRUE WHERE id = NEW.reported_user_id;
     UPDATE dialog SET banned = TRUE WHERE user1_id = NEW.reported_user_id OR user2_id = NEW.reported_user_id;
+    DELETE FROM complaint WHERE reported_user_id = NEW.reported_user_id AND id != NEW.id;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

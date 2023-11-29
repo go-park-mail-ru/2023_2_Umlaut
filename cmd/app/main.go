@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 
 	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
