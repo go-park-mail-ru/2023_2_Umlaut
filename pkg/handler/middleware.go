@@ -108,7 +108,9 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 
 		method := r.Method
 		path := r.RequestURI
-		h.metrics.Hits.WithLabelValues(path, method).Inc()
+		re := regexp.MustCompile(`\d+`)
+		castomPath := strings.Split(re.ReplaceAllString(path, "1"), "?")[0]
+		h.metrics.Hits.WithLabelValues(castomPath, method).Inc()
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 
@@ -120,10 +122,7 @@ func (h *Handler) loggingMiddleware(next http.Handler) http.Handler {
 			zap.Duration("Time", timing),
 		)
 
-		re := regexp.MustCompile(`\d+`)
-		path = strings.Split(re.ReplaceAllString(path, "1"), "?")[0]
-
-		h.metrics.Duration.WithLabelValues(strconv.Itoa(requestInfo.Status), path, method).Observe(timing.Seconds())
+		h.metrics.Duration.WithLabelValues(strconv.Itoa(requestInfo.Status), castomPath, method).Observe(timing.Seconds())
 	})
 }
 
