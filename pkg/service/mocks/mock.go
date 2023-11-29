@@ -524,21 +524,6 @@ func (mr *MockAdminMockRecorder) GetRecommendationsStatistics(ctx interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRecommendationsStatistics", reflect.TypeOf((*MockAdmin)(nil).GetRecommendationsStatistics), ctx)
 }
 
-// GetStatistic mocks base method.
-func (m *MockAdmin) GetStatistic(ctx context.Context) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetStatistic", ctx)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetStatistic indicates an expected call of GetStatistic.
-func (mr *MockAdminMockRecorder) GetStatistic(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStatistic", reflect.TypeOf((*MockAdmin)(nil).GetStatistic), ctx)
-}
-
 // MockComplaint is a mock of Complaint interface.
 type MockComplaint struct {
 	ctrl     *gomock.Controller

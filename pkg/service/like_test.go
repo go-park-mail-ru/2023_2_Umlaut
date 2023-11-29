@@ -15,6 +15,7 @@ func TestLikeService_CreateLike(t *testing.T) {
 	mockLike := model.Like{
 		LikedByUserId: 1,
 		LikedToUserId: 2,
+		IsLike:        true,
 	}
 
 	tests := []struct {

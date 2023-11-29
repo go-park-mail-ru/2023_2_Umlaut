@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -40,6 +41,14 @@ func TestFeedService_GetNextUser(t *testing.T) {
 			expectedError: errors.New("GetNextUser error: get user error"),
 		},
 		{
+			name: "Banned User",
+			mockBehavior: func(r *mock_repository.MockUser) {
+				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.User{}, static.ErrBannedUser)
+			},
+			expectedUser:  model.User{},
+			expectedError: static.ErrBannedUser,
+		},
+		{
 			name: "Error Getting Next User",
 			mockBehavior: func(r *mock_repository.MockUser) {
 				r.EXPECT().GetUserById(gomock.Any(), 1).Return(mockUser, nil)
@@ -59,7 +68,7 @@ func TestFeedService_GetNextUser(t *testing.T) {
 			test.mockBehavior(repoUser)
 
 			service := &FeedService{repoUser: repoUser}
-			user, err := service.GetNextUser(context.Background(), model.FilterParams{})
+			user, err := service.GetNextUser(context.Background(), model.FilterParams{UserId: 1})
 
 			assert.Equal(t, test.expectedUser, user)
 			assert.Equal(t, test.expectedError, err)

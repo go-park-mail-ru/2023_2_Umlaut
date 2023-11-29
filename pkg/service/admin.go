@@ -86,7 +86,7 @@ func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {
 	likedMap := make(map[string]int32)
 	needFixMap := make(map[string]model.NeedFixObject)
 	var ratingCount [11]int32
-	comment := []string{}
+	var comment []string
 	sum := 0
 	for _, feedback := range feedbacks {
 		if feedback.Liked != nil {
