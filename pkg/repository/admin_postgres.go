@@ -49,7 +49,7 @@ func (r *AdminPostgres) ShowFeedback(ctx context.Context, userId int) (bool, err
 				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
 			},
 			sq.Eq{"user_id": userId},
-	}).ToSql()
+		}).ToSql()
 
 	if err != nil {
 		return false, fmt.Errorf("failed to check can show feedback. err: %w", err)
@@ -75,7 +75,7 @@ func (r *AdminPostgres) ShowRecommendation(ctx context.Context, userId int) (boo
 				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
 			},
 			sq.Eq{"user_id": userId},
-	}).ToSql()
+		}).ToSql()
 
 	if err != nil {
 		return false, fmt.Errorf("failed to check can show recommendation. err: %w", err)
@@ -172,7 +172,7 @@ func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, err
 
 func (r *AdminPostgres) GetRecommendations(ctx context.Context) ([]model.Recommendation, error) {
 	query, args, err := psql.
-		Select("id", "user_id", "recommend").
+		Select("id", "user_id", "recommend", "show").
 		From(recommendationTable).
 		Where(sq.Eq{"show": true}).
 		ToSql()
