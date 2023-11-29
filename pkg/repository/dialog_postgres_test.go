@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"testing"
+	time2 "time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,6 @@ func TestDialogPostgres_CreateDialog(t *testing.T) {
 		User2Id: 2,
 	}
 
-	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(`INSERT INTO "dialog"`).
 		WithArgs(testDialog.User1Id, testDialog.User2Id).
 		WillReturnRows(pgxmock.NewRows([]string{"id"}).AddRow(1))
@@ -36,7 +36,6 @@ func TestDialogPostgres_CreateDialog(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, createdID)
 
-	// Проверяем ситуацию с дубликатом
 	mock.ExpectQuery(`INSERT INTO "dialog"`).
 		WithArgs(testDialog.User1Id, testDialog.User2Id).
 		WillReturnError(static.ErrAlreadyExists)
@@ -45,7 +44,6 @@ func TestDialogPostgres_CreateDialog(t *testing.T) {
 
 	assert.ErrorIs(t, err, static.ErrAlreadyExists)
 
-	// Проверка других случаев ошибок
 	mock.ExpectQuery(`INSERT INTO "dialog"`).
 		WithArgs(testDialog.User1Id, testDialog.User2Id).
 		WillReturnError(errors.New("some other error"))
@@ -54,6 +52,33 @@ func TestDialogPostgres_CreateDialog(t *testing.T) {
 
 	assert.Error(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestDialogPostgres_GetDialogs(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mock.Close()
+
+	dialogRepo := NewDialogPostgres(mock)
+
+	id := 1
+	m := "Test message"
+	b := false
+	time := time2.Now()
+
+	mock.ExpectQuery(`SELECT`).WithArgs(id, id, id).
+		WillReturnRows(pgxmock.NewRows([]string{
+			"id", "user1_id", "user2_id", "banned", "name", "image_paths",
+			"message_id", "sender_id", "dialog_id", "message_text", "is_read", "created_at",
+		}).AddRow(1, 1, 2, false, "User2", nil, &id, &id, &id, &m, &b, &time))
+
+	dialogs, err := dialogRepo.GetDialogs(context.Background(), id)
+
+	assert.NoError(t, err)
+	assert.Len(t, dialogs, 1)
+
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
