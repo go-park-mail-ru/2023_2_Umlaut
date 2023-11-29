@@ -9,6 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/gorilla/mux"
 )
@@ -74,7 +75,7 @@ func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 	complaint, err := h.adminMicroservice.GetNextComplaint(r.Context(), &proto.AdminEmpty{})
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -108,7 +109,7 @@ func (h *Handler) deleteComplaint(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = h.adminMicroservice.DeleteComplaint(r.Context(), &proto.Complaint{Id: int32(id)})
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
 
@@ -131,7 +132,7 @@ func (h *Handler) acceptComplaint(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = h.adminMicroservice.AcceptComplaint(r.Context(), &proto.Complaint{Id: int32(id)})
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 	}
 

@@ -40,7 +40,7 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 		})
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -72,7 +72,7 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 		})
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -104,7 +104,7 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 		})
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -121,7 +121,7 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/show-csat [get]
 func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(static.KeyUserID).(int)
-	
+
 	csatType, err := h.services.Admin.GetCSATType(r.Context(), id)
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
@@ -141,7 +141,7 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Request) {
 	recommend, err := h.adminMicroservice.GetRecommendationStatistic(r.Context(), &proto.AdminEmpty{})
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -164,7 +164,7 @@ func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Requ
 func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
 	feedbackStat, err := h.adminMicroservice.GetFeedbackStatistic(r.Context(), &proto.AdminEmpty{})
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -172,27 +172,8 @@ func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
 	NewSuccessClientResponseDto(r.Context(), w, &model.FeedbackStatistic{
 		AvgRating:   feedbackStat.AvgRating,
 		RatingCount: feedbackStat.RatingCount,
-		LikedMap:    getLikedMap(feedbackStat.LikedMap),
-		NeedFixMap:  getNeedFixMap(feedbackStat.NeedFixMap),
+		LikedMap:    utils.ModifyLikedMap(feedbackStat.LikedMap),
+		NeedFixMap:  utils.ModifyNeedFixMap(feedbackStat.NeedFixMap),
 		Comments:    feedbackStat.Comments,
 	})
-}
-
-func getLikedMap(likedMap []*proto.LikedMap) map[string]int32 {
-	result := make(map[string]int32)
-	for _, item := range likedMap {
-		result[item.Liked] = item.Count
-	}
-	return result
-}
-
-func getNeedFixMap(needFixMap []*proto.NeedFixMap) map[string]model.NeedFixObject {
-	result := make(map[string]model.NeedFixObject)
-	for _, item := range needFixMap {
-		result[item.NeedFix] = model.NeedFixObject{
-			Count:      item.NeedFixObject.Count,
-			CommentFix: item.NeedFixObject.CommentFix,
-		}
-	}
-	return result
 }

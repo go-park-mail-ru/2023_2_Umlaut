@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/golang/protobuf/ptypes"
 )
 
@@ -29,7 +30,7 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}

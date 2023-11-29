@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 )
 
 // @Summary log in to admin
@@ -33,7 +32,7 @@ func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -64,7 +63,7 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -93,7 +92,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -127,7 +126,7 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
-		statusCode, message := parseError(err)
+		statusCode, message := utils.ParseError(err)
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -147,27 +146,4 @@ func createCookie(name, SID string) *http.Cookie {
 		//SameSite: http.SameSiteNoneMode,
 		//Secure:   true,
 	}
-}
-
-func parseError(err error) (int, string) {
-	code, ok := status.FromError(err)
-	if ok {
-		switch code.Code() {
-		case codes.InvalidArgument:
-			return http.StatusBadRequest, code.Message()
-		case codes.Unauthenticated:
-			return http.StatusUnauthorized, code.Message()
-		case codes.Internal:
-			return http.StatusInternalServerError, code.Message()
-		case codes.NotFound:
-			return http.StatusNotFound, code.Message()
-		case codes.PermissionDenied:
-			return http.StatusForbidden, code.Message()
-		}
-	}
-	if err != nil {
-		return http.StatusInternalServerError, err.Error()
-	}
-
-	return 200, ""
 }
