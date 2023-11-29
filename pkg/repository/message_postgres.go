@@ -6,15 +6,16 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
 type MessagePostgres struct {
-	db PgxPoolInterface
+	db mock_repository.PgxPoolInterface
 }
 
-func NewMessagePostgres(db PgxPoolInterface) *MessagePostgres {
+func NewMessagePostgres(db mock_repository.PgxPoolInterface) *MessagePostgres {
 	return &MessagePostgres{db: db}
 }
 

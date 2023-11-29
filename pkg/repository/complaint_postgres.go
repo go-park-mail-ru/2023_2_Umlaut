@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,10 +14,10 @@ import (
 )
 
 type ComplaintPostgres struct {
-	db PgxPoolInterface
+	db mock_repository.PgxPoolInterface
 }
 
-func NewComplaintPostgres(db PgxPoolInterface) *ComplaintPostgres {
+func NewComplaintPostgres(db mock_repository.PgxPoolInterface) *ComplaintPostgres {
 	return &ComplaintPostgres{db: db}
 }
 

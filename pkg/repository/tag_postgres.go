@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/jackc/pgx/v5"
 )
 
 type TagPostgres struct {
-	db PgxPoolInterface
+	db mock_repository.PgxPoolInterface
 }
 
-func NewTagPostgres(db PgxPoolInterface) *TagPostgres {
+func NewTagPostgres(db mock_repository.PgxPoolInterface) *TagPostgres {
 	return &TagPostgres{db: db}
 }
 
