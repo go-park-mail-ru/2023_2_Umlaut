@@ -40,15 +40,7 @@ func (h *Handler) registerUserToHub(w http.ResponseWriter, r *http.Request) {
 		Conn:    conn,
 	}
 	h.hub.Register <- cl
-	//m := &ws.Message{
-	//	Id:          -1,
-	//	SenderId:    -1,
-	//	RecipientId: -1,
-	//	DialogId:    -1,
-	//	Text:        "HELLO FROM WS! TEST!",
-	//	CreatedAt:   time.Now(),
-	//}
-	//h.hub.Broadcast <- m
+
 	go cl.WriteMessage()
 	cl.ReadMessage(r.Context(), h.hub, h.services)
 }
