@@ -8,7 +8,6 @@ import (
 	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc/keepalive"
 
@@ -22,23 +21,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	reg = prometheus.NewRegistry()
-
-	grpcMetrics = grpc_prometheus.NewServerMetrics()
-
-	info = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "grpcMetrics",
-		Help: "help",
-	}, []string{"name"})
-)
-
-func init() {
-	reg.MustRegister(grpcMetrics, info)
-	info.WithLabelValues("Test")
-}
-
 func main() {
+	grpc_prometheus.EnableHandlingTimeHistogram()
 	ctx := context.Background()
 
 	db, err := utils.InitPostgres(ctx)
@@ -79,6 +63,7 @@ func main() {
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
 	)
 
+	grpc_prometheus.Register(grpcServer)
 	http.Handle("/metrics", promhttp.Handler())
 	httpServer := &http.Server{
 		Addr:    ":9091",

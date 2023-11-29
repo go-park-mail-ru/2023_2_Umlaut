@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"log"
 
 	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
@@ -22,6 +23,7 @@ import (
 )
 
 func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, adminProto.AdminClient, error) {
+	grpc_prometheus.EnableHandlingTimeHistogram()
 	authConn, err := grpc.Dial(
 		viper.GetString("authorization.host")+":"+viper.GetString("authorization.port"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
