@@ -6,7 +6,7 @@ run:
 
 test:
 	go test -coverpkg=./... -coverprofile=cover.out.tmp ./...
-	cat cover.out.tmp | grep -v "dto.go\|service.go\|handler.go\|mocks\|.pb.go\|.pb\|middleware.go\|/cmd\|/model\|docs\|postgres.go\|db\|configs" > cover.out
+	cat cover.out.tmp | grep -v "dto.go\|service.go\|handler.go\|mocks\|proto\|.pb.go\|.pb\|middleware.go\|cmd\|model\|docs\|postgres.go\|db\|configs" > cover.out
 	go tool cover -func=cover.out
 
 swag:
