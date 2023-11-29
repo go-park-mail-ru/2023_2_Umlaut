@@ -17,10 +17,6 @@ func NewAdminService(repoAdmin repository.Admin, repoUser repository.User) *Admi
 	return &AdminService{repoAdmin: repoAdmin, repoUser: repoUser}
 }
 
-func (s *AdminService) GetStatistic(ctx context.Context) (int, error) {
-	return 0, nil
-}
-
 func (s *AdminService) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
 	return s.repoAdmin.CreateRecommendation(ctx, rec)
 }
