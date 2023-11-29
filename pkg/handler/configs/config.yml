@@ -1,0 +1,63 @@
+port: "8000"
+
+authorization:
+  host: "authorization"
+  port: "8001"
+
+feed:
+  host: "feed"
+  port: "8002"
+
+admin:
+  host: "admin"
+  port: "8003"
+
+db_umlaut:
+  username: "postgres"
+  host: "db_umlaut"
+  port: "5432"
+  dbname: "postgres"
+  sslmode: "disable"
+  password: "1474"
+
+db_admin:
+  username: "postgres"
+  host: "db_admin"
+  port: "5432"
+  dbname: "postgres"
+  sslmode: "disable"
+  password: "1474"
+
+redis:
+  addr: "redis:6379"
+  db: "0"
+
+minio:
+  user: "umlaut"
+  password: "minio123"
+  sslmode: false
+  endpoint: "umlaut-bmstu.me:9000"
+
+cors:
+  origins: [
+    "http://37.139.32.76:80",
+    "http://37.139.32.76",
+    "http://37.139.32.76:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://umlaut-bmstu.me",
+    "http://umlaut-bmstu.me:8000",
+    "https://umlaut-bmstu.me",
+    "https://umlaut-bmstu.me:8000"
+  ]
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "HEAD",
+    "OPTIONS"
+  ]
+  headers: [
+    "*"
+  ]
