@@ -39,6 +39,58 @@ func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin,
 	return admin, err
 }
 
+func (r *AdminPostgres) ShowFeedback(ctx context.Context, userId int) (bool, error) {
+	var id int
+
+	query, args, err := psql.Select("id").From(feedbackTable).Where(
+		sq.And{
+			sq.Or{
+				sq.Eq{"show": false},
+				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
+			},
+			sq.Eq{"user_id": userId},
+	}).ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check can show feedback. err: %w", err)
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return true, nil
+	}
+
+	return false, err
+}
+
+func (r *AdminPostgres) ShowRecommendation(ctx context.Context, userId int) (bool, error) {
+	var id int
+
+	query, args, err := psql.Select("id").From(recommendationTable).Where(
+		sq.And{
+			sq.Or{
+				sq.Eq{"show": false},
+				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
+			},
+			sq.Eq{"user_id": userId},
+	}).ToSql()
+
+	if err != nil {
+		return false, fmt.Errorf("failed to check can show recommendation. err: %w", err)
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return true, nil
+	}
+
+	return false, err
+}
+
 func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
 	var id int
 	query, args, err := psql.Insert(feedbackTable).

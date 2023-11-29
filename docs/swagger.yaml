@@ -696,6 +696,32 @@ paths:
       summary: get user for feed
       tags:
       - feed
+  /api/v1/feed-feedback:
+    post:
+      consumes:
+      - application/json
+      operationId: FeedFeedback
+      parameters:
+      - description: feed_feedback data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.Recommendation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: create feed feedback
+      tags:
+      - statistic
   /api/v1/feedback:
     post:
       consumes:
@@ -752,9 +778,9 @@ paths:
     post:
       consumes:
       - application/json
-      operationId: FeedFeedback
+      operationId: Recommendation
       parameters:
-      - description: feed_feedback data
+      - description: Recommendation data
         in: body
         name: input
         required: true
@@ -771,7 +797,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: create feed feedback
+      summary: create recommendation
       tags:
       - statistic
   /api/v1/show-csat:

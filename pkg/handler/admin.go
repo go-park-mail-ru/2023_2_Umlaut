@@ -2,9 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
-	"math/rand"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
@@ -87,7 +87,7 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 // @Param input body model.Recommendation true "feed_feedback data"
 // @Success 200 {object} ClientResponseDto[string]
 // @Failure 500 {object} ClientResponseDto[string]
-// @Router /api/v1/recommendation [post]
+// @Router /api/v1/feed-feedback [post]
 func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var rec model.Recommendation
@@ -120,7 +120,14 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/show-csat [get]
 func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
-	NewSuccessClientResponseDto(r.Context(), w, rand.Intn(4))
+	id := r.Context().Value(static.KeyUserID).(int)
+	
+	csatType, err := h.services.Admin.GetCSATType(r.Context(), id)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	NewSuccessClientResponseDto(r.Context(), w, csatType)
 }
 
 // @Summary statistic by recommendation

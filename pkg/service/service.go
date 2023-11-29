@@ -54,6 +54,7 @@ type Admin interface {
 	CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error)
 	GetRecommendationsStatistics(ctx context.Context) (model.RecommendationStatistic, error)
 	GetFeedbackStatistics(ctx context.Context) (model.FeedbackStatistic, error)
+	GetCSATType(ctx context.Context, userId int) (int, error)
 }
 
 type Complaint interface {

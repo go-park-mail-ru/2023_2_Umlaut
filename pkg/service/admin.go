@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 )
@@ -28,6 +30,26 @@ func (s *AdminService) CreateFeedFeedback(ctx context.Context, rec model.Recomme
 
 func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
 	return s.repoAdmin.CreateFeedback(ctx, stat)
+}
+
+func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error) {
+	ok, err := s.repoAdmin.ShowFeedback(ctx, userId)
+	if err != nil {
+		return 0, fmt.Errorf("GetCSATType error: %v", err)
+	}
+	if ok {
+		return 1, nil
+	}
+
+	ok, err = s.repoAdmin.ShowRecommendation(ctx, userId)
+	if err != nil {
+		return 0, fmt.Errorf("GetCSATType error: %v", err)
+	}
+	if ok {
+		return 2, nil
+	}
+
+	return 0, nil
 }
 
 func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (model.RecommendationStatistic, error) {

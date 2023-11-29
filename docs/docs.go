@@ -584,6 +584,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/feed-feedback": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "statistic"
+                ],
+                "summary": "create feed feedback",
+                "operationId": "FeedFeedback",
+                "parameters": [
+                    {
+                        "description": "feed_feedback data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Recommendation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/feedback": {
             "post": {
                 "consumes": [
@@ -675,11 +715,11 @@ const docTemplate = `{
                 "tags": [
                     "statistic"
                 ],
-                "summary": "create feed feedback",
-                "operationId": "FeedFeedback",
+                "summary": "create recommendation",
+                "operationId": "Recommendation",
                 "parameters": [
                     {
-                        "description": "feed_feedback data",
+                        "description": "Recommendation data",
                         "name": "input",
                         "in": "body",
                         "required": true,
