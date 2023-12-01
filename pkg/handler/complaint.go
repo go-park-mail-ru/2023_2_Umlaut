@@ -89,6 +89,7 @@ func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 		Id:             int(complaint.Id),
 		ReporterUserId: int(complaint.ReporterUserId),
 		ReportedUserId: int(complaint.ReportedUserId),
+		ComplaintType:  complaint.ComplaintType,
 		CreatedAt:      &createdAt,
 	})
 }
