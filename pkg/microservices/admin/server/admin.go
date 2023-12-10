@@ -63,7 +63,7 @@ func (as *AdminServer) GetNextComplaint(ctx context.Context, _ *proto.AdminEmpty
 		ReporterUserId:  int32(complaint.ReporterUserId),
 		ReportedUserId:  int32(complaint.ReportedUserId),
 		ComplaintTypeId: int32(complaint.ComplaintTypeId),
-		ComplaintText:   complaint.ComplaintText,
+		ComplaintText:   *complaint.ComplaintText,
 		CreatedAt:       createdAt,
 	}, nil
 }
