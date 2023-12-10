@@ -36,22 +36,25 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 // @Summary get dialog message
 // @Tags dialog
 // @Accept  json
-// @Param id path integer true "Dialog ID"
+// @Param id path integer true "Recipient ID"
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[[]model.Message]
 // @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/dialogs/{id}/message [get]
 func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	userId := r.Context().Value(static.KeyUserID).(int)
+	recipientId, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
 		return
 	}
 
-	messages, err := h.services.Message.GetDialogMessages(r.Context(), id)
+	messages, err := h.services.Message.GetDialogMessages(r.Context(), userId, recipientId)
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
+	} else if len(messages) > 0 && *messages[0].RecipientId != userId && *messages[0].SenderId != userId {
+		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "нет доступа")
 	}
 
 	NewSuccessClientResponseArrayDto(r.Context(), w, messages)

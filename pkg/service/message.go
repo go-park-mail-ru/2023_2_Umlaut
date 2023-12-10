@@ -14,8 +14,8 @@ func NewMessageService(repoMessage repository.Message) *MessageService {
 	return &MessageService{repoMessage: repoMessage}
 }
 
-func (s *MessageService) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
-	return s.repoMessage.GetDialogMessages(ctx, dialogId)
+func (s *MessageService) GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]model.Message, error) {
+	return s.repoMessage.GetDialogMessages(ctx, userId, recipientId)
 }
 
 func (s *MessageService) SaveOrUpdateMessage(ctx context.Context, message model.Message) (model.Message, error) {

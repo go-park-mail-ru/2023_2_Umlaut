@@ -20,8 +20,8 @@ func NewMessagePostgres(db PgxPoolInterface) *MessagePostgres {
 
 func (r *MessagePostgres) CreateMessage(ctx context.Context, message model.Message) (model.Message, error) {
 	query, args, err := psql.Insert(messageTable).
-		Columns("sender_id", "dialog_id", "message_text").
-		Values(message.SenderId, message.DialogId, message.Text).
+		Columns("sender_id", "recipient_id", "dialog_id", "message_text").
+		Values(message.SenderId, message.RecipientId, message.DialogId, message.Text).
 		ToSql()
 
 	if err != nil {
@@ -59,21 +59,24 @@ func (r *MessagePostgres) UpdateMessage(ctx context.Context, message model.Messa
 	return newMessage, err
 }
 
-func (r *MessagePostgres) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+func (r *MessagePostgres) GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]model.Message, error) {
 	queryBuilder := psql.
 		Select(static.MessageDbField).
 		From(messageTable).
-		Where(sq.Eq{"dialog_id": dialogId}).
+		Where(sq.And{
+			sq.Or{sq.Eq{"sender_id": userId}, sq.Eq{"sender_id": recipientId}},
+			sq.Or{sq.Eq{"recipient_id": userId}, sq.Eq{"recipient_id": recipientId}},
+		}).
 		OrderBy("created_at")
 	query, args, err := queryBuilder.ToSql()
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get message for dialogId %d. err: %w", dialogId, err)
+		return nil, fmt.Errorf("failed to get message for users: %d, %d err: %w", userId, recipientId, err)
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get message for dialogId %d. err: %w", dialogId, err)
+		return nil, fmt.Errorf("failed to get message for users: %d, %d err: %w", userId, recipientId, err)
 	}
 	defer rows.Close()
 
@@ -94,6 +97,7 @@ func scanMessages(rows pgx.Rows) ([]model.Message, error) {
 			&message.Id,
 			&message.DialogId,
 			&message.SenderId,
+			&message.RecipientId,
 			&message.Text,
 			&message.IsRead,
 			&message.CreatedAt,

@@ -1,10 +1,12 @@
-CREATE OR REPLACE FUNCTION calculate_age(birth_date DATE)
+CREATE
+    OR REPLACE FUNCTION calculate_age(birth_date DATE)
     RETURNS INTEGER AS
 $$
 BEGIN
     RETURN DATE_PART('year', CURRENT_DATE) - DATE_PART('year', birth_date);
 END;
-$$ LANGUAGE plpgsql
+$$
+    LANGUAGE plpgsql
     IMMUTABLE;
 
 CREATE TABLE "user"
@@ -62,6 +64,7 @@ CREATE TABLE message
     id           SERIAL PRIMARY KEY,
     dialog_id    INT  NOT NULL REFERENCES dialog (id) ON DELETE CASCADE,
     sender_id    INT  NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
+    recipient_id INT  NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     message_text TEXT NOT NULL,
     is_read      BOOLEAN     DEFAULT FALSE,
     created_at   TIMESTAMPTZ DEFAULT NOW()
@@ -78,27 +81,32 @@ CREATE TABLE complaint_type
 
 CREATE TABLE complaint
 (
-    id                  SERIAL PRIMARY KEY,
-    reporter_user_id    INT  NOT NULL REFERENCES "user"           (id) ON DELETE CASCADE,
-    reported_user_id    INT  NOT NULL REFERENCES "user"           (id) ON DELETE CASCADE,
-    complaint_type_id   INT  NOT NULL REFERENCES "complaint_type" (id) ON DELETE CASCADE,
-    complaint_text      TEXT,
-    report_status       SMALLINT    DEFAULT 0,
-    created_at          TIMESTAMPTZ DEFAULT NOW(),
+    id                SERIAL PRIMARY KEY,
+    reporter_user_id  INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    reported_user_id  INT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    complaint_type_id INT NOT NULL REFERENCES "complaint_type" (id) ON DELETE CASCADE,
+    complaint_text    TEXT,
+    report_status     SMALLINT    DEFAULT 0,
+    created_at        TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (reporter_user_id, reported_user_id),
-    CHECK (reporter_user_id != reported_user_id)
+    CHECK (reporter_user_id != reported_user_id
+        )
 );
 
 
 -- triggers
-CREATE OR REPLACE FUNCTION delete_tag_cascade()
+CREATE
+    OR REPLACE FUNCTION delete_tag_cascade()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    UPDATE "user" SET tags = array_remove(tags, OLD.name) WHERE OLD.name = ANY (tags);
+    UPDATE "user"
+    SET tags = array_remove(tags, OLD.name)
+    WHERE OLD.name = ANY (tags);
     RETURN OLD;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_delete_tag_cascade
     AFTER DELETE
@@ -106,14 +114,18 @@ CREATE TRIGGER trigger_delete_tag_cascade
     FOR EACH ROW
 EXECUTE FUNCTION delete_tag_cascade();
 
-CREATE OR REPLACE FUNCTION update_last_message_id()
+CREATE
+    OR REPLACE FUNCTION update_last_message_id()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    UPDATE dialog SET last_message_id = NEW.id WHERE id = NEW.dialog_id;
+    UPDATE dialog
+    SET last_message_id = NEW.id
+    WHERE id = NEW.dialog_id;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_last_message_id
     AFTER INSERT
@@ -122,7 +134,8 @@ CREATE TRIGGER trigger_update_last_message_id
 EXECUTE FUNCTION update_last_message_id();
 
 
-CREATE OR REPLACE FUNCTION delete_invalid_tag()
+CREATE
+    OR REPLACE FUNCTION delete_invalid_tag()
     RETURNS TRIGGER AS
 $$
 DECLARE
@@ -136,23 +149,28 @@ BEGIN
         END LOOP;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_delete_invalid_tag
-    BEFORE INSERT or UPDATE
+    BEFORE INSERT or
+        UPDATE
     ON "user"
     FOR EACH ROW
 EXECUTE FUNCTION delete_invalid_tag();
 
 
-CREATE OR REPLACE FUNCTION update_updated_at()
+CREATE
+    OR REPLACE FUNCTION update_updated_at()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    NEW.updated_at = NOW();
+    NEW.updated_at
+        = NOW();
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER user_updated_at_trigger
     BEFORE UPDATE
@@ -160,7 +178,8 @@ CREATE TRIGGER user_updated_at_trigger
     FOR EACH ROW
 EXECUTE FUNCTION update_updated_at();
 
-CREATE OR REPLACE FUNCTION update_banned_dialog()
+CREATE
+    OR REPLACE FUNCTION update_banned_dialog()
     RETURNS TRIGGER AS
 $$
 BEGIN
@@ -170,7 +189,8 @@ BEGIN
       AND user2_id = GREATEST(NEW.reporter_user_id, NEW.reported_user_id);
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_banned_dialog
     AFTER INSERT
@@ -178,16 +198,26 @@ CREATE TRIGGER trigger_update_banned_dialog
     FOR EACH ROW
 EXECUTE FUNCTION update_banned_dialog();
 
-CREATE OR REPLACE FUNCTION update_banned_user()
+CREATE
+    OR REPLACE FUNCTION update_banned_user()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    UPDATE "user" SET banned = TRUE WHERE id = NEW.reported_user_id;
-    UPDATE dialog SET banned = TRUE WHERE user1_id = NEW.reported_user_id OR user2_id = NEW.reported_user_id;
-    DELETE FROM complaint WHERE reported_user_id = NEW.reported_user_id AND id != NEW.id;
+    UPDATE "user"
+    SET banned = TRUE
+    WHERE id = NEW.reported_user_id;
+    UPDATE dialog
+    SET banned = TRUE
+    WHERE user1_id = NEW.reported_user_id
+       OR user2_id = NEW.reported_user_id;
+    DELETE
+    FROM complaint
+    WHERE reported_user_id = NEW.reported_user_id
+      AND id != NEW.id;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_banned_user
     AFTER UPDATE
@@ -266,10 +296,10 @@ VALUES (3, 4),
        (3, 8),
        (3, 9);
 
-INSERT INTO message (dialog_id, sender_id, message_text)
-VALUES (2, 3, 'Hello'),
-       (2, 4, 'Hello last'),
-       (3, 5, 'Hello last 1');
+INSERT INTO message (dialog_id, sender_id, recipient_id, message_text)
+VALUES (2, 3, 4, 'Hello'),
+       (2, 4, 3, 'Hello last'),
+       (3, 5, 3, 'Hello last 1');
 
 INSERT INTO complaint_type (type_name)
 VALUES ('Порнография'),
