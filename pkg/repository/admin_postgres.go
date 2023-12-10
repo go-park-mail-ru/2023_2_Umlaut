@@ -42,10 +42,7 @@ func (r *AdminPostgres) ShowFeedback(ctx context.Context, userId int) (bool, err
 
 	query, args, err := psql.Select("id").From(feedbackTable).Where(
 		sq.And{
-			sq.Or{
-				sq.Eq{"show": false},
-				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
-			},
+			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
 			sq.Eq{"user_id": userId},
 		}).ToSql()
 
@@ -68,10 +65,7 @@ func (r *AdminPostgres) ShowRecommendation(ctx context.Context, userId int) (boo
 
 	query, args, err := psql.Select("id").From(recommendationTable).Where(
 		sq.And{
-			sq.Or{
-				sq.Eq{"show": false},
-				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
-			},
+			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
 			sq.Eq{"user_id": userId},
 		}).ToSql()
 
@@ -92,8 +86,8 @@ func (r *AdminPostgres) ShowRecommendation(ctx context.Context, userId int) (boo
 func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
 	var id int
 	query, args, err := psql.Insert(feedbackTable).
-		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment", "show").
-		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.CommentFix, stat.Comment, stat.Show).
+		Columns("user_id", "rating", "liked", "need_fix", "comment").
+		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.Comment).
 		ToSql()
 
 	if err != nil {
@@ -110,8 +104,8 @@ func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat model.Feedback)
 func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
 	var id int
 	query, args, err := psql.Insert(recommendationTable).
-		Columns("user_id", "recommend", "show").
-		Values(rec.UserId, rec.Recommend, rec.Show).
+		Columns("user_id", "rating").
+		Values(rec.UserId, rec.Rating).
 		ToSql()
 
 	if err != nil {
@@ -128,8 +122,8 @@ func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Reco
 func (r *AdminPostgres) CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error) {
 	var id int
 	query, args, err := psql.Insert(feedFeedbackTable).
-		Columns("user_id", "recommend", "show").
-		Values(rec.UserId, rec.Recommend, rec.Show).
+		Columns("user_id", "rating").
+		Values(rec.UserId, rec.Rating).
 		ToSql()
 
 	if err != nil {
@@ -147,7 +141,6 @@ func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, err
 	query, args, err := psql.
 		Select(static.FeedbackDbField).
 		From(feedbackTable).
-		Where(sq.Eq{"show": true}).
 		ToSql()
 
 	if err != nil {
@@ -170,9 +163,8 @@ func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, err
 
 func (r *AdminPostgres) GetRecommendations(ctx context.Context) ([]model.Recommendation, error) {
 	query, args, err := psql.
-		Select("id", "user_id", "recommend", "show").
+		Select("id", "user_id", "rating").
 		From(recommendationTable).
-		Where(sq.Eq{"show": true}).
 		ToSql()
 
 	if err != nil {
@@ -215,9 +207,7 @@ func scanFeedbacks(rows pgx.Rows) ([]model.Feedback, error) {
 			&feedback.Rating,
 			&feedback.Liked,
 			&feedback.NeedFix,
-			&feedback.CommentFix,
 			&feedback.Comment,
-			&feedback.Show,
 			&feedback.CreatedAt,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -243,8 +233,7 @@ func scanRecommendations(rows pgx.Rows) ([]model.Recommendation, error) {
 		err = rows.Scan(
 			&feedback.Id,
 			&feedback.UserId,
-			&feedback.Recommend,
-			&feedback.Show,
+			&feedback.Rating,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

@@ -70,7 +70,7 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 	}{
 		{
 			name:           "Success",
-			inputComplaint: model.Complaint{ComplaintType: "Test Complaint"},
+			inputComplaint: model.Complaint{ComplaintTypeId: 1},
 			mockBehavior: func(r *mock_repository.MockComplaint) {
 				r.EXPECT().CreateComplaint(gomock.Any(), gomock.Any()).Return(mockComplaintID, nil)
 			},
@@ -107,8 +107,8 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 
 func TestComplaintService_GetNextComplaint(t *testing.T) {
 	mockComplaint := model.Complaint{
-		Id:            1,
-		ComplaintType: "Test Complaint",
+		Id:              1,
+		ComplaintTypeId: 1,
 	}
 
 	tests := []struct {

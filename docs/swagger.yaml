@@ -142,8 +142,10 @@ definitions:
     type: object
   model.Complaint:
     properties:
-      complaint_type:
+      complaint_text:
         type: string
+      complaint_type_id:
+        type: integer
       created_at:
         type: string
       id:
@@ -183,8 +185,6 @@ definitions:
     properties:
       comment:
         type: string
-      comment_fix:
-        type: string
       created_at:
         type: string
       id:
@@ -195,8 +195,6 @@ definitions:
         type: string
       rating:
         type: integer
-      show:
-        type: boolean
       user_id:
         type: integer
     type: object
@@ -258,10 +256,8 @@ definitions:
         type: string
       id:
         type: integer
-      recommend:
+      rating:
         type: integer
-      show:
-        type: boolean
       user_id:
         type: integer
     type: object

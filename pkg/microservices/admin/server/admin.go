@@ -22,7 +22,7 @@ type AdminServer struct {
 
 func NewAdminServer(admin *service.AdminService, complaint *service.ComplaintService) *AdminServer {
 	return &AdminServer{
-		AdminService: admin,
+		AdminService:     admin,
 		ComplaintService: complaint,
 	}
 }
@@ -59,23 +59,23 @@ func (as *AdminServer) GetNextComplaint(ctx context.Context, _ *proto.AdminEmpty
 	}
 
 	return &proto.Complaint{
-		Id: int32(complaint.Id),
-		ReporterUserId: int32(complaint.ReporterUserId),
-		ReportedUserId: int32(complaint.ReportedUserId),
-		ComplaintType: complaint.ComplaintType,
-		CreatedAt: createdAt,
+		Id:              int32(complaint.Id),
+		ReporterUserId:  int32(complaint.ReporterUserId),
+		ReportedUserId:  int32(complaint.ReportedUserId),
+		ComplaintTypeId: int32(complaint.ComplaintTypeId),
+		ComplaintText:   complaint.ComplaintText,
+		CreatedAt:       createdAt,
 	}, nil
 }
 
 func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {
-	recommend := int(rec.Recommend)
+	rating := int(rec.Rating)
 	_, err := as.AdminService.CreateRecommendation(
 		ctx,
 		model.Recommendation{
-			Id:        int(rec.Id),
-			UserId:    int(rec.UserId),
-			Recommend: &recommend,
-			Show:      rec.Show,
+			Id:     int(rec.Id),
+			UserId: int(rec.UserId),
+			Rating: &rating,
 		})
 
 	if err != nil {
@@ -86,14 +86,13 @@ func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Reco
 }
 
 func (as *AdminServer) CreateFeedFeedback(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {
-	recommend := int(rec.Recommend)
+	rating := int(rec.Rating)
 	_, err := as.AdminService.CreateFeedFeedback(
 		ctx,
 		model.Recommendation{
-			Id:        int(rec.Id),
-			UserId:    int(rec.UserId),
-			Recommend: &recommend,
-			Show:      rec.Show,
+			Id:     int(rec.Id),
+			UserId: int(rec.UserId),
+			Rating: &rating,
 		})
 
 	if err != nil {
@@ -108,14 +107,12 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 	_, err := as.AdminService.CreateFeedback(
 		ctx,
 		model.Feedback{
-			Id:         int(stat.Id),
-			UserId:     int(stat.UserId),
-			Rating:     &rating,
-			Liked:      &stat.Liked,
-			NeedFix:    &stat.NeedFix,
-			CommentFix: &stat.CommentFix,
-			Comment:    &stat.Comment,
-			Show:       stat.Show,
+			Id:      int(stat.Id),
+			UserId:  int(stat.UserId),
+			Rating:  &rating,
+			Liked:   &stat.Liked,
+			NeedFix: &stat.NeedFix,
+			Comment: &stat.Comment,
 		})
 
 	if err != nil {

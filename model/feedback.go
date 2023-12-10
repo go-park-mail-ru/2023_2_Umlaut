@@ -3,15 +3,13 @@ package model
 import "time"
 
 type Feedback struct {
-	Id         int        `json:"id" db:"id"`
-	UserId     int        `json:"user_id" db:"user_id"`
-	Rating     *int       `json:"rating" db:"rating"`
-	Liked      *string    `json:"liked" db:"liked"`
-	NeedFix    *string    `json:"need_fix" db:"need_fix"`
-	CommentFix *string    `json:"comment_fix" db:"comment_fix"`
-	Comment    *string    `json:"comment" db:"comment"`
-	Show       bool       `json:"show" db:"show"`
-	CreatedAt  *time.Time `json:"created_at" db:"created_at"`
+	Id        int        `json:"id" db:"id"`
+	UserId    int        `json:"user_id" db:"user_id"`
+	Rating    *int       `json:"rating" db:"rating"`
+	Liked     *string    `json:"liked" db:"liked"`
+	NeedFix   *string    `json:"need_fix" db:"need_fix"`
+	Comment   *string    `json:"comment" db:"comment"`
+	CreatedAt *time.Time `json:"created_at" db:"created_at"`
 }
 
 type FeedbackStatistic struct {

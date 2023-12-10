@@ -78,12 +78,13 @@ CREATE TABLE complaint_type
 
 CREATE TABLE complaint
 (
-    id               SERIAL PRIMARY KEY,
-    reporter_user_id INT  NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    reported_user_id INT  NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
-    complaint_type   TEXT NOT NULL,
-    report_status    SMALLINT    DEFAULT 0,
-    created_at       TIMESTAMPTZ DEFAULT NOW(),
+    id                  SERIAL PRIMARY KEY,
+    reporter_user_id    INT  NOT NULL REFERENCES "user"           (id) ON DELETE CASCADE,
+    reported_user_id    INT  NOT NULL REFERENCES "user"           (id) ON DELETE CASCADE,
+    complaint_type_id   INT  NOT NULL REFERENCES "complaint_type" (id) ON DELETE CASCADE,
+    complaint_text      TEXT,
+    report_status       SMALLINT    DEFAULT 0,
+    created_at          TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (reporter_user_id, reported_user_id),
     CHECK (reporter_user_id != reported_user_id)
 );
@@ -276,4 +277,5 @@ VALUES ('Порнография'),
        ('Оскорбительное поведение'),
        ('Мошенничество'),
        ('Рекламная страница'),
-       ('Клон моей страницы (или моя старая страница)');
+       ('Клон моей страницы (или моя старая страница)'),
+       ('Другое');

@@ -30,13 +30,11 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateFeedback(
 		r.Context(),
 		&proto.Feedback{
-			UserId:     int32(r.Context().Value(static.KeyUserID).(int)),
-			Rating:     utils.ModifyInt(stat.Rating),
-			Liked:      utils.ModifyString(stat.Liked),
-			NeedFix:    utils.ModifyString(stat.NeedFix),
-			CommentFix: utils.ModifyString(stat.CommentFix),
-			Comment:    utils.ModifyString(stat.Comment),
-			Show:       stat.Show,
+			UserId:  int32(r.Context().Value(static.KeyUserID).(int)),
+			Rating:  utils.ModifyInt(stat.Rating),
+			Liked:   utils.ModifyString(stat.Liked),
+			NeedFix: utils.ModifyString(stat.NeedFix),
+			Comment: utils.ModifyString(stat.Comment),
 		})
 
 	if err != nil {
@@ -66,9 +64,8 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateRecommendation(
 		r.Context(),
 		&proto.Recommendation{
-			UserId:    int32(r.Context().Value(static.KeyUserID).(int)),
-			Recommend: utils.ModifyInt(rec.Recommend),
-			Show:      rec.Show,
+			UserId: int32(r.Context().Value(static.KeyUserID).(int)),
+			Rating: utils.ModifyInt(rec.Rating),
 		})
 	if err != nil {
 		statusCode, message := utils.ParseError(err)
@@ -97,9 +94,8 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 	_, err := h.adminMicroservice.CreateRecommendation(
 		r.Context(),
 		&proto.Recommendation{
-			UserId:    int32(r.Context().Value(static.KeyUserID).(int)),
-			Recommend: utils.ModifyInt(rec.Recommend),
-			Show:      rec.Show,
+			UserId: int32(r.Context().Value(static.KeyUserID).(int)),
+			Rating: utils.ModifyInt(rec.Rating),
 		})
 
 	if err != nil {

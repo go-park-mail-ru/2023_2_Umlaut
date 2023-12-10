@@ -1277,8 +1277,11 @@ const docTemplate = `{
         "model.Complaint": {
             "type": "object",
             "properties": {
-                "complaint_type": {
+                "complaint_text": {
                     "type": "string"
+                },
+                "complaint_type_id": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"
@@ -1340,9 +1343,6 @@ const docTemplate = `{
                 "comment": {
                     "type": "string"
                 },
-                "comment_fix": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1357,9 +1357,6 @@ const docTemplate = `{
                 },
                 "rating": {
                     "type": "integer"
-                },
-                "show": {
-                    "type": "boolean"
                 },
                 "user_id": {
                     "type": "integer"
@@ -1455,11 +1452,8 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "recommend": {
+                "rating": {
                     "type": "integer"
-                },
-                "show": {
-                    "type": "boolean"
                 },
                 "user_id": {
                     "type": "integer"
