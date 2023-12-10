@@ -507,7 +507,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Dialog ID",
+                        "description": "Recipient ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1423,6 +1423,9 @@ const docTemplate = `{
                 },
                 "message_text": {
                     "type": "string"
+                },
+                "recipient_id": {
+                    "type": "integer"
                 },
                 "sender_id": {
                     "type": "integer"

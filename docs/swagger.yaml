@@ -238,6 +238,8 @@ definitions:
         type: boolean
       message_text:
         type: string
+      recipient_id:
+        type: integer
       sender_id:
         type: integer
     type: object
@@ -637,7 +639,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Dialog ID
+      - description: Recipient ID
         in: path
         name: id
         required: true
