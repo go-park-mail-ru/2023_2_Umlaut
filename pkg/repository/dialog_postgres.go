@@ -95,6 +95,13 @@ func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (model.Dialo
 		return model.Dialog{}, fmt.Errorf("user with id: %d not found", id)
 	}
 
+	userId := ctx.Value(static.KeyUserID).(int)
+	if dialog.User1Id == userId {
+		tmp := dialog.User1Id
+		dialog.User1Id = dialog.User2Id
+		dialog.User2Id = tmp
+	}
+
 	return dialog, err
 }
 
