@@ -78,6 +78,26 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	return dialogs, nil
 }
 
+func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (model.Dialog, error) {
+	var dialog model.Dialog
+	query, args, err := psql.Select("id", "user1_id", "user2_id", "banned").
+		From(dialogTable).
+		Where(sq.Eq{"id": id}).ToSql()
+
+	if err != nil {
+		return dialog, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanDialog(row, &dialog)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.Dialog{}, fmt.Errorf("user with id: %d not found", id)
+	}
+
+	return dialog, err
+}
+
 func scanDialogs(rows pgx.Rows, userId int) ([]model.Dialog, error) {
 	var dialogs []model.Dialog
 	var err error
@@ -125,4 +145,12 @@ func scanDialogs(rows pgx.Rows, userId int) ([]model.Dialog, error) {
 	}
 
 	return dialogs, nil
+}
+func scanDialog(rows pgx.Row, dialog *model.Dialog) error {
+	return rows.Scan(
+		&dialog.Id,
+		&dialog.User1Id,
+		&dialog.User2Id,
+		&dialog.Banned,
+	)
 }
