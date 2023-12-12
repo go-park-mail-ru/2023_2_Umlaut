@@ -3,13 +3,13 @@ package server
 import (
 	"context"
 	"errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -38,7 +38,7 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	birthdayProto, err := ptypes.TimestampProto(*nextUser.Birthday)
+	birthdayProto := timestamppb.New(*nextUser.Birthday)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

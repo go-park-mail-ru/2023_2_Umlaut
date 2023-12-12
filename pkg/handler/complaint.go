@@ -10,7 +10,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/gorilla/mux"
 )
 
@@ -79,11 +78,7 @@ func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
-	createdAt, err := ptypes.Timestamp(complaint.CreatedAt)
-	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
-		return
-	}
+	createdAt := complaint.CreatedAt.AsTime()
 
 	NewSuccessClientResponseDto(r.Context(), w, model.Complaint{
 		Id:              int(complaint.Id),

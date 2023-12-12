@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 	"errors"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -53,7 +53,7 @@ func (as *AdminServer) GetNextComplaint(ctx context.Context, _ *proto.AdminEmpty
 	if err != nil {
 		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
 	}
-	createdAt, err := ptypes.TimestampProto(*complaint.CreatedAt)
+	createdAt := timestamppb.New(*complaint.CreatedAt)
 	if err != nil {
 		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
 	}
