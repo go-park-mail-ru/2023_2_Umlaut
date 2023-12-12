@@ -35,7 +35,9 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 
 // @Summary get dialog by id
 // @Tags dialog
+// @ID dialogById
 // @Accept  json
+// @Param id path integer true "dialog ID"
 // @Produce  json
 // @Success 200 {object} ClientResponseDto[model.Dialog]
 // @Failure 401,500 {object} ClientResponseDto[string]

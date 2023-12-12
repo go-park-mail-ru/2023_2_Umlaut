@@ -647,6 +647,13 @@ paths:
     get:
       consumes:
       - application/json
+      operationId: dialogById
+      parameters:
+      - description: dialog ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

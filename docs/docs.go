@@ -504,6 +504,16 @@ const docTemplate = `{
                     "dialog"
                 ],
                 "summary": "get dialog by id",
+                "operationId": "dialogById",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "dialog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
