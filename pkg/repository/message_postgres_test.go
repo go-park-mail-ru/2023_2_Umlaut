@@ -82,7 +82,7 @@ func TestMessagePostgres_GetDialogMessages(t *testing.T) {
 			AddRow(testMessages[0].Id, testMessages[0].DialogId, testMessages[0].SenderId, testMessages[0].Text, testMessages[0].IsRead, testMessages[0].CreatedAt).
 			AddRow(testMessages[1].Id, testMessages[1].DialogId, testMessages[1].SenderId, testMessages[1].Text, testMessages[1].IsRead, testMessages[1].CreatedAt))
 
-	messages, err := messageRepo.GetDialogMessages(context.Background(), dialogID)
+	messages, err := messageRepo.GetDialogMessages(context.Background(), dialogID, dialogID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, messages)

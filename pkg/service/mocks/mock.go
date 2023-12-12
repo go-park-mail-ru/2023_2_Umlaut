@@ -305,6 +305,21 @@ func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockDialog)(nil).CreateDialog), ctx, dialog)
 }
 
+// GetDialog mocks base method.
+func (m *MockDialog) GetDialog(ctx context.Context, id int) (model.Dialog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDialog", ctx, id)
+	ret0, _ := ret[0].(model.Dialog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDialog indicates an expected call of GetDialog.
+func (mr *MockDialogMockRecorder) GetDialog(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialog", reflect.TypeOf((*MockDialog)(nil).GetDialog), ctx, id)
+}
+
 // GetDialogs mocks base method.
 func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
 	m.ctrl.T.Helper()
@@ -344,18 +359,18 @@ func (m *MockMessage) EXPECT() *MockMessageMockRecorder {
 }
 
 // GetDialogMessages mocks base method.
-func (m *MockMessage) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+func (m *MockMessage) GetDialogMessages(ctx context.Context, userId, recipientId int) ([]model.Message, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, dialogId)
+	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, userId, recipientId)
 	ret0, _ := ret[0].([]model.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetDialogMessages indicates an expected call of GetDialogMessages.
-func (mr *MockMessageMockRecorder) GetDialogMessages(ctx, dialogId interface{}) *gomock.Call {
+func (mr *MockMessageMockRecorder) GetDialogMessages(ctx, userId, recipientId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockMessage)(nil).GetDialogMessages), ctx, dialogId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockMessage)(nil).GetDialogMessages), ctx, userId, recipientId)
 }
 
 // SaveOrUpdateMessage mocks base method.

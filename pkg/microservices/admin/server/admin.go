@@ -151,7 +151,7 @@ func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.
 }
 
 func getProtoLikedMap(likedMap map[string]int32) []*proto.LikedMap {
-	result := []*proto.LikedMap{}
+	var result []*proto.LikedMap
 	for key, value := range likedMap {
 		result = append(result, &proto.LikedMap{Liked: key, Count: value})
 	}
@@ -159,7 +159,7 @@ func getProtoLikedMap(likedMap map[string]int32) []*proto.LikedMap {
 }
 
 func getProtoNeedFixMap(needFixMap map[string]model.NeedFixObject) []*proto.NeedFixMap {
-	result := []*proto.NeedFixMap{}
+	var result []*proto.NeedFixMap
 	for key, value := range needFixMap {
 		result = append(
 			result,
