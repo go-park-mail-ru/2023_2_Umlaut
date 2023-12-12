@@ -24,9 +24,7 @@ func ModifyArray(data *[]string) []string {
 		return []string{}
 	}
 	var result []string
-	for _, path := range *data {
-		result = append(result, path)
-	}
+	result = append(result, *data...)
 	return result
 }
 
