@@ -81,7 +81,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			hub.Broadcast <- &Message{
 				Id:          *newMessage.Id,
 				SenderId:    *newMessage.SenderId,
-				RecipientId: receivedMessage.RecipientId,
+				RecipientId: *newMessage.RecipientId,
 				DialogId:    *newMessage.DialogId,
 				Text:        *newMessage.Text,
 				IsRead:      *newMessage.IsRead,

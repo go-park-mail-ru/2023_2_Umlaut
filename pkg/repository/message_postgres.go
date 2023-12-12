@@ -123,6 +123,7 @@ func scanMessage(rows pgx.Row) (model.Message, error) {
 		&message.Id,
 		&message.DialogId,
 		&message.SenderId,
+		&message.RecipientId,
 		&message.Text,
 		&message.IsRead,
 		&message.CreatedAt,
