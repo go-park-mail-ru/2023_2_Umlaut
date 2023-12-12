@@ -1,5 +1,5 @@
 # path to docker compose file
-DCOMPOSE:=docker-compose.yaml
+DCOMPOSE:=docker-compose.yml
 
 # improve build time
 DOCKER_BUILD_KIT:=COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1
