@@ -17,5 +17,5 @@ func (h *Handler) getAllTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(r.Context(), w, tags)
+	NewSuccessClientResponseDto(r.Context(), w, tags)
 }

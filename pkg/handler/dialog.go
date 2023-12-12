@@ -30,7 +30,7 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
-	NewSuccessClientResponseArrayDto(r.Context(), w, dialogs)
+	NewSuccessClientResponseDto(r.Context(), w, dialogs)
 }
 
 // @Summary get dialog message
@@ -57,5 +57,5 @@ func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "нет доступа")
 	}
 
-	NewSuccessClientResponseArrayDto(r.Context(), w, messages)
+	NewSuccessClientResponseDto(r.Context(), w, messages)
 }

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
@@ -21,13 +21,17 @@ import (
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feedback [post]
 func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var stat model.Feedback
-	if err := decoder.Decode(&stat); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	_, err := h.adminMicroservice.CreateFeedback(
+	var stat model.Feedback
+	if err := stat.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	_, err = h.adminMicroservice.CreateFeedback(
 		r.Context(),
 		&proto.Feedback{
 			UserId:  int32(r.Context().Value(static.KeyUserID).(int)),
@@ -55,13 +59,17 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/recommendation [post]
 func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var rec model.Recommendation
-	if err := decoder.Decode(&rec); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	_, err := h.adminMicroservice.CreateRecommendation(
+	var rec model.Recommendation
+	if err := rec.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	_, err = h.adminMicroservice.CreateRecommendation(
 		r.Context(),
 		&proto.Recommendation{
 			UserId: int32(r.Context().Value(static.KeyUserID).(int)),
@@ -85,13 +93,17 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed-feedback [post]
 func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var rec model.Recommendation
-	if err := decoder.Decode(&rec); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	_, err := h.adminMicroservice.CreateRecommendation(
+	var rec model.Recommendation
+	if err := rec.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+	_, err = h.adminMicroservice.CreateRecommendation(
 		r.Context(),
 		&proto.Recommendation{
 			UserId: int32(r.Context().Value(static.KeyUserID).(int)),

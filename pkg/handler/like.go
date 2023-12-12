@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -19,16 +19,21 @@ import (
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/like [post]
 func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var like model.Like
-	if err := decoder.Decode(&like); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	var like model.Like
+	if err := like.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
 	userId := r.Context().Value(static.KeyUserID).(int)
 	like.LikedByUserId = userId
 
-	err := h.services.Like.CreateLike(r.Context(), like)
+	err = h.services.Like.CreateLike(r.Context(), like)
 	if err != nil {
 		if errors.Is(err, static.ErrAlreadyExists) {
 			newErrorClientResponseDto(r.Context(), w, http.StatusOK, "already liked")

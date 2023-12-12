@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"time"
 
@@ -20,12 +20,17 @@ import (
 // @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/admin [post]
 func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var input signInInput
-	if err := decoder.Decode(&input); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	var input signInInput
+	if err := input.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
 	cookie, err := h.authMicroservice.LogInAdmin(
 		r.Context(),
 		&proto.SignInInput{Mail: input.Mail, Password: input.Password},
@@ -51,12 +56,17 @@ func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/login [post]
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var input signInInput
-	if err := decoder.Decode(&input); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	var input signInInput
+	if err := input.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
 	cookie, err := h.authMicroservice.SignIn(
 		r.Context(),
 		&proto.SignInInput{Mail: input.Mail, Password: input.Password},
@@ -114,12 +124,17 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/sign-up [post]
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var input signUpInput
-	if err := decoder.Decode(&input); err != nil {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	var input signUpInput
+	if err := input.UnmarshalJSON(body); err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
 	userId, err := h.authMicroservice.SignUp(
 		r.Context(),
 		&proto.SignUpInput{Mail: input.Mail, Password: input.Password, Name: input.Name},

@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -30,7 +30,7 @@ func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(r.Context(), w, complaintTypes)
+	NewSuccessClientResponseDto(r.Context(), w, complaintTypes)
 }
 
 // @Summary create complaint
@@ -43,16 +43,20 @@ func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,401,409,500 {object} ClientResponseDto[string]
 // @Router /api/v1/complaint [post]
 func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
 	var complaint model.Complaint
-	if err := decoder.Decode(&complaint); err != nil {
+	if err := complaint.UnmarshalJSON(body); err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
 	complaint.ReporterUserId = r.Context().Value(static.KeyUserID).(int)
 
-	_, err := h.services.Complaint.CreateComplaint(r.Context(), complaint)
+	_, err = h.services.Complaint.CreateComplaint(r.Context(), complaint)
 	if err != nil {
 		if errors.Is(err, static.ErrAlreadyExists) {
 			newErrorClientResponseDto(r.Context(), w, http.StatusConflict, "complaint already exists")
