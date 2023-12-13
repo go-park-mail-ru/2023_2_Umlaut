@@ -58,7 +58,6 @@ jobs:
     needs: [ build ]
     name: Backend deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
       - name: git pull
         uses: appleboy/ssh-action@master
@@ -70,6 +69,7 @@ jobs:
             cd 2023_2_Umlaut/
             git pull
       - name: run project
+        timeout-minutes: 20
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -77,4 +77,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd 2023_2_Umlaut/
-            sudo make
+            sudo make up
