@@ -66,7 +66,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd 2023_2_Umlaut/
-            git checkout dev
             git pull
       - name: run project
         uses: appleboy/ssh-action@master
