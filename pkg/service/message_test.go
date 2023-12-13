@@ -27,7 +27,7 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 		{
 			name: "Success",
 			mockBehavior: func(r *mock_repository.MockMessage) {
-				r.EXPECT().GetDialogMessages(gomock.Any(), 1).Return(mockMessages, nil)
+				r.EXPECT().GetDialogMessages(gomock.Any(), 1, 2).Return(mockMessages, nil)
 			},
 			expectedResult: mockMessages,
 			expectedError:  nil,
@@ -35,7 +35,7 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 		{
 			name: "Error",
 			mockBehavior: func(r *mock_repository.MockMessage) {
-				r.EXPECT().GetDialogMessages(gomock.Any(), 1).Return(nil, errors.New("error getting messages"))
+				r.EXPECT().GetDialogMessages(gomock.Any(), 1, 2).Return(nil, errors.New("error getting messages"))
 			},
 			expectedResult: nil,
 			expectedError:  errors.New("error getting messages"),
@@ -51,7 +51,7 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 			test.mockBehavior(repoMessage)
 
 			service := &MessageService{repoMessage: repoMessage}
-			messages, err := service.GetDialogMessages(context.Background(), 1)
+			messages, err := service.GetDialogMessages(context.Background(), 1, 2)
 
 			assert.Equal(t, test.expectedResult, messages)
 			assert.Equal(t, test.expectedError, err)

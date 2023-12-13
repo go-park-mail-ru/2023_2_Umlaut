@@ -38,9 +38,9 @@ func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, co
 func (m *MinioProvider) DeleteFile(ctx context.Context, bucketName, link string) error {
 	i := strings.LastIndex(link, "/")
 	if i == -1 {
-		return fmt.Errorf("failed to upload file. Uncorrect link");
+		return fmt.Errorf("failed to upload file. Uncorrect link")
 	}
-	fileName := link[i + 1:]
+	fileName := link[i+1:]
 
 	err := m.client.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{})
 	if err != nil {

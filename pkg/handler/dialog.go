@@ -33,6 +33,30 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 	NewSuccessClientResponseDto(r.Context(), w, dialogs)
 }
 
+// @Summary get dialog by id
+// @Tags dialog
+// @ID dialogById
+// @Accept  json
+// @Param id path integer true "dialog ID"
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[model.Dialog]
+// @Failure 401,500 {object} ClientResponseDto[string]
+// @Router /api/v1/dialogs/{id} [get]
+func (h *Handler) getDialog(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
+		return
+	}
+	dialog, err := h.services.Dialog.GetDialog(r.Context(), id)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	NewSuccessClientResponseDto(r.Context(), w, dialog)
+}
+
 // @Summary get dialog message
 // @Tags dialog
 // @Accept  json

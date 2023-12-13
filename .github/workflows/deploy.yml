@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  tests:
+    name: Tests check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Installation Go v1.21
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21.x'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Start tests
+        run: |
+          go get github.com/golang/mock/gomock
+          go install github.com/golang/mock/mockgen
+          go get golang.org/x/tools/go/packages
+          make mod
+          make mock
+          make tests
+
+  linter:
+    name: Linter check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Installation Go v1.21
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21.x'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run linter
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+          $(go env GOPATH)/bin/golangci-lint run --timeout=5m
+
+  build:
+    needs: [ linter, tests ]
+    name: Run Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Shutdown process
+        run: make down
+      - name: Build
+        run: make build
+
+  deploy:
+    needs: [ build ]
+    name: Backend deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: git pull
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd 2023_2_Umlaut/
+            git checkout dev
+            git pull
+      - name: run project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 20m
+          script: |
+            cd 2023_2_Umlaut/
+            sudo make up

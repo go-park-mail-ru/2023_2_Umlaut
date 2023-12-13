@@ -59,7 +59,7 @@ func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, a
 // @version 1.0
 // @description API Server for Umlaut Application
 
-// @host localhost:8000
+// @host umlaut-bmstu.me
 // @BasePath /
 func main() {
 	logger, err := utils.InitLogger()

@@ -127,7 +127,7 @@ definitions:
     - name
     - password
     type: object
-host: localhost:8000
+host: umlaut-bmstu.me
 info:
   contact: {}
   description: API Server for Umlaut Application
@@ -444,6 +444,35 @@ paths:
           schema:
             $ref: '#/definitions/handler.ClientResponseDto'
       summary: get user dialogs
+      tags:
+      - dialog
+  /api/v1/dialogs/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: dialogById
+      parameters:
+      - description: dialog ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto'
+      summary: get dialog by id
       tags:
       - dialog
   /api/v1/dialogs/{id}/message:

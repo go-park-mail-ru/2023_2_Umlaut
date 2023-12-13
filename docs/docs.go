@@ -492,6 +492,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/dialogs/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dialog"
+                ],
+                "summary": "get dialog by id",
+                "operationId": "dialogById",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "dialog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/dialogs/{id}/message": {
             "get": {
                 "consumes": [
@@ -1256,7 +1300,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8000",
+	Host:             "umlaut-bmstu.me",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Umlaut API",

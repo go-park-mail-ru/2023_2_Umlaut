@@ -28,8 +28,8 @@ CREATE TABLE "user"
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
     age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
-    created_at    TIMESTAMPTZ          DEFAULT NOW(),
-    updated_at    TIMESTAMPTZ          DEFAULT NOW()
+    created_at    TIMESTAMPTZ          DEFAULT timezone('Europe/Moscow'::text, NOW()),
+    updated_at    TIMESTAMPTZ          DEFAULT timezone('Europe/Moscow'::text, NOW())
 );
 
 CREATE TABLE tag
@@ -43,7 +43,7 @@ CREATE TABLE "like"
     liked_by_user_id INT     NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     liked_to_user_id INT     NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     is_like          BOOLEAN NOT NULL,
-    created_at       TIMESTAMPTZ DEFAULT NOW(),
+    created_at       TIMESTAMPTZ DEFAULT timezone('Europe/Moscow'::text, NOW()),
     UNIQUE (liked_by_user_id, liked_to_user_id)
 );
 
@@ -55,7 +55,7 @@ CREATE TABLE dialog
     banned     BOOlEAN     DEFAULT FALSE,
 --     last_message_id INT REFERENCES message (id) ON DELETE SET NULL DEFAULT NULL, не раскоментирывать!
     UNIQUE (user1_id, user2_id),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT timezone('Europe/Moscow'::text, NOW()),
     CONSTRAINT check_pair_order CHECK (user1_id < user2_id)
 );
 
@@ -67,7 +67,7 @@ CREATE TABLE message
     recipient_id INT  NOT NULL REFERENCES "user" (id) ON DELETE SET NULL,
     message_text TEXT NOT NULL,
     is_read      BOOLEAN     DEFAULT FALSE,
-    created_at   TIMESTAMPTZ DEFAULT NOW()
+    created_at   TIMESTAMPTZ DEFAULT timezone('Europe/Moscow'::text, NOW())
 );
 
 ALTER TABLE dialog
@@ -87,7 +87,7 @@ CREATE TABLE complaint
     complaint_type_id INT NOT NULL REFERENCES "complaint_type" (id) ON DELETE CASCADE,
     complaint_text    TEXT,
     report_status     SMALLINT    DEFAULT 0,
-    created_at        TIMESTAMPTZ DEFAULT NOW(),
+    created_at        TIMESTAMPTZ DEFAULT timezone('Europe/Moscow'::text, NOW()),
     UNIQUE (reporter_user_id, reported_user_id),
     CHECK (reporter_user_id != reported_user_id
         )
@@ -166,7 +166,7 @@ CREATE
 $$
 BEGIN
     NEW.updated_at
-        = NOW();
+        = timezone('Europe/Moscow'::text, NOW());
     RETURN NEW;
 END;
 $$
@@ -287,19 +287,6 @@ VALUES ('Фёдор', 'fedor@mail.ru',
        ('Юлия', 'julia@mail.ru', '635262426a51506543766a5078476349596d747150577c4a8d09ca3762af61e59520943dc26494f8941b',
         'cRbBjQPeCvjPxGcIYmtqPW', 0, 1, 'Студент 1 курса МГУ', 'Новые знакомства', NULL, 'Неполное высшее',
         'Волейбол, компьютерные игры', '2003-01-01', ARRAY ['Путешествия', 'Наука']);
-
-INSERT INTO dialog (user1_id, user2_id)
-VALUES (3, 4),
-       (3, 5),
-       (3, 6),
-       (3, 7),
-       (3, 8),
-       (3, 9);
-
-INSERT INTO message (dialog_id, sender_id, recipient_id, message_text)
-VALUES (2, 3, 4, 'Hello'),
-       (2, 4, 3, 'Hello last'),
-       (3, 5, 3, 'Hello last 1');
 
 INSERT INTO complaint_type (type_name)
 VALUES ('Порнография'),

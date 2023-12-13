@@ -72,7 +72,7 @@ func (h *Handler) InitRoutes() http.Handler {
 
 	apiRouter := api.PathPrefix("/v1").Subrouter()
 	apiRouter.Use(
-		//h.csrfMiddleware,
+		h.csrfMiddleware,
 		h.authMiddleware,
 	)
 	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
@@ -83,6 +83,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/user/photo", h.deleteUserPhoto).Methods("DELETE", "OPTIONS")
 	apiRouter.HandleFunc("/like", h.createLike).Methods("POST", "OPTIONS")
 	apiRouter.HandleFunc("/dialogs", h.getDialogs).Methods("GET")
+	apiRouter.HandleFunc("/dialogs/{id}", h.getDialog).Methods("GET")
 	apiRouter.HandleFunc("/dialogs/{id}/message", h.getDialogMessage).Methods("GET")
 	apiRouter.HandleFunc("/tag", h.getAllTags).Methods("GET")
 	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
