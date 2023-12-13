@@ -72,7 +72,7 @@ func (h *Handler) InitRoutes() http.Handler {
 
 	apiRouter := api.PathPrefix("/v1").Subrouter()
 	apiRouter.Use(
-		//h.csrfMiddleware,
+		h.csrfMiddleware,
 		h.authMiddleware,
 	)
 	apiRouter.HandleFunc("/feed", h.feed).Methods("GET")
