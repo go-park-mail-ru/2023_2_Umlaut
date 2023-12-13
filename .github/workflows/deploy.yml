@@ -58,6 +58,7 @@ jobs:
     needs: [ build ]
     name: Backend deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: git pull
         uses: appleboy/ssh-action@master
