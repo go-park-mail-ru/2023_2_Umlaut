@@ -69,12 +69,12 @@ jobs:
             cd 2023_2_Umlaut/
             git pull
       - name: run project
-        timeout-minutes: 20
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 20m
           script: |
             cd 2023_2_Umlaut/
             sudo make up
