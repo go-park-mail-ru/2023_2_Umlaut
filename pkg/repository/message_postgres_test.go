@@ -77,7 +77,7 @@ func TestMessagePostgres_GetDialogMessages(t *testing.T) {
 	testMessages := []model.Message{testMessage, testMessage}
 
 	mock.ExpectQuery(`SELECT`).
-		WithArgs(dialogID).
+		WithArgs(dialogID, dialogID, dialogID, dialogID).
 		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "recipient_id", "message_text", "is_read", "created_at"}).
 			AddRow(testMessages[0].Id, testMessages[0].DialogId, testMessages[0].SenderId, testMessages[0].RecipientId, testMessages[0].Text, testMessages[0].IsRead, testMessages[0].CreatedAt).
 			AddRow(testMessages[1].Id, testMessages[1].DialogId, testMessages[1].SenderId, testMessages[1].RecipientId, testMessages[1].Text, testMessages[1].IsRead, testMessages[1].CreatedAt))
