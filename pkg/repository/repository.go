@@ -34,10 +34,11 @@ type Like interface {
 type Dialog interface {
 	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
 	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
+	GetDialogById(ctx context.Context, id int) (model.Dialog, error)
 }
 
 type Message interface {
-	GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error)
+	GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]model.Message, error)
 	CreateMessage(ctx context.Context, message model.Message) (model.Message, error)
 	UpdateMessage(ctx context.Context, message model.Message) (model.Message, error)
 }
@@ -99,14 +100,14 @@ type PgxPoolInterface interface {
 	Close()
 }
 
-func NewRepository(db *pgxpool.Pool, db_admin *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
+func NewRepository(db *pgxpool.Pool, dbAdmin *pgxpool.Pool, redisClient *redis.Client, minioClient *minio.Client) *Repository {
 	return &Repository{
 		User:       NewUserPostgres(db),
 		Like:       NewLikePostgres(db),
 		Dialog:     NewDialogPostgres(db),
 		Message:    NewMessagePostgres(db),
 		Tag:        NewTagPostgres(db),
-		Admin:      NewAdminPostgres(db_admin),
+		Admin:      NewAdminPostgres(dbAdmin),
 		Complaint:  NewComplaintPostgres(db),
 		Store:      NewRedisStore(redisClient),
 		FileServer: NewMinioProvider(minioClient),

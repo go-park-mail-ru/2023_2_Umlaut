@@ -68,11 +68,12 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			break
 		}
 		newMessage, err := services.Message.SaveOrUpdateMessage(ctx, model.Message{
-			Id:       &receivedMessage.Id,
-			SenderId: &receivedMessage.SenderId,
-			DialogId: &receivedMessage.DialogId,
-			Text:     &receivedMessage.Text,
-			IsRead:   &receivedMessage.IsRead,
+			Id:          &receivedMessage.Id,
+			SenderId:    &receivedMessage.SenderId,
+			DialogId:    &receivedMessage.DialogId,
+			RecipientId: &receivedMessage.RecipientId,
+			Text:        &receivedMessage.Text,
+			IsRead:      &receivedMessage.IsRead,
 		})
 		if err != nil {
 			//TODO: do something
@@ -80,7 +81,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			hub.Broadcast <- &Message{
 				Id:          *newMessage.Id,
 				SenderId:    *newMessage.SenderId,
-				RecipientId: receivedMessage.RecipientId,
+				RecipientId: *newMessage.RecipientId,
 				DialogId:    *newMessage.DialogId,
 				Text:        *newMessage.Text,
 				IsRead:      *newMessage.IsRead,

@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
-	"github.com/golang/protobuf/ptypes"
 )
 
 // @Summary get user for feed
@@ -30,11 +29,7 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
-	birthday, err := ptypes.Timestamp(user.Birthday)
-	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
-		return
-	}
+	birthday := user.Birthday.AsTime()
 	preferGender := int(user.PreferGender)
 	age := int(user.Age)
 

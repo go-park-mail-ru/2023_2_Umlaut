@@ -36,10 +36,11 @@ type Like interface {
 type Dialog interface {
 	CreateDialog(ctx context.Context, dialog model.Dialog) (int, error)
 	GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error)
+	GetDialog(ctx context.Context, id int) (model.Dialog, error)
 }
 
 type Message interface {
-	GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error)
+	GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]model.Message, error)
 	SaveOrUpdateMessage(ctx context.Context, message model.Message) (model.Message, error)
 }
 

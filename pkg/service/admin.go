@@ -63,9 +63,9 @@ func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (model.
 	var counter [11]int32
 	sum := 0
 	for _, recommendation := range recommendations {
-		if recommendation.Recommend != nil {
-			counter[*recommendation.Recommend] += 1
-			sum += *recommendation.Recommend
+		if recommendation.Rating != nil {
+			counter[*recommendation.Rating] += 1
+			sum += *recommendation.Rating
 		}
 	}
 	recommendationsStat.AvgRecommend = float32(sum) / float32(len(recommendations))
@@ -95,8 +95,8 @@ func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {
 		if feedback.NeedFix != nil {
 			tmp := needFixMap[*feedback.NeedFix]
 			tmp.Count += 1
-			if feedback.CommentFix != nil {
-				tmp.CommentFix = append(tmp.CommentFix, *feedback.CommentFix)
+			if feedback.Comment != nil {
+				tmp.CommentFix = append(tmp.CommentFix, *feedback.Comment)
 			}
 			needFixMap[*feedback.NeedFix] = tmp
 		}

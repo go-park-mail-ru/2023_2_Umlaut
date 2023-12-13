@@ -44,17 +44,3 @@ func (h *Handler) registerUserToHub(w http.ResponseWriter, r *http.Request) {
 	go cl.WriteMessage()
 	cl.ReadMessage(r.Context(), h.hub, h.services)
 }
-
-//func (h *Handler) addDialogsToUserHub(w http.ResponseWriter, r *http.Request, userId int, dialogs []model.Dialog) error {
-//	//if _, ok := h.hub.Users[userId]; !ok {
-//	//	h.registerUserToHub(w, r)
-//	//}
-//	if _, ok := h.hub.Users[userId]; !ok {
-//		return errors.New("user has not ws connect")
-//	}
-//
-//	for _, dialog := range dialogs {
-//		h.hub.Users[userId].Dialogs[dialog.Id] = true
-//	}
-//	return nil
-//}

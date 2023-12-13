@@ -28,6 +28,11 @@ socket.onerror = error => {
 // 	CreatedAt   time.Time `json:"created_at"`
 // }
 
+// type Message struct {
+//     type string `json:"type" // "Message" || "Match"`
+//     payload interface `json:"payload"` // объект сообщения или объект пары
+// }
+
 // примеры создания сообщения:
 socket.send(`{
     "sender_id": 101,

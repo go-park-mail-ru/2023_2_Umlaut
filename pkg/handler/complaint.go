@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -10,7 +10,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/gorilla/mux"
 )
 
@@ -30,7 +29,7 @@ func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	NewSuccessClientResponseArrayDto(r.Context(), w, complaintTypes)
+	NewSuccessClientResponseDto(r.Context(), w, complaintTypes)
 }
 
 // @Summary create complaint
@@ -43,16 +42,20 @@ func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,401,409,500 {object} ClientResponseDto[string]
 // @Router /api/v1/complaint [post]
 func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
 	var complaint model.Complaint
-	if err := decoder.Decode(&complaint); err != nil {
+	if err := complaint.UnmarshalJSON(body); err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
 	complaint.ReporterUserId = r.Context().Value(static.KeyUserID).(int)
 
-	_, err := h.services.Complaint.CreateComplaint(r.Context(), complaint)
+	_, err = h.services.Complaint.CreateComplaint(r.Context(), complaint)
 	if err != nil {
 		if errors.Is(err, static.ErrAlreadyExists) {
 			newErrorClientResponseDto(r.Context(), w, http.StatusConflict, "complaint already exists")
@@ -79,17 +82,15 @@ func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
-	createdAt, err := ptypes.Timestamp(complaint.CreatedAt)
-	if err != nil {
-		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
-		return
-	}
+	createdAt := complaint.CreatedAt.AsTime()
 
 	NewSuccessClientResponseDto(r.Context(), w, model.Complaint{
-		Id:             int(complaint.Id),
-		ReporterUserId: int(complaint.ReporterUserId),
-		ReportedUserId: int(complaint.ReportedUserId),
-		CreatedAt:      &createdAt,
+		Id:              int(complaint.Id),
+		ReporterUserId:  int(complaint.ReporterUserId),
+		ReportedUserId:  int(complaint.ReportedUserId),
+		ComplaintTypeId: int(complaint.ComplaintTypeId),
+		ComplaintText:   &complaint.ComplaintText,
+		CreatedAt:       &createdAt,
 	})
 }
 

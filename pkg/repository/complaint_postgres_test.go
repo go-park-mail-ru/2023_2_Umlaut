@@ -24,16 +24,18 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 	defer mock.Close()
 
 	complaintRepo := NewComplaintPostgres(mock)
-
+	
+	complaintText := "complaint"
 	testComplaint := model.Complaint{
-		ReporterUserId: 1,
-		ReportedUserId: 2,
-		ComplaintType:  "complaint",
+		ReporterUserId:  1,
+		ReportedUserId:  2,
+		ComplaintTypeId: 1,
+		ComplaintText: &complaintText,
 	}
 
 	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(`INSERT INTO "complaint"`).
-		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintType).
+		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintTypeId, testComplaint.ComplaintText).
 		WillReturnRows(pgxmock.NewRows([]string{"id"}).AddRow(1))
 
 	createdID, err := complaintRepo.CreateComplaint(context.Background(), testComplaint)
@@ -43,7 +45,7 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 
 	// Проверяем ситуацию с дубликатом
 	mock.ExpectQuery(`INSERT INTO "complaint"`).
-		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintType).
+	WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintTypeId, testComplaint.ComplaintText).
 		WillReturnError(static.ErrAlreadyExists)
 
 	_, err = complaintRepo.CreateComplaint(context.Background(), testComplaint)
@@ -52,7 +54,7 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 
 	// Проверка других случаев ошибок
 	mock.ExpectQuery(`INSERT INTO "complaint"`).
-		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintType).
+	WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintTypeId, testComplaint.ComplaintText).
 		WillReturnError(errors.New("some other error"))
 
 	_, err = complaintRepo.CreateComplaint(context.Background(), testComplaint)
@@ -137,11 +139,13 @@ func TestComplaintPostgres_AcceptComplaint(t *testing.T) {
 
 	complaintRepo := NewComplaintPostgres(mock)
 
+	testComplaintText := "complaint"
+
 	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(`UPDATE "complaint"`).
 		WithArgs(1, 1).
-		WillReturnRows(pgxmock.NewRows([]string{"id", "reporter_user_id", "reported_user_id", "complaint_type", "created_at"}).
-			AddRow(1, 1, 2, "type1", &time.Time{}))
+		WillReturnRows(pgxmock.NewRows([]string{"id", "reporter_user_id", "reported_user_id", "complaint_type_id", "complaint_text", "created_at"}).
+			AddRow(1, 1, 2, 1, &testComplaintText, &time.Time{}))
 
 	_, err = complaintRepo.AcceptComplaint(context.Background(), 1)
 
@@ -168,17 +172,21 @@ func TestComplaintPostgres_GetNextComplaint(t *testing.T) {
 
 	complaintRepo := NewComplaintPostgres(mock)
 
+	testComplaintText := "complaint"
+
 	testComplaint := model.Complaint{
-		Id: 1,
-		ReporterUserId: 1,
-		ReportedUserId: 2,
-		ComplaintType: "type1",
-		CreatedAt: &time.Time{},
+		Id:              1,
+		ReporterUserId:  1,
+		ReportedUserId:  2,
+		ComplaintTypeId: 1,
+		ComplaintText: &testComplaintText,
+		CreatedAt:       &time.Time{},
 	}
+
 	mock.ExpectQuery(`SELECT`).
 		WithArgs(0).
-		WillReturnRows(pgxmock.NewRows([]string{"id", "reporter_user_id", "reported_user_id", "complaint_type", "created_at"}).
-		AddRow(1, 1, 2, "type1", &time.Time{}))
+		WillReturnRows(pgxmock.NewRows([]string{"id", "reporter_user_id", "reported_user_id", "complaint_type_id", "complaint_text", "created_at"}).
+			AddRow(1, 1, 2, 1, &testComplaintText, &time.Time{}))
 
 	complaint, _ := complaintRepo.GetNextComplaint(context.Background())
 	assert.Equal(t, testComplaint, complaint)

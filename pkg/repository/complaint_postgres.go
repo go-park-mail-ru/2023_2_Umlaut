@@ -47,8 +47,14 @@ func (r *ComplaintPostgres) GetComplaintTypes(ctx context.Context) ([]model.Comp
 func (r *ComplaintPostgres) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
 	var id int
 	query, args, err := psql.Insert(complaintTable).
-		Columns("reporter_user_id", "reported_user_id", "complaint_type").
-		Values(complaint.ReporterUserId, complaint.ReportedUserId, complaint.ComplaintType).
+		Columns("reporter_user_id",
+			"reported_user_id",
+			"complaint_type_id",
+			"complaint_text").
+		Values(complaint.ReporterUserId,
+			complaint.ReportedUserId,
+			complaint.ComplaintTypeId,
+			complaint.ComplaintText).
 		ToSql()
 
 	if err != nil {
@@ -121,7 +127,8 @@ func scanComplaint(row pgx.Row, complaint *model.Complaint) error {
 		&complaint.Id,
 		&complaint.ReporterUserId,
 		&complaint.ReportedUserId,
-		&complaint.ComplaintType,
+		&complaint.ComplaintTypeId,
+		&complaint.ComplaintText,
 		&complaint.CreatedAt,
 	)
 

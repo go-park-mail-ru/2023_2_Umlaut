@@ -31,10 +31,10 @@ func TestHandler_getAllTags(t *testing.T) {
 		{
 			name: "Internal Server Error",
 			mockBehavior: func(r *mock_service.MockTag) {
-				r.EXPECT().GetAllTags(gomock.Any()).Return(nil, errors.New("Internal Server Error"))
+				r.EXPECT().GetAllTags(gomock.Any()).Return(nil, errors.New("internal Server Error"))
 			},
 			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"status":500,"message":"Internal Server Error","payload":""}`,
+			expectedResponseBody: `{"status":500,"message":"internal Server Error","payload":""}`,
 		},
 	}
 

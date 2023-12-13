@@ -19,9 +19,9 @@ import (
 func TestHandler_createComplaint(t *testing.T) {
 
 	mockComplaint := model.Complaint{
-		ReporterUserId: 1,
-		ReportedUserId: 2,
-		ComplaintType:  "complaint",
+		ReporterUserId:  1,
+		ReportedUserId:  2,
+		ComplaintTypeId: 1,
 	}
 
 	tests := []struct {
@@ -33,7 +33,7 @@ func TestHandler_createComplaint(t *testing.T) {
 	}{
 		{
 			name:        "Ok",
-			requestBody: `{"reported_user_id": 2, "complaint_type": "complaint"}`,
+			requestBody: `{"reported_user_id": 2, "complaint_type_id": 1}`,
 			mockBehavior: func(r *mock_service.MockComplaint) {
 				r.EXPECT().CreateComplaint(gomock.Any(), mockComplaint).Return(1, nil)
 			},
@@ -42,7 +42,7 @@ func TestHandler_createComplaint(t *testing.T) {
 		},
 		{
 			name:        "invalid input body",
-			requestBody: `{"reported_user_id": 2, "complaint_type": "complaint}`,
+			requestBody: `{"reported_user_id": 2, "complaint_type_id": "complaint}`,
 			mockBehavior: func(r *mock_service.MockComplaint) {
 			},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -50,7 +50,7 @@ func TestHandler_createComplaint(t *testing.T) {
 		},
 		{
 			name:        "already exists",
-			requestBody: `{"reported_user_id": 2, "complaint_type": "complaint"}`,
+			requestBody: `{"reported_user_id": 2, "complaint_type_id": 1}`,
 			mockBehavior: func(r *mock_service.MockComplaint) {
 				r.EXPECT().CreateComplaint(gomock.Any(), mockComplaint).Return(1, static.ErrAlreadyExists)
 			},
@@ -59,7 +59,7 @@ func TestHandler_createComplaint(t *testing.T) {
 		},
 		{
 			name:        "error",
-			requestBody: `{"reported_user_id": 2, "complaint_type": "complaint"}`,
+			requestBody: `{"reported_user_id": 2, "complaint_type_id": 1}`,
 			mockBehavior: func(r *mock_service.MockComplaint) {
 				r.EXPECT().CreateComplaint(gomock.Any(), mockComplaint).Return(1, errors.New("some error"))
 			},
@@ -104,11 +104,11 @@ func TestHandler_getAllComplaintTypes(t *testing.T) {
 			mockBehavior: func(r *mock_service.MockComplaint) {
 				complaintTypes := []model.ComplaintType{
 					{
-						Id: 1,
+						Id:       1,
 						TypeName: "type1",
 					},
 					{
-						Id: 2,
+						Id:       2,
 						TypeName: "type2",
 					},
 				}
@@ -134,7 +134,7 @@ func TestHandler_getAllComplaintTypes(t *testing.T) {
 
 			complaintService := mock_service.NewMockComplaint(c)
 			test.mockBehavior(complaintService)
-			
+
 			ctx := context.WithValue(context.Background(), static.KeyUserID, 1)
 			services := &service.Service{Complaint: complaintService}
 			handler := Handler{services: services}

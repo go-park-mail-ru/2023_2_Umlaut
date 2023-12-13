@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -85,9 +85,13 @@ func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
 // @Failure 401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user [post]
 func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
 	var user model.User
-	if err := decoder.Decode(&user); err != nil {
+	if err := user.UnmarshalJSON(body); err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
@@ -148,16 +152,20 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
+		return
+	}
 	var link deleteLink
-	if err := decoder.Decode(&link); err != nil {
+	if err := link.UnmarshalJSON(body); err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
 	id := r.Context().Value(static.KeyUserID).(int)
 
-	err := h.services.User.DeleteFile(r.Context(), id, link.Link)
+	err = h.services.User.DeleteFile(r.Context(), id, link.Link)
 	if errors.Is(err, static.ErrBannedUser) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
 		return
