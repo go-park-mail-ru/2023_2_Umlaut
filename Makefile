@@ -4,8 +4,6 @@ DCOMPOSE:=docker-compose.yml
 # improve build time
 DOCKER_BUILD_KIT:=COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1
 
-all: down build up
-
 down:
 	docker compose -f ${DCOMPOSE} down --remove-orphans
 
@@ -13,7 +11,7 @@ build:
 	${DOCKER_BUILD_KIT} docker compose build
 
 up:
-	docker-compose --compatibility -f ${DCOMPOSE} up -d --remove-orphans
+	docker compose up --build
 
 # Vendoring is useful for local debugging since you don't have to
 # reinstall all packages again and again in docker

@@ -75,5 +75,5 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd 2023_2_Umlaut
-            sudo make 
+            cd 2023_2_Umlaut/
+            sudo make up
