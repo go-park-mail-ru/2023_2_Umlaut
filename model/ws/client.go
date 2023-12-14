@@ -5,10 +5,16 @@ import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/websocket"
 	"log"
 	"time"
 )
+
+type Notification struct {
+	Type    string      `json:"type"`
+	Payload interface{} `json:"payload"`
+}
 
 type Message struct {
 	Id          int       `json:"id"`
@@ -21,10 +27,9 @@ type Message struct {
 }
 
 type Client struct {
-	Conn    *websocket.Conn
-	Message chan *Message
-	Id      int          `json:"id" db:"id"`
-	Dialogs map[int]bool `json:"clients"`
+	Conn          *websocket.Conn
+	Notifications chan *Notification
+	Id            int `json:"id" db:"id"`
 }
 
 func (c *Client) WriteMessage() {
@@ -33,7 +38,7 @@ func (c *Client) WriteMessage() {
 	}()
 
 	for {
-		message, ok := <-c.Message
+		message, ok := <-c.Notifications
 		if !ok {
 			return
 		}
@@ -52,7 +57,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 		_, m, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				log.Printf(`{place: "client.go: 59", message: "error: %v"}`, err)
 			}
 			break
 		}
@@ -64,7 +69,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			isEdit = true
 		}
 		if err != nil {
-			log.Printf("error: %v", err)
+			log.Printf(`{place: "client.go: 71", message: "error: %v"}`, err)
 			break
 		}
 		newMessage, err := services.Message.SaveOrUpdateMessage(ctx, model.Message{
@@ -76,9 +81,9 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			IsRead:      &receivedMessage.IsRead,
 		})
 		if err != nil {
-			//TODO: do something
+			log.Printf(`{place: "client.go: 84", message: "error: %v"}`, err)
 		} else if !isEdit {
-			hub.Broadcast <- &Message{
+			message := &Message{
 				Id:          *newMessage.Id,
 				SenderId:    *newMessage.SenderId,
 				RecipientId: *newMessage.RecipientId,
@@ -86,6 +91,10 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 				Text:        *newMessage.Text,
 				IsRead:      *newMessage.IsRead,
 				CreatedAt:   *newMessage.CreatedAt,
+			}
+			hub.Broadcast <- &Notification{
+				Type:    static.Message,
+				Payload: message,
 			}
 		}
 	}

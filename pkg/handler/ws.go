@@ -35,9 +35,9 @@ func (h *Handler) registerUserToHub(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cl := &ws.Client{
-		Id:      userId,
-		Message: make(chan *ws.Message, 10),
-		Conn:    conn,
+		Id:            userId,
+		Notifications: make(chan *ws.Notification, 10),
+		Conn:          conn,
 	}
 	h.hub.Register <- cl
 

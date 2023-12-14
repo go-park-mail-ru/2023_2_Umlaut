@@ -34,7 +34,7 @@ func TestHandler_createLike(t *testing.T) {
 			name:        "Like Create",
 			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(nil)
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.Dialog{}, nil)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":200,"message":"success","payload":""}`,
@@ -43,19 +43,10 @@ func TestHandler_createLike(t *testing.T) {
 			name:        "already liked",
 			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(static.ErrAlreadyExists)
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.Dialog{}, static.ErrAlreadyExists)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":200,"message":"already liked","payload":""}`,
-		},
-		{
-			name:        "Mutual like",
-			requestBody: string(likeJSON),
-			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(static.ErrMutualLike)
-			},
-			expectedStatusCode:   http.StatusOK,
-			expectedResponseBody: `{"status":200,"message":"Mutual like","payload":""}`,
 		},
 		{
 			name:                 "invalid input body",
@@ -68,7 +59,7 @@ func TestHandler_createLike(t *testing.T) {
 			name:        "Error",
 			requestBody: string(likeJSON),
 			mockBehavior: func(r *mock_service.MockLike, m *mock_service.MockDialog) {
-				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(errors.New("some error"))
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(model.Dialog{}, errors.New("some error"))
 			},
 			expectedStatusCode:   http.StatusInternalServerError,
 			expectedResponseBody: `{"status":500,"message":"some error","payload":""}`,
