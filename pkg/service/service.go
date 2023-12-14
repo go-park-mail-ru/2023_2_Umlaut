@@ -30,7 +30,7 @@ type User interface {
 }
 
 type Like interface {
-	CreateLike(ctx context.Context, like model.Like) error
+	CreateLike(ctx context.Context, like model.Like) (model.Dialog, error)
 }
 
 type Dialog interface {

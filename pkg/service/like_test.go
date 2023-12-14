@@ -29,8 +29,19 @@ func TestLikeService_CreateLike(t *testing.T) {
 				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(mockLike, nil)
 				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(true, nil)
 				d.EXPECT().CreateDialog(gomock.Any(), gomock.Any()).Return(0, nil)
+				d.EXPECT().GetDialogById(gomock.Any(), gomock.Any()).Return(model.Dialog{}, nil)
 			},
 			expectedError: static.ErrMutualLike,
+		},
+		{
+			name: "Error in GetDialogById",
+			mockBehavior: func(r *mock_repository.MockLike, d *mock_repository.MockDialog) {
+				r.EXPECT().CreateLike(gomock.Any(), mockLike).Return(mockLike, nil)
+				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(true, nil)
+				d.EXPECT().CreateDialog(gomock.Any(), gomock.Any()).Return(0, nil)
+				d.EXPECT().GetDialogById(gomock.Any(), gomock.Any()).Return(model.Dialog{}, errors.New("some error"))
+			},
+			expectedError: errors.New("some error"),
 		},
 		{
 			name: "Non-Mutual Like",
@@ -77,7 +88,7 @@ func TestLikeService_CreateLike(t *testing.T) {
 			test.mockBehavior(repoLike, repoDialog)
 
 			service := &LikeService{repoLike, repoDialog}
-			result := service.CreateLike(context.Background(), mockLike)
+			_, result := service.CreateLike(context.Background(), mockLike)
 
 			assert.Equal(t, test.expectedError, result)
 		})

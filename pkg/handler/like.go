@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"io"
 	"net/http"
 
@@ -33,13 +34,18 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(static.KeyUserID).(int)
 	like.LikedByUserId = userId
 
-	err = h.services.Like.CreateLike(r.Context(), like)
+	dialog, err := h.services.Like.CreateLike(r.Context(), like)
 	if err != nil {
 		if errors.Is(err, static.ErrAlreadyExists) {
 			newErrorClientResponseDto(r.Context(), w, http.StatusOK, "already liked")
 			return
 		}
 		if errors.Is(err, static.ErrMutualLike) {
+
+			h.hub.Broadcast <- &ws.Notification{
+				Type:    static.Match,
+				Payload: dialog,
+			}
 			newErrorClientResponseDto(r.Context(), w, http.StatusOK, "Mutual like")
 			return
 		}
