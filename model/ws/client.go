@@ -40,6 +40,7 @@ func (c *Client) WriteMessage() {
 	for {
 		message, ok := <-c.Notifications
 		if !ok {
+			log.Println("client.go: 43, error")
 			return
 		}
 

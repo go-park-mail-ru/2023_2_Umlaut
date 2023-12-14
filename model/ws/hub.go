@@ -3,6 +3,7 @@ package ws
 import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"log"
 )
 
 type Hub struct {
@@ -39,6 +40,7 @@ func (h *Hub) Run() {
 					h.Users[message.RecipientId].Notifications <- m
 				}
 			case static.Match:
+				log.Println("match like")
 				match := m.Payload.(model.Dialog)
 				if _, ok := h.Users[match.User1Id]; ok {
 					h.Users[match.User1Id].Notifications <- m
@@ -46,6 +48,7 @@ func (h *Hub) Run() {
 				if _, ok := h.Users[match.User2Id]; ok {
 					h.Users[match.User2Id].Notifications <- m
 				}
+				log.Println("match like send")
 			}
 
 		}
