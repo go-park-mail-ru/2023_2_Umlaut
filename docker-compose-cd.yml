@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   authorization:
-    image: umlaut/auth:latest
+    image: umlaut-auth:latest
     command: ./wait-for-postgres.sh db_umlaut ./auth
     restart: always
     depends_on:
@@ -15,7 +15,7 @@ services:
       - DB_PASSWORD=1474
 
   feed:
-    image: umlaut/feed:latest
+    image: umlaut-feed:latest
     command: ./wait-for-postgres.sh db_umlaut ./feed
     restart: always
     depends_on:
@@ -27,7 +27,7 @@ services:
       - DB_PASSWORD=1474
 
   admin:
-    image: umlaut/admin:latest
+    image: umlaut-admin:latest
     command: ./wait-for-postgres.sh db_admin ./admin
     restart: always
     depends_on:
@@ -38,7 +38,7 @@ services:
       - DB_PASSWORD=1474
 
   umlaut:
-    image: umlaut/app:latest
+    image: umlaut-app:latest
     command: ./wait-for-postgres.sh db_umlaut ./umlaut
     ports:
       - "8000:8000"
