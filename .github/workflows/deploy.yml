@@ -66,7 +66,7 @@ jobs:
           file: ./cmd/auth/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: umlaut/auth:latest
+          tags: umlaut-auth:latest
       - name: Build and push feed
         uses: docker/build-push-action@v2
         with:
@@ -74,7 +74,7 @@ jobs:
           file: ./cmd/feed/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: umlaut/feed:latest
+          tags: umlaut-feed:latest
       - name: Build and push admin
         uses: docker/build-push-action@v2
         with:
@@ -82,7 +82,7 @@ jobs:
           file: ./cmd/admin/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: umlaut/admin:latest
+          tags: umlaut-admin:latest
       - name: Build and push app
         uses: docker/build-push-action@v2
         with:
@@ -90,7 +90,7 @@ jobs:
           file: ./cmd/app/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: umlaut/app:latest
+          tags: umlaut-app:latest
 
   deploy:
     needs: [ build ]
