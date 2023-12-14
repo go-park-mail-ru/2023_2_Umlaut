@@ -29,8 +29,8 @@ func InitLogger() (*zap.Logger, error) {
 		Development:      true,
 		Encoding:         "json",
 		EncoderConfig:    zap.NewProductionEncoderConfig(),
-		OutputPaths:      []string{"stdout"},
-		ErrorOutputPaths: []string{"stderr"},
+		OutputPaths:      []string{"stdout", "../logs/logfile.log"},
+		ErrorOutputPaths: []string{"stderr", "../logs/error_logfile.log"},
 	}
 	return config.Build()
 }
