@@ -11,12 +11,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc/keepalive"
 
+	initial "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/server"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/interceptors"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
@@ -25,12 +25,12 @@ func main() {
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	ctx := context.Background()
 
-	db, err := utils.InitPostgres(ctx)
+	db, err := initial.InitPostgres(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize Postgres: %s", err.Error())
 	}
 
-	sessionStore, err := utils.InitRedis()
+	sessionStore, err := initial.InitRedis()
 	if err != nil {
 		log.Fatalf("failed to initialize redisDb: %s", err.Error())
 	}
