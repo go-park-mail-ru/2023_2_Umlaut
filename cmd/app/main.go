@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	initial "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 
@@ -15,7 +16,6 @@ import (
 	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -62,35 +62,35 @@ func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, a
 // @host umlaut-bmstu.me
 // @BasePath /
 func main() {
-	logger, err := utils.InitLogger()
+	logger, err := initial.InitLogger()
 	if err != nil {
 		log.Fatal(err)
 	}
 	logger.Info("Starting server...")
 	defer logger.Sync()
-
+	
 	ctx := context.Background()
 
-	db, err := utils.InitPostgres(ctx)
+	db, err := initial.InitPostgres(ctx)
 	if err != nil {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres: %s", err.Error())))
 	}
 
-	dbAdmin, err := utils.InitPostgresAdmin(ctx)
+	dbAdmin, err := initial.InitPostgresAdmin(ctx)
 	if err != nil {
 		logger.Error("initialize Postgres",
 			zap.String("Error", fmt.Sprintf("failed to initialize Postgres admin: %s", err.Error())))
 	}
 
-	sessionStore, err := utils.InitRedis()
+	sessionStore, err := initial.InitRedis()
 	if err != nil {
 		logger.Error("initialize redisDb",
 			zap.String("Error", fmt.Sprintf("failed to initialize redisDb: %s", err.Error())))
 	}
 	defer sessionStore.Close()
 
-	fileClient, err := utils.InitMinioClient()
+	fileClient, err := initial.InitMinioClient()
 	if err != nil {
 		logger.Error("initialize Minio",
 			zap.String("Error", fmt.Sprintf("failed to initialize Minio: %s", err.Error())))
