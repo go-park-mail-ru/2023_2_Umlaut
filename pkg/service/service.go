@@ -16,6 +16,7 @@ type Authorization interface {
 	GetSessionValue(ctx context.Context, session string) (int, error)
 	CreateUser(ctx context.Context, user model.User) (int, error)
 	GetUser(ctx context.Context, mail, password string) (model.User, error)
+	GetDecodeUserId(ctx context.Context, message string) (int, error)
 }
 
 type Feed interface {
@@ -27,6 +28,7 @@ type User interface {
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 	CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error)
 	DeleteFile(ctx context.Context, userId int, link string) error
+	GetUserShareCridentials(ctx context.Context, userId int) (int, string, error)
 }
 
 type Like interface {

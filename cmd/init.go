@@ -16,7 +16,7 @@ import (
 
 func init() {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
+	viper.SetConfigName("config_local")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -29,8 +29,8 @@ func InitLogger() (*zap.Logger, error) {
 		Development:      true,
 		Encoding:         "json",
 		EncoderConfig:    zap.NewProductionEncoderConfig(),
-		OutputPaths:      []string{"stdout", "../logs/logfile.log"},
-		ErrorOutputPaths: []string{"stderr", "../logs/error_logfile.log"},
+		// OutputPaths:      []string{"stdout", "../logs/logfile.log"},
+		// ErrorOutputPaths: []string{"stderr", "../logs/error_logfile.log"},
 	}
 	return config.Build()
 }
