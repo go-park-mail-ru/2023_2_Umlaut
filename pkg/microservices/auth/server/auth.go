@@ -74,7 +74,19 @@ func (as *AuthServer) SignUp(ctx context.Context, input *proto.SignUpInput) (*pr
 		return &proto.UserId{}, status.Error(codes.InvalidArgument, "missing required fields")
 	}
 
-	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
+	var invitedBy *int
+	if input.InvitedBy != "" {
+		tmp, err := as.Authorization.GetDecodeUserId(ctx, input.InvitedBy)
+		if err != nil {
+			return &proto.UserId{}, status.Error(codes.DataLoss, "failed to activate link")
+		}
+		invitedBy = &tmp
+	}
+	user := model.User{Name: input.Name, 
+		Mail: input.Mail, 
+		PasswordHash: input.Password,
+		InvitedBy: invitedBy,
+	}
 
 	id, err := as.Authorization.CreateUser(ctx, user)
 	if err != nil {

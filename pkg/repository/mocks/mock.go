@@ -99,6 +99,21 @@ func (mr *MockUserMockRecorder) GetUserById(ctx, id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserById", reflect.TypeOf((*MockUser)(nil).GetUserById), ctx, id)
 }
 
+// GetUserInvites mocks base method.
+func (m *MockUser) GetUserInvites(ctx context.Context, userId int) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserInvites", ctx, userId)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserInvites indicates an expected call of GetUserInvites.
+func (mr *MockUserMockRecorder) GetUserInvites(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInvites", reflect.TypeOf((*MockUser)(nil).GetUserInvites), ctx, userId)
+}
+
 // ShowCSAT mocks base method.
 func (m *MockUser) ShowCSAT(ctx context.Context, userId int) (bool, error) {
 	m.ctrl.T.Helper()

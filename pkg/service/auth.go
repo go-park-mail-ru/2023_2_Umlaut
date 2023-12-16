@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -25,6 +26,9 @@ func NewAuthService(repoUser repository.User, repoStore repository.Store, repoAd
 func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, error) {
 	if !user.IsValid() {
 		return 0, errors.New("invalid fields")
+	}
+	if *user.InvitedBy == 0 {
+		user.InvitedBy = nil
 	}
 	user.Salt = utils.GenerateUuid()
 	user.PasswordHash = utils.GeneratePasswordHash(user.PasswordHash, user.Salt)
@@ -89,3 +93,13 @@ func (s *AuthService) GetSessionValue(ctx context.Context, session string) (int,
 
 	return id, nil
 }
+
+func (s *AuthService) GetDecodeUserId(ctx context.Context, message string) (int, error) {
+	newMessage, err := utils.DecryptString(message)
+	if err != nil {
+		return 0, fmt.Errorf("GetDecodeUserId error: %v", err)
+	}
+
+	return strconv.Atoi(newMessage)
+}
+

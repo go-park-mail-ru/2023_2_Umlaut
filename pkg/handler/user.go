@@ -180,3 +180,21 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	NewSuccessClientResponseDto(r.Context(), w, "")
 }
+
+// @Summary get user share link
+// @Tags user
+// @Accept  json
+// @Success 200 {object} ClientResponseDto[shareCridentialsOutput]
+// @Failure 401,500 {object} ClientResponseDto[string]
+// @Router /api/v1/user/share [get]
+func (h *Handler) getUserShareCridentials(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value(static.KeyUserID).(int)
+	invitesCount, link, err := h.services.User.GetUserShareCridentials(r.Context(), id)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	share := shareCridentialsOutput{InvitesCount: invitesCount, ShareLink: link}
+
+	NewSuccessClientResponseDto(r.Context(), w, share)
+}

@@ -16,9 +16,15 @@ type signInInput struct {
 }
 
 type signUpInput struct {
-	Name     string `json:"name" binding:"required"`
-	Mail     string `json:"mail" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Name      string  `json:"name" binding:"required"`
+	Mail      string  `json:"mail" binding:"required"`
+	Password  string  `json:"password" binding:"required"`
+	InvitedBy *string `json:"invited_by"`
+}
+
+type shareCridentialsOutput struct {
+	InvitesCount int    `json:"invites_count" binding:"required"`
+	ShareLink    string `json:"share_link" binding:"required"`
 }
 
 type deleteLink struct {

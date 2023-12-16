@@ -80,6 +80,21 @@ func (mr *MockAuthorizationMockRecorder) GenerateCookie(ctx, id interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateCookie", reflect.TypeOf((*MockAuthorization)(nil).GenerateCookie), ctx, id)
 }
 
+// GetDecodeUserId mocks base method.
+func (m *MockAuthorization) GetDecodeUserId(ctx context.Context, message string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDecodeUserId", ctx, message)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDecodeUserId indicates an expected call of GetDecodeUserId.
+func (mr *MockAuthorizationMockRecorder) GetDecodeUserId(ctx, message interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDecodeUserId", reflect.TypeOf((*MockAuthorization)(nil).GetDecodeUserId), ctx, message)
+}
+
 // GetSessionValue mocks base method.
 func (m *MockAuthorization) GetSessionValue(ctx context.Context, session string) (int, error) {
 	m.ctrl.T.Helper()
@@ -213,6 +228,22 @@ func (m *MockUser) GetCurrentUser(ctx context.Context, userId int) (model.User, 
 func (mr *MockUserMockRecorder) GetCurrentUser(ctx, userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentUser", reflect.TypeOf((*MockUser)(nil).GetCurrentUser), ctx, userId)
+}
+
+// GetUserShareCridentials mocks base method.
+func (m *MockUser) GetUserShareCridentials(ctx context.Context, userId int) (int, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserShareCridentials", ctx, userId)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetUserShareCridentials indicates an expected call of GetUserShareCridentials.
+func (mr *MockUserMockRecorder) GetUserShareCridentials(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserShareCridentials", reflect.TypeOf((*MockUser)(nil).GetUserShareCridentials), ctx, userId)
 }
 
 // UpdateUser mocks base method.

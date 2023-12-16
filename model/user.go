@@ -25,7 +25,8 @@ type User struct {
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
 	Online       bool       `json:"online" db:"online"`
-	Banned       bool       `json:"-" db:"banned" swaggerignore:"true"`
+	Role         int        `json:"role" db:"role"`
+	InvitedBy    *int       `json:"-" db:"invited_by" swaggerignore:"true"`
 	Tags         *[]string  `json:"tags" db:"tags"`
 }
 
