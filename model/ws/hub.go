@@ -1,9 +1,10 @@
 package ws
 
 import (
+	"log"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
-	"log"
 )
 
 type Hub struct {
@@ -35,13 +36,13 @@ func (h *Hub) Run() {
 		case m := <-h.Broadcast:
 			switch m.Type {
 			case static.Message:
-				message := m.Payload.(Message)
+				message := m.Payload.(*Message)
 				if _, ok := h.Users[message.RecipientId]; ok {
 					h.Users[message.RecipientId].Notifications <- m
 				}
 			case static.Match:
 				log.Println("[HUB] match like")
-				match := m.Payload.(model.Dialog)
+				match := m.Payload.(*model.Dialog)
 				if _, ok := h.Users[match.User1Id]; ok {
 					h.Users[match.User1Id].Notifications <- m
 				}

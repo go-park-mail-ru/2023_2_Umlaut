@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/websocket"
-	"net/http"
 )
 
 var upgrader = websocket.Upgrader{
@@ -38,6 +39,7 @@ func (h *Handler) registerUserToHub(w http.ResponseWriter, r *http.Request) {
 		Id:            userId,
 		Notifications: make(chan *ws.Notification, 10),
 		Conn:          conn,
+		Logger:        h.logger,
 	}
 	h.hub.Register <- cl
 
