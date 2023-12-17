@@ -131,7 +131,7 @@ definitions:
     - name
     - password
     type: object
-host: localhost:8000
+host: umlaut-bmstu.me
 info:
   contact: {}
   description: API Server for Umlaut Application

@@ -1,8 +1,8 @@
 package static
 
 var (
-	//Host = "https://umlaut-bmstu.me"
-	Host    = "http://localhost:8000"
+	Host = "https://umlaut-bmstu.me"
+	//Host    = "http://localhost:8000"
 	Message = "message"
 	Match   = "match"
 	Banned  = 3

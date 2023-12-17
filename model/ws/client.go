@@ -3,12 +3,13 @@ package ws
 import (
 	"context"
 	"encoding/json"
+	"time"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Notification struct {
@@ -29,7 +30,7 @@ type Message struct {
 type Client struct {
 	Conn          *websocket.Conn
 	Notifications chan *Notification
-	logger        *zap.Logger
+	Logger        *zap.Logger
 	Id            int `json:"id" db:"id"`
 }
 
@@ -41,7 +42,7 @@ func (c *Client) WriteMessage() {
 	for {
 		message, ok := <-c.Notifications
 		if !ok {
-			c.logger.Info("WS",
+			c.Logger.Info("WS",
 				zap.String("Place", "client.go: 43"),
 				zap.String("Message", "error"),
 			)
@@ -62,13 +63,16 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 		_, m, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				c.logger.Info("WS",
+				c.Logger.Info("WS",
 					zap.String("Place", "client.go: 59"),
 					zap.String("Message", "error"),
 					zap.Error(err),
 				)
 			}
 			break
+		}
+		if len(m) < 1 {
+			continue
 		}
 
 		var receivedMessage Message
@@ -78,7 +82,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			isEdit = true
 		}
 		if err != nil {
-			c.logger.Info("WS",
+			c.Logger.Info("WS",
 				zap.String("Place", "client.go: 71"),
 				zap.String("Message", "error"),
 				zap.Error(err),
@@ -94,7 +98,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			IsRead:      &receivedMessage.IsRead,
 		})
 		if err != nil {
-			c.logger.Info("WS",
+			c.Logger.Info("WS",
 				zap.String("Place", "client.go: 84"),
 				zap.String("Message", "error"),
 				zap.Error(err),
