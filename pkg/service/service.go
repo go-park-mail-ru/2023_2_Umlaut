@@ -33,6 +33,7 @@ type User interface {
 
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) (model.Dialog, error)
+	GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error)
 }
 
 type Dialog interface {
@@ -82,7 +83,7 @@ func NewService(repo *repository.Repository) *Service {
 		Authorization: NewAuthService(repo.User, repo.Store, repo.Admin),
 		Feed:          NewFeedService(repo.User, repo.Store, repo.Dialog),
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
-		Like:          NewLikeService(repo.Like, repo.Dialog),
+		Like:          NewLikeService(repo.Like, repo.Dialog, repo.User),
 		Dialog:        NewDialogService(repo.Dialog),
 		Message:       NewMessageService(repo.Message),
 		Tag:           NewTagService(repo.Tag),

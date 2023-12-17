@@ -11,10 +11,11 @@ import (
 type LikeService struct {
 	repoLike   repository.Like
 	repoDialog repository.Dialog
+	repoUser   repository.User
 }
 
-func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog) *LikeService {
-	return &LikeService{repoLike: repoLike, repoDialog: repoDialog}
+func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog, repoUser repository.User) *LikeService {
+	return &LikeService{repoLike: repoLike, repoDialog: repoDialog, repoUser: repoUser}
 }
 
 func (s *LikeService) CreateLike(ctx context.Context, like model.Like) (model.Dialog, error) {
@@ -42,4 +43,16 @@ func (s *LikeService) CreateLike(ctx context.Context, like model.Like) (model.Di
 	}
 
 	return model.Dialog{}, err
+}
+
+func (s *LikeService) GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error) {
+	user, err := s.repoUser.GetUserById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	if user.Role != 2 {
+		return nil, static.ErrNoAccess
+	}
+
+	return s.repoLike.GetUserLikedToLikes(ctx, userId)
 }

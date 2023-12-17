@@ -40,6 +40,7 @@ services:
   umlaut:
     image: 100ma/umlaut-app:latest
     command: ./wait-for-postgres.sh db_umlaut ./umlaut
+    restart: always
     ports:
       - "8000:8000"
     depends_on:

@@ -9,4 +9,5 @@ var (
 	ErrNoFiles       = errors.New("no photos")
 	ErrNoData        = errors.New("no data")
 	ErrBannedUser    = errors.New("this user is blocked")
+	ErrNoAccess      = errors.New("there are no rights to use")
 )

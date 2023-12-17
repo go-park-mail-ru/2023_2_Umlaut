@@ -299,6 +299,21 @@ func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockLike)(nil).CreateLike), ctx, like)
 }
 
+// GetUserLikedToLikes mocks base method.
+func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserLikedToLikes", ctx, userId)
+	ret0, _ := ret[0].([]model.PremiumLike)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserLikedToLikes indicates an expected call of GetUserLikedToLikes.
+func (mr *MockLikeMockRecorder) GetUserLikedToLikes(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserLikedToLikes", reflect.TypeOf((*MockLike)(nil).GetUserLikedToLikes), ctx, userId)
+}
+
 // MockDialog is a mock of Dialog interface.
 type MockDialog struct {
 	ctrl     *gomock.Controller

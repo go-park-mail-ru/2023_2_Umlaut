@@ -27,7 +27,7 @@ func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, err
 	if !user.IsValid() {
 		return 0, errors.New("invalid fields")
 	}
-	if *user.InvitedBy == 0 {
+	if user.InvitedBy != nil && *user.InvitedBy == 0 {
 		user.InvitedBy = nil
 	}
 	user.Salt = utils.GenerateUuid()

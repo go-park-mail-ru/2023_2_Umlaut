@@ -48,6 +48,7 @@ services:
       context: ./
       dockerfile: ./cmd/app/Dockerfile
     command: ./wait-for-postgres.sh db_umlaut ./umlaut
+    restart: always
     ports:
       - "8000:8000"
     depends_on:

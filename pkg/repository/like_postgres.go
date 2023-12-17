@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"strings"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -64,6 +65,60 @@ func (r *LikePostgres) IsMutualLike(ctx context.Context, like model.Like) (bool,
 	}
 
 	return true, err
+}
+
+func (r *LikePostgres) GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error) {
+	query, args, err := psql.Select("liked_by_user_id", "u.image_paths").
+		From(likeTable).
+		Join(userTable + " u ON liked_by_user_id = u.id").
+		Where(sq.And{
+			sq.Eq{"liked_to_user_id": userId},
+			sq.Eq{"is_like": true},
+		}).
+		Where(fmt.Sprintf("liked_by_user_id NOT IN (SELECT l.liked_to_user_id FROM \"like\" l WHERE l.liked_by_user_id = %d)", userId)).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
+	}
+
+	var likes []model.PremiumLike
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
+	}
+	defer rows.Close()
+
+	likes, err = scanPremiumLikes(rows)
+		if err != nil {
+		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
+	}
+
+	return likes, nil
+}
+
+func scanPremiumLikes(rows pgx.Rows) ([]model.PremiumLike, error) {
+	var likes []model.PremiumLike
+	var err error
+	for rows.Next() {
+		var like model.PremiumLike
+		err = rows.Scan(
+			&like.LikedByUserId,
+			&like.ImagePaths,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		likes = append(likes, like)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("scan like error: %v", err)
+	}
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("rows like error: %v", rows.Err())
+	}
+
+	return likes, nil
 }
 
 func scanLike(row pgx.Row, like *model.Like) error {

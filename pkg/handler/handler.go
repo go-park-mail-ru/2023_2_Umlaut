@@ -91,6 +91,8 @@ func (h *Handler) InitRoutes() http.Handler {
 	apiRouter.HandleFunc("/complaint_types", h.getAllComplaintTypes).Methods("GET")
 	apiRouter.HandleFunc("/complaint", h.createComplaint).Methods("POST", "OPTIONS")
 
+	apiRouter.HandleFunc("/premium/likes", h.getPremiumLikes).Methods("GET")
+
 	apiRouter.HandleFunc("/ws/messenger", h.registerUserToHub).Methods("GET")
 
 	apiRouter.HandleFunc("/feedback", h.createFeedback).Methods("POST", "OPTIONS")

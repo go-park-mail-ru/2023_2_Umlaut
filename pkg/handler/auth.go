@@ -134,6 +134,10 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	if input.InvitedBy == nil {
+		tmp := ""
+		input.InvitedBy = &tmp
+	}
 
 	userId, err := h.authMicroservice.SignUp(
 		r.Context(),

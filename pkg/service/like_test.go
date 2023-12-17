@@ -84,10 +84,11 @@ func TestLikeService_CreateLike(t *testing.T) {
 
 			repoLike := mock_repository.NewMockLike(c)
 			repoDialog := mock_repository.NewMockDialog(c)
+			repoUser := mock_repository.NewMockUser(c)
 
 			test.mockBehavior(repoLike, repoDialog)
 
-			service := &LikeService{repoLike, repoDialog}
+			service := &LikeService{repoLike, repoDialog, repoUser}
 			_, result := service.CreateLike(context.Background(), mockLike)
 
 			assert.Equal(t, test.expectedError, result)

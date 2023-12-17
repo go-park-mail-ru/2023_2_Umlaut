@@ -30,6 +30,7 @@ type User interface {
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) (model.Like, error)
 	IsMutualLike(ctx context.Context, like model.Like) (bool, error)
+	GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error)
 }
 
 type Dialog interface {
