@@ -12,7 +12,6 @@ on:
 jobs:
   tests:
     name: Tests check
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Installation Go v1.21
@@ -32,7 +31,6 @@ jobs:
 
   linter:
     name: Linter check
-    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Installation Go v1.21
