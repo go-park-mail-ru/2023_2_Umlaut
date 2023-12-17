@@ -35,6 +35,7 @@ func (s *FeedService) GetNextUser(ctx context.Context, params model.FilterParams
 	
 	nextUser.Sanitize()
 
-	feed := model.FeedData{User: user, LikeCounter: nextUser.LikeCounter}
-	return feed, nil
+	return model.FeedData{User: nextUser, 
+		LikeCounter: user.LikeCounter,
+		}, nil
 }
