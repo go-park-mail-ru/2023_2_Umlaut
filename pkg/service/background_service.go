@@ -3,6 +3,9 @@ package service
 import (
 	"context"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"go.uber.org/zap"
+	"log"
 	"time"
 )
 
@@ -36,6 +39,13 @@ func worker(ctx context.Context, work func(context.Context) error, periodicity t
 			case <-ticker.C:
 				err = work(ctx)
 				if err != nil {
+					logger, ok := ctx.Value(static.KeyLogger).(*zap.Logger)
+					if !ok {
+						log.Println("Logger not found in context")
+					} else {
+						logger.Error("BackgroundService worker",
+							zap.Error(err))
+					}
 				}
 			case <-ctx.Done():
 				ticker.Stop()
