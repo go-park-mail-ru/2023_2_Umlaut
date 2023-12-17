@@ -15,11 +15,11 @@ import (
 // @Param min_age query integer false "Minimum age filter"
 // @Param max_age query integer false "Maximum age filter"
 // @Param tags query string false "Tags filter"
-// @Success 200 {object} ClientResponseDto[model.User]
+// @Success 200 {object} ClientResponseDto[model.FeedData]
 // @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
-	user, err := h.feedMicroservice.Feed(
+	feed, err := h.feedMicroservice.Feed(
 		r.Context(),
 		utils.ParseQueryParams(r),
 	)
@@ -29,21 +29,24 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
-	birthday := user.Birthday.AsTime()
-	preferGender := int(user.PreferGender)
-	age := int(user.Age)
+	birthday := feed.User.Birthday.AsTime()
+	preferGender := int(feed.User.PreferGender)
+	age := int(feed.User.Age)
 
-	NewSuccessClientResponseDto(r.Context(), w, model.User{
-		Id:           int(user.Id),
-		Name:         user.Name,
-		PreferGender: &preferGender,
-		Description:  &user.Description,
-		Age:          &age,
-		Looking:      &user.Looking,
-		Education:    &user.Education,
-		Hobbies:      &user.Hobbies,
-		Birthday:     &birthday,
-		Tags:         &user.Tags,
-		ImagePaths:   &user.ImagePaths,
+	NewSuccessClientResponseDto(r.Context(), w, model.FeedData{
+		User: model.User{
+			Id:           int(feed.User.Id),
+			Name:         feed.User.Name,
+			PreferGender: &preferGender,
+			Description:  &feed.User.Description,
+			Age:          &age,
+			Looking:      &feed.User.Looking,
+			Education:    &feed.User.Education,
+			Hobbies:      &feed.User.Hobbies,
+			Birthday:     &birthday,
+			Tags:         &feed.User.Tags,
+			ImagePaths:   &feed.User.ImagePaths,
+		},
+		LikeCounter: int(feed.LikeCounter),
 	})
 }

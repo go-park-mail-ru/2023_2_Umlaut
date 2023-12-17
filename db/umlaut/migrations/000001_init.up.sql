@@ -26,6 +26,7 @@ CREATE TABLE "user"
     birthday      DATE,
     role          SMALLINT    NOT NULL DEFAULT 1 CHECK (role BETWEEN 1 AND 3),
     invited_by    INT                  REFERENCES "user" (id) ON DELETE SET NULL,
+    like_counter  INT                  DEFAULT 50,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
     age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
@@ -252,6 +253,26 @@ CREATE TRIGGER trigger_update_user_role
     ON "user"
     FOR EACH ROW
 EXECUTE FUNCTION update_user_role();
+
+
+CREATE
+    OR REPLACE FUNCTION update_user_like_counter()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE "user"
+    SET like_counter = like_counter - 1
+    WHERE id = NEW.liked_by_user_id;
+    RETURN NEW;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_user_like_counter
+    AFTER INSERT
+    ON "like"
+    FOR EACH ROW
+EXECUTE FUNCTION update_user_like_counter();
 
 
 -- fill db

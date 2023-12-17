@@ -149,10 +149,10 @@ func (m *MockFeed) EXPECT() *MockFeedMockRecorder {
 }
 
 // GetNextUser mocks base method.
-func (m *MockFeed) GetNextUser(ctx context.Context, params model.FilterParams) (model.User, error) {
+func (m *MockFeed) GetNextUser(ctx context.Context, params model.FilterParams) (model.FeedData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextUser", ctx, params)
-	ret0, _ := ret[0].(model.User)
+	ret0, _ := ret[0].(model.FeedData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -300,12 +300,13 @@ func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 }
 
 // GetUserLikedToLikes mocks base method.
-func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error) {
+func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) (bool, []model.PremiumLike, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserLikedToLikes", ctx, userId)
-	ret0, _ := ret[0].([]model.PremiumLike)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].([]model.PremiumLike)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetUserLikedToLikes indicates an expected call of GetUserLikedToLikes.

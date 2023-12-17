@@ -65,14 +65,13 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getPremiumLikes(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(static.KeyUserID).(int)
 
-	likes, err := h.services.Like.GetUserLikedToLikes(r.Context(), userId)
-	if err == static.ErrNoAccess {
-		newErrorClientResponseDto(r.Context(), w, http.StatusPaymentRequired, err.Error())
-		return
-	}
+	show, likes, err := h.services.Like.GetUserLikedToLikes(r.Context(), userId)
 	if err != nil {
 		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	NewSuccessClientResponseDto(r.Context(), w, likes)
+	NewSuccessClientResponseDto(r.Context(), w, map[string]interface{}{
+		"likes": likes,
+		"show": show,
+	})
 }

@@ -20,7 +20,7 @@ type Authorization interface {
 }
 
 type Feed interface {
-	GetNextUser(ctx context.Context, params model.FilterParams) (model.User, error)
+	GetNextUser(ctx context.Context, params model.FilterParams) (model.FeedData, error)
 }
 
 type User interface {
@@ -33,7 +33,7 @@ type User interface {
 
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) (model.Dialog, error)
-	GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error)
+	GetUserLikedToLikes(ctx context.Context, userId int) (bool, []model.PremiumLike, error)
 }
 
 type Dialog interface {

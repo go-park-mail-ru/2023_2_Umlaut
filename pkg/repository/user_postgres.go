@@ -251,6 +251,7 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Hobbies,
 		&user.Birthday,
 		&user.Role,
+		&user.LikeCounter,
 		&user.Online,
 		&user.Tags,
 	)
