@@ -6,11 +6,13 @@ on:
       - main
       - dev
     types:
+      - opened
       - closed
 
 jobs:
   tests:
     name: Tests check
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Installation Go v1.21
@@ -30,6 +32,7 @@ jobs:
 
   linter:
     name: Linter check
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     steps:
       - name: Installation Go v1.21
@@ -44,8 +47,9 @@ jobs:
           $(go env GOPATH)/bin/golangci-lint run --timeout=5m
 
   build:
-    needs: [ linter, tests ]
     name: Run Build
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    needs: [ linter, tests ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -93,8 +97,9 @@ jobs:
           tags: 100ma/umlaut-app:latest
 
   deploy:
-    needs: [ build ]
     name: Backend deploy
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - name: git pull

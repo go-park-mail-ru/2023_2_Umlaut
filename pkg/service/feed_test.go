@@ -18,8 +18,7 @@ func TestFeedService_GetNextUser(t *testing.T) {
 		Name: "TestUser",
 	}
 	mockFeedData := model.FeedData{
-		User:        mockUser,
-		LikeCounter: 50,
+		User: mockUser,
 	}
 
 	tests := []struct {
@@ -32,7 +31,7 @@ func TestFeedService_GetNextUser(t *testing.T) {
 			name: "Success",
 			mockBehavior: func(r *mock_repository.MockUser) {
 				r.EXPECT().GetUserById(gomock.Any(), 1).Return(mockUser, nil)
-				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(mockFeedData, nil)
+				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(mockUser, nil)
 			},
 			expectedFeed:  mockFeedData,
 			expectedError: nil,
@@ -40,7 +39,7 @@ func TestFeedService_GetNextUser(t *testing.T) {
 		{
 			name: "Error Getting User",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.FeedData{}, errors.New("get user error"))
+				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.User{}, errors.New("get user error"))
 			},
 			expectedFeed:  model.FeedData{},
 			expectedError: errors.New("GetNextUser error: get user error"),
@@ -48,7 +47,7 @@ func TestFeedService_GetNextUser(t *testing.T) {
 		{
 			name: "Banned User",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.FeedData{}, static.ErrBannedUser)
+				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.User{}, static.ErrBannedUser)
 			},
 			expectedFeed:  model.FeedData{},
 			expectedError: static.ErrBannedUser,
@@ -57,7 +56,7 @@ func TestFeedService_GetNextUser(t *testing.T) {
 			name: "Error Getting Next User",
 			mockBehavior: func(r *mock_repository.MockUser) {
 				r.EXPECT().GetUserById(gomock.Any(), 1).Return(mockUser, nil)
-				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(model.FeedData{}, errors.New("get next user error"))
+				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(model.User{}, errors.New("get next user error"))
 			},
 			expectedFeed:  model.FeedData{},
 			expectedError: errors.New("GetNextUser error: get next user error"),
