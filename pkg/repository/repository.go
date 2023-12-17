@@ -25,12 +25,14 @@ type User interface {
 	UpdateUserPassword(ctx context.Context, user model.User) error
 	ShowCSAT(ctx context.Context, userId int) (bool, error)
 	GetUserInvites(ctx context.Context, userId int) (int, error)
+	ResetLikeCounter(ctx context.Context) error
 }
 
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) (model.Like, error)
 	IsMutualLike(ctx context.Context, like model.Like) (bool, error)
 	GetUserLikedToLikes(ctx context.Context, userId int) ([]model.PremiumLike, error)
+	ResetDislike(ctx context.Context) error
 }
 
 type Dialog interface {

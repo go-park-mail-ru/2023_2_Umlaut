@@ -654,3 +654,54 @@ func (mr *MockComplaintMockRecorder) GetNextComplaint(ctx interface{}) *gomock.C
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextComplaint", reflect.TypeOf((*MockComplaint)(nil).GetNextComplaint), ctx)
 }
+
+// MockBackground is a mock of Background interface.
+type MockBackground struct {
+	ctrl     *gomock.Controller
+	recorder *MockBackgroundMockRecorder
+}
+
+// MockBackgroundMockRecorder is the mock recorder for MockBackground.
+type MockBackgroundMockRecorder struct {
+	mock *MockBackground
+}
+
+// NewMockBackground creates a new mock instance.
+func NewMockBackground(ctrl *gomock.Controller) *MockBackground {
+	mock := &MockBackground{ctrl: ctrl}
+	mock.recorder = &MockBackgroundMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockBackground) EXPECT() *MockBackgroundMockRecorder {
+	return m.recorder
+}
+
+// ResetDislike mocks base method.
+func (m *MockBackground) ResetDislike(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetDislike", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetDislike indicates an expected call of ResetDislike.
+func (mr *MockBackgroundMockRecorder) ResetDislike(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetDislike", reflect.TypeOf((*MockBackground)(nil).ResetDislike), ctx)
+}
+
+// ResetLikeCounter mocks base method.
+func (m *MockBackground) ResetLikeCounter(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetLikeCounter", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetLikeCounter indicates an expected call of ResetLikeCounter.
+func (mr *MockBackgroundMockRecorder) ResetLikeCounter(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetLikeCounter", reflect.TypeOf((*MockBackground)(nil).ResetLikeCounter), ctx)
+}

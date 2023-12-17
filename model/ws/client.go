@@ -3,6 +3,7 @@ package ws
 import (
 	"context"
 	"encoding/json"
+	"runtime/debug"
 	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -36,9 +37,16 @@ type Client struct {
 
 func (c *Client) WriteMessage() {
 	defer func() {
-		c.Conn.Close()
+		if r := recover(); r != nil {
+			c.Logger.Error("Panic [WS]",
+				zap.String("Message", "Panic in WriteMessage"),
+				zap.String("Error", string(debug.Stack())),
+			)
+			c.WriteMessage()
+		} else {
+			c.Conn.Close()
+		}
 	}()
-
 	for {
 		message, ok := <-c.Notifications
 		if !ok {
@@ -55,8 +63,16 @@ func (c *Client) WriteMessage() {
 
 func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Service) {
 	defer func() {
-		hub.Unregister <- c
-		c.Conn.Close()
+		if r := recover(); r != nil {
+			c.Logger.Error("Panic [WS]",
+				zap.String("Message", "Panic in WriteMessage"),
+				zap.String("Error", string(debug.Stack())),
+			)
+			c.ReadMessage(ctx, hub, services)
+		} else {
+			hub.Unregister <- c
+			c.Conn.Close()
+		}
 	}()
 
 	for {
@@ -64,15 +80,11 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				c.Logger.Info("WS",
-					zap.String("Place", "client.go: 59"),
 					zap.String("Message", "error"),
 					zap.Error(err),
 				)
 			}
 			break
-		}
-		if len(m) < 1 {
-			continue
 		}
 
 		var receivedMessage Message
@@ -83,7 +95,6 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 		}
 		if err != nil {
 			c.Logger.Info("WS",
-				zap.String("Place", "client.go: 71"),
 				zap.String("Message", "error"),
 				zap.Error(err),
 			)
@@ -99,7 +110,6 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 		})
 		if err != nil {
 			c.Logger.Info("WS",
-				zap.String("Place", "client.go: 84"),
 				zap.String("Message", "error"),
 				zap.Error(err),
 			)

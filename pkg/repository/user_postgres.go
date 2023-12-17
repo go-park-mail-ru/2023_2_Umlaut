@@ -220,7 +220,7 @@ func (r *UserPostgres) GetUserInvites(ctx context.Context, userId int) (int, err
 	query, args, err := psql.Select("count(id)").From(userTable).
 		Where(fmt.Sprintf("invited_by = %d AND description IS NOT NULL", userId)).
 		ToSql()
-	
+
 	if err != nil {
 		return 0, fmt.Errorf("failed to get user invites. err: %w", err)
 	}
@@ -233,6 +233,11 @@ func (r *UserPostgres) GetUserInvites(ctx context.Context, userId int) (int, err
 	}
 
 	return count, err
+}
+
+func (r *UserPostgres) ResetLikeCounter(ctx context.Context) error {
+	_, err := r.db.Exec(ctx, fmt.Sprintf("update %s set like_counter = default;", userTable))
+	return err
 }
 
 func scanUser(row pgx.Row, user *model.User) error {

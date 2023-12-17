@@ -25,7 +25,7 @@ CREATE TABLE "user"
     hobbies       TEXT,
     birthday      DATE,
     role          SMALLINT    NOT NULL DEFAULT 1 CHECK (role BETWEEN 1 AND 3),
-    invited_by    INT                  REFERENCES "user" (id) ON DELETE SET NULL,
+    invited_by    INT         REFERENCES "user" (id) ON DELETE SET NULL,
     like_counter  INT                  DEFAULT 50,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
@@ -91,8 +91,7 @@ CREATE TABLE complaint
     report_status     SMALLINT    DEFAULT 0,
     created_at        TIMESTAMPTZ DEFAULT timezone('Europe/Moscow'::text, NOW()),
     UNIQUE (reporter_user_id, reported_user_id),
-    CHECK (reporter_user_id != reported_user_id
-        )
+    CHECK (reporter_user_id != reported_user_id)
 );
 
 
@@ -167,8 +166,7 @@ CREATE
     RETURNS TRIGGER AS
 $$
 BEGIN
-    NEW.updated_at
-        = timezone('Europe/Moscow'::text, NOW());
+    NEW.updated_at = timezone('Europe/Moscow'::text, NOW());
     RETURN NEW;
 END;
 $$
@@ -236,9 +234,9 @@ BEGIN
     IF NEW.invited_by IS NOT NULL AND
        (SELECT count(id)
         FROM "user"
-        WHERE invited_by = NEW.invited_by AND
-              description IS NOT NULL) = 5
-        THEN
+        WHERE invited_by = NEW.invited_by
+          AND description IS NOT NULL) = 5
+    THEN
         UPDATE "user"
         SET role = 2
         WHERE id = NEW.invited_by;

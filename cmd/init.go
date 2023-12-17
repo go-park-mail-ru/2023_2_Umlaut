@@ -14,7 +14,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func init() {
+func InitConfig() {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	err := viper.ReadInConfig()

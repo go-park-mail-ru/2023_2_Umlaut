@@ -23,15 +23,16 @@ import (
 )
 
 func main() {
+	initial.InitConfig()
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	ctx := context.Background()
 
-	db_admin, err := initial.InitPostgresAdmin(ctx)
+	dbAdmin, err := initial.InitPostgresAdmin(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize Postgres admin: %s", err.Error())
 	}
 
-	db_umlaut, err := initial.InitPostgres(ctx)
+	dbUmlaut, err := initial.InitPostgres(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize Postgres umlaut: %s", err.Error())
 	}
@@ -43,10 +44,10 @@ func main() {
 	defer sessionStore.Close()
 
 	adminService := service.NewAdminService(
-		repository.NewAdminPostgres(db_admin),
-		repository.NewUserPostgres(db_umlaut),
+		repository.NewAdminPostgres(dbAdmin),
+		repository.NewUserPostgres(dbUmlaut),
 	)
-	complaintService := service.NewComplaintService(repository.NewComplaintPostgres(db_umlaut))
+	complaintService := service.NewComplaintService(repository.NewComplaintPostgres(dbUmlaut))
 
 	adminServer := server.NewAdminServer(adminService, complaintService)
 	viper.GetString("admin.port")

@@ -114,6 +114,20 @@ func (mr *MockUserMockRecorder) GetUserInvites(ctx, userId interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInvites", reflect.TypeOf((*MockUser)(nil).GetUserInvites), ctx, userId)
 }
 
+// ResetLikeCounter mocks base method.
+func (m *MockUser) ResetLikeCounter(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetLikeCounter", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetLikeCounter indicates an expected call of ResetLikeCounter.
+func (mr *MockUserMockRecorder) ResetLikeCounter(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetLikeCounter", reflect.TypeOf((*MockUser)(nil).ResetLikeCounter), ctx)
+}
+
 // ShowCSAT mocks base method.
 func (m *MockUser) ShowCSAT(ctx context.Context, userId int) (bool, error) {
 	m.ctrl.T.Helper()
@@ -224,6 +238,20 @@ func (m *MockLike) IsMutualLike(ctx context.Context, like model.Like) (bool, err
 func (mr *MockLikeMockRecorder) IsMutualLike(ctx, like interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsMutualLike", reflect.TypeOf((*MockLike)(nil).IsMutualLike), ctx, like)
+}
+
+// ResetDislike mocks base method.
+func (m *MockLike) ResetDislike(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetDislike", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetDislike indicates an expected call of ResetDislike.
+func (mr *MockLikeMockRecorder) ResetDislike(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetDislike", reflect.TypeOf((*MockLike)(nil).ResetDislike), ctx)
 }
 
 // MockDialog is a mock of Dialog interface.

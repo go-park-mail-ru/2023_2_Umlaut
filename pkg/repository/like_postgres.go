@@ -90,11 +90,17 @@ func (r *LikePostgres) GetUserLikedToLikes(ctx context.Context, userId int) ([]m
 	defer rows.Close()
 
 	likes, err = scanPremiumLikes(rows)
-		if err != nil {
+	if err != nil {
 		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
 	}
 
 	return likes, nil
+}
+
+func (r *LikePostgres) ResetDislike(ctx context.Context) error {
+	_, err := r.db.Exec(ctx, fmt.Sprintf("delete from %s where is_like = false;", likeTable))
+	return err
+
 }
 
 func scanPremiumLikes(rows pgx.Rows) ([]model.PremiumLike, error) {

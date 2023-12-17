@@ -66,6 +66,11 @@ type Complaint interface {
 	GetNextComplaint(ctx context.Context) (model.Complaint, error)
 }
 
+type Background interface {
+	ResetLikeCounter(ctx context.Context) error
+	ResetDislike(ctx context.Context) error
+}
+
 type Service struct {
 	Authorization Authorization
 	Feed          Feed
@@ -76,6 +81,7 @@ type Service struct {
 	Tag           Tag
 	Admin         Admin
 	Complaint     Complaint
+	Background    Background
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -89,5 +95,6 @@ func NewService(repo *repository.Repository) *Service {
 		Tag:           NewTagService(repo.Tag),
 		Admin:         NewAdminService(repo.Admin, repo.User),
 		Complaint:     NewComplaintService(repo.Complaint),
+		Background:    NewBackgroundService(repo.User, repo.Like),
 	}
 }
