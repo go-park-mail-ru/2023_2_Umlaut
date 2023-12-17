@@ -99,5 +99,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd 2023_2_Umlaut/
-            sudo docker system prune
-            y
+            sudo docker container prune -f
+            sudo docker images prune
