@@ -54,3 +54,24 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	}
 	NewSuccessClientResponseDto(r.Context(), w, "")
 }
+
+// @Summary get users who have liked the user
+// @Tags like
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ClientResponseDto[model.PremiumLike]
+// @Failure 401,402,403,500 {object} ClientResponseDto[string]
+// @Router /api/v1/premium/likes [get]
+func (h *Handler) getPremiumLikes(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value(static.KeyUserID).(int)
+
+	show, likes, err := h.services.Like.GetUserLikedToLikes(r.Context(), userId)
+	if err != nil {
+		newErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	NewSuccessClientResponseDto(r.Context(), w, map[string]interface{}{
+		"likes": likes,
+		"show": show,
+	})
+}

@@ -25,6 +25,8 @@ func ParseError(err error) (int, string) {
 			return http.StatusNotFound, code.Message()
 		case codes.PermissionDenied:
 			return http.StatusForbidden, code.Message()
+		case codes.DataLoss:
+			return http.StatusRequestURITooLong, code.Message()
 		}
 	}
 	if err != nil {

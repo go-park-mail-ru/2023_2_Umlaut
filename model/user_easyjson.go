@@ -160,6 +160,8 @@ func easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautModel(in *jlexer.Lexe
 			}
 		case "online":
 			out.Online = bool(in.Bool())
+		case "role":
+			out.Role = int(in.Int())
 		case "tags":
 			if in.IsNull() {
 				in.Skip()
@@ -321,6 +323,11 @@ func easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautModel(out *jwriter.Wr
 		const prefix string = ",\"online\":"
 		out.RawString(prefix)
 		out.Bool(bool(in.Online))
+	}
+	{
+		const prefix string = ",\"role\":"
+		out.RawString(prefix)
+		out.Int(int(in.Role))
 	}
 	{
 		const prefix string = ",\"tags\":"

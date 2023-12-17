@@ -3,7 +3,8 @@ package ws
 import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
-	"log"
+	"go.uber.org/zap"
+	"runtime/debug"
 )
 
 type Hub struct {
@@ -11,18 +12,29 @@ type Hub struct {
 	Register   chan *Client
 	Unregister chan *Client
 	Broadcast  chan *Notification
+	Logger     *zap.Logger
 }
 
-func NewHub() *Hub {
+func NewHub(logger *zap.Logger) *Hub {
 	return &Hub{
 		Users:      make(map[int]*Client),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Broadcast:  make(chan *Notification, 5),
+		Logger:     logger,
 	}
 }
 
 func (h *Hub) Run() {
+	defer func() {
+		if r := recover(); r != nil {
+			h.Logger.Error("Panic [WS]",
+				zap.String("Message", "Panic in Run"),
+				zap.String("Error", string(debug.Stack())),
+			)
+			h.Run()
+		}
+	}()
 	for {
 		select {
 		case cl := <-h.Register:
@@ -35,22 +47,29 @@ func (h *Hub) Run() {
 		case m := <-h.Broadcast:
 			switch m.Type {
 			case static.Message:
-				message := m.Payload.(Message)
-				if _, ok := h.Users[message.RecipientId]; ok {
-					h.Users[message.RecipientId].Notifications <- m
+				if message, ok := m.Payload.(*Message); ok {
+					if user, userExists := h.Users[message.RecipientId]; userExists {
+						user.Notifications <- m
+					}
+				} else {
+					h.Logger.Info("[WS] (*Message)",
+						zap.String("Message", "Ошибка преобразования типа"),
+					)
 				}
 			case static.Match:
-				log.Println("[HUB] match like")
-				match := m.Payload.(model.Dialog)
-				if _, ok := h.Users[match.User1Id]; ok {
-					h.Users[match.User1Id].Notifications <- m
+				if match, ok := m.Payload.(*model.Dialog); ok {
+					if user1, user1Exists := h.Users[match.User1Id]; user1Exists {
+						user1.Notifications <- m
+					}
+					if user2, user2Exists := h.Users[match.User2Id]; user2Exists {
+						user2.Notifications <- m
+					}
+				} else {
+					h.Logger.Info("[WS] (*Dialog)",
+						zap.String("Message", "Ошибка преобразования типа"),
+					)
 				}
-				if _, ok := h.Users[match.User2Id]; ok {
-					h.Users[match.User2Id].Notifications <- m
-				}
-				log.Println("[HUB] match like send")
 			}
-
 		}
 	}
 }

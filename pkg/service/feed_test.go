@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
+	mock_repository "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestFeedService_GetNextUser(t *testing.T) {
@@ -16,45 +17,49 @@ func TestFeedService_GetNextUser(t *testing.T) {
 		Id:   1,
 		Name: "TestUser",
 	}
+	mockFeedData := model.FeedData{
+		User:        mockUser,
+		LikeCounter: 50,
+	}
 
 	tests := []struct {
 		name          string
 		mockBehavior  func(r *mock_repository.MockUser)
-		expectedUser  model.User
+		expectedFeed  model.FeedData
 		expectedError error
 	}{
 		{
 			name: "Success",
 			mockBehavior: func(r *mock_repository.MockUser) {
 				r.EXPECT().GetUserById(gomock.Any(), 1).Return(mockUser, nil)
-				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(mockUser, nil)
+				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(mockFeedData, nil)
 			},
-			expectedUser:  mockUser,
+			expectedFeed:  mockFeedData,
 			expectedError: nil,
 		},
 		{
 			name: "Error Getting User",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.User{}, errors.New("get user error"))
+				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.FeedData{}, errors.New("get user error"))
 			},
-			expectedUser:  model.User{},
+			expectedFeed:  model.FeedData{},
 			expectedError: errors.New("GetNextUser error: get user error"),
 		},
 		{
 			name: "Banned User",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.User{}, static.ErrBannedUser)
+				r.EXPECT().GetUserById(gomock.Any(), 1).Return(model.FeedData{}, static.ErrBannedUser)
 			},
-			expectedUser:  model.User{},
+			expectedFeed:  model.FeedData{},
 			expectedError: static.ErrBannedUser,
 		},
 		{
 			name: "Error Getting Next User",
 			mockBehavior: func(r *mock_repository.MockUser) {
 				r.EXPECT().GetUserById(gomock.Any(), 1).Return(mockUser, nil)
-				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(model.User{}, errors.New("get next user error"))
+				r.EXPECT().GetNextUser(gomock.Any(), mockUser, gomock.Any()).Return(model.FeedData{}, errors.New("get next user error"))
 			},
-			expectedUser:  model.User{},
+			expectedFeed:  model.FeedData{},
 			expectedError: errors.New("GetNextUser error: get next user error"),
 		},
 	}
@@ -68,9 +73,9 @@ func TestFeedService_GetNextUser(t *testing.T) {
 			test.mockBehavior(repoUser)
 
 			service := &FeedService{repoUser: repoUser}
-			user, err := service.GetNextUser(context.Background(), model.FilterParams{UserId: 1})
+			feedData, err := service.GetNextUser(context.Background(), model.FilterParams{UserId: 1})
 
-			assert.Equal(t, test.expectedUser, user)
+			assert.Equal(t, test.expectedFeed, feedData)
 			assert.Equal(t, test.expectedError, err)
 		})
 	}

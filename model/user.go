@@ -25,7 +25,9 @@ type User struct {
 	Hobbies      *string    `json:"hobbies" db:"hobbies"`
 	Birthday     *time.Time `json:"birthday" db:"birthday"`
 	Online       bool       `json:"online" db:"online"`
-	Banned       bool       `json:"-" db:"banned" swaggerignore:"true"`
+	Role         int        `json:"role" db:"role"`
+	InvitedBy    *int       `json:"-" db:"invited_by" swaggerignore:"true"`
+	LikeCounter  int        `json:"-" db:"like_counter" swaggerignore:"true"`
 	Tags         *[]string  `json:"tags" db:"tags"`
 }
 
@@ -71,4 +73,9 @@ func (u *User) Sanitize() {
 
 	u.PasswordHash = ""
 	u.Salt = ""
+}
+
+type FeedData struct {
+	User        User `json:"user"`
+	LikeCounter int  `json:"like_counter"`
 }

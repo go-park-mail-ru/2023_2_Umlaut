@@ -15,6 +15,7 @@ message SignUpInput {
     string Name = 1;
 	string Mail = 2;
 	string Password = 3;
+    string InvitedBy = 4;
 }
 
 message Cookie {

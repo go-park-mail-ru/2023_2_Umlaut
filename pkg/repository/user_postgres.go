@@ -25,8 +25,8 @@ func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, error) {
 	var id int
 	query, args, err := psql.Insert(userTable).
-		Columns("name", "mail", "password_hash", "salt").
-		Values(user.Name, user.Mail, user.PasswordHash, user.Salt).
+		Columns("name", "mail", "password_hash", "salt", "invited_by").
+		Values(user.Name, user.Mail, user.PasswordHash, user.Salt, user.InvitedBy).
 		ToSql()
 
 	if err != nil {
@@ -60,7 +60,7 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("user with mail: %s not found", mail)
 	}
-	if user.Banned {
+	if user.Role == static.Banned {
 		return model.User{}, static.ErrBannedUser
 	}
 
@@ -82,7 +82,7 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	if errors.Is(err, pgx.ErrNoRows) {
 		return model.User{}, fmt.Errorf("user with id: %d not found", id)
 	}
-	if user.Banned {
+	if user.Role == static.Banned {
 		return model.User{}, static.ErrBannedUser
 	}
 
@@ -214,6 +214,32 @@ func (r *UserPostgres) ShowCSAT(ctx context.Context, userId int) (bool, error) {
 	return false, err
 }
 
+func (r *UserPostgres) GetUserInvites(ctx context.Context, userId int) (int, error) {
+	var count int
+
+	query, args, err := psql.Select("count(id)").From(userTable).
+		Where(fmt.Sprintf("invited_by = %d AND description IS NOT NULL", userId)).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to get user invites. err: %w", err)
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&count)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, nil
+	}
+
+	return count, err
+}
+
+func (r *UserPostgres) ResetLikeCounter(ctx context.Context) error {
+	_, err := r.db.Exec(ctx, fmt.Sprintf("update %s set like_counter = default;", userTable))
+	return err
+}
+
 func scanUser(row pgx.Row, user *model.User) error {
 	err := row.Scan(
 		&user.Id,
@@ -229,7 +255,8 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Education,
 		&user.Hobbies,
 		&user.Birthday,
-		&user.Banned,
+		&user.Role,
+		&user.LikeCounter,
 		&user.Online,
 		&user.Tags,
 	)

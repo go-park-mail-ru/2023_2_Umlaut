@@ -121,7 +121,7 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @Produce  json
 // @Param input body signUpInput true "Sign-up input user"
 // @Success 200 {object} ClientResponseDto[idResponse]
-// @Failure 400,404 {object} ClientResponseDto[string]
+// @Failure 400,404,414 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/sign-up [post]
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -134,10 +134,17 @@ func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 		newErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
+	if input.InvitedBy == nil {
+		tmp := ""
+		input.InvitedBy = &tmp
+	}
 
 	userId, err := h.authMicroservice.SignUp(
 		r.Context(),
-		&proto.SignUpInput{Mail: input.Mail, Password: input.Password, Name: input.Name},
+		&proto.SignUpInput{Mail: input.Mail, 
+			Password: input.Password, 
+			Name: input.Name, 
+			InvitedBy: *input.InvitedBy},
 	)
 
 	if err != nil {

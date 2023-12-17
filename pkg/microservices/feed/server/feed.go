@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
@@ -24,8 +25,8 @@ func NewFeedServer(feed *service.FeedService) *FeedServer {
 	return &FeedServer{FeedService: feed}
 }
 
-func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*proto.User, error) {
-	nextUser, err := fs.FeedService.GetNextUser(ctx, model.FilterParams{
+func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*proto.FeedData, error) {
+	feed, err := fs.FeedService.GetNextUser(ctx, model.FilterParams{
 		UserId: int(params.UserId),
 		MinAge: int(params.MinAge),
 		MaxAge: int(params.MaxAge),
@@ -38,24 +39,27 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	birthdayProto := timestamppb.New(*nextUser.Birthday)
+	birthdayProto := timestamppb.New(*feed.User.Birthday)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &proto.User{
-		Id:           int32(nextUser.Id),
-		Name:         nextUser.Name,
-		UserGender:   utils.ModifyInt(nextUser.UserGender),
-		PreferGender: utils.ModifyInt(nextUser.PreferGender),
-		Description:  utils.ModifyString(nextUser.Description),
-		Age:          utils.ModifyInt(nextUser.Age),
-		Looking:      utils.ModifyString(nextUser.Looking),
-		ImagePaths:   utils.ModifyArray(nextUser.ImagePaths),
-		Education:    utils.ModifyString(nextUser.Education),
-		Hobbies:      utils.ModifyString(nextUser.Hobbies),
-		Birthday:     birthdayProto,
-		Online:       nextUser.Online,
-		Tags:         utils.ModifyArray(nextUser.Tags),
+	return &proto.FeedData{
+		User: &proto.User{
+			Id:           int32(feed.User.Id),
+			Name:         feed.User.Name,
+			UserGender:   utils.ModifyInt(feed.User.UserGender),
+			PreferGender: utils.ModifyInt(feed.User.PreferGender),
+			Description:  utils.ModifyString(feed.User.Description),
+			Age:          utils.ModifyInt(feed.User.Age),
+			Looking:      utils.ModifyString(feed.User.Looking),
+			ImagePaths:   utils.ModifyArray(feed.User.ImagePaths),
+			Education:    utils.ModifyString(feed.User.Education),
+			Hobbies:      utils.ModifyString(feed.User.Hobbies),
+			Birthday:     birthdayProto,
+			Online:       feed.User.Online,
+			Tags:         utils.ModifyArray(feed.User.Tags),
+		},
+		LikeCounter: int32(feed.LikeCounter),
 	}, nil
 }

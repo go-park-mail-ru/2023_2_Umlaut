@@ -22,6 +22,7 @@ import (
 )
 
 func main() {
+	initial.InitConfig()
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	ctx := context.Background()
 

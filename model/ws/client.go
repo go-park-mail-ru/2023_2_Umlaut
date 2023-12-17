@@ -3,12 +3,14 @@ package ws
 import (
 	"context"
 	"encoding/json"
+	"runtime/debug"
+	"time"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Notification struct {
@@ -29,19 +31,26 @@ type Message struct {
 type Client struct {
 	Conn          *websocket.Conn
 	Notifications chan *Notification
-	logger        *zap.Logger
+	Logger        *zap.Logger
 	Id            int `json:"id" db:"id"`
 }
 
 func (c *Client) WriteMessage() {
 	defer func() {
-		c.Conn.Close()
+		if r := recover(); r != nil {
+			c.Logger.Error("Panic [WS]",
+				zap.String("Message", "Panic in WriteMessage"),
+				zap.String("Error", string(debug.Stack())),
+			)
+			c.WriteMessage()
+		} else {
+			c.Conn.Close()
+		}
 	}()
-
 	for {
 		message, ok := <-c.Notifications
 		if !ok {
-			c.logger.Info("WS",
+			c.Logger.Info("WS",
 				zap.String("Place", "client.go: 43"),
 				zap.String("Message", "error"),
 			)
@@ -54,16 +63,23 @@ func (c *Client) WriteMessage() {
 
 func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Service) {
 	defer func() {
-		hub.Unregister <- c
-		c.Conn.Close()
+		if r := recover(); r != nil {
+			c.Logger.Error("Panic [WS]",
+				zap.String("Message", "Panic in WriteMessage"),
+				zap.String("Error", string(debug.Stack())),
+			)
+			c.ReadMessage(ctx, hub, services)
+		} else {
+			hub.Unregister <- c
+			c.Conn.Close()
+		}
 	}()
 
 	for {
 		_, m, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				c.logger.Info("WS",
-					zap.String("Place", "client.go: 59"),
+				c.Logger.Info("WS",
 					zap.String("Message", "error"),
 					zap.Error(err),
 				)
@@ -78,8 +94,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			isEdit = true
 		}
 		if err != nil {
-			c.logger.Info("WS",
-				zap.String("Place", "client.go: 71"),
+			c.Logger.Info("WS",
 				zap.String("Message", "error"),
 				zap.Error(err),
 			)
@@ -94,8 +109,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			IsRead:      &receivedMessage.IsRead,
 		})
 		if err != nil {
-			c.logger.Info("WS",
-				zap.String("Place", "client.go: 84"),
+			c.Logger.Info("WS",
 				zap.String("Message", "error"),
 				zap.Error(err),
 			)

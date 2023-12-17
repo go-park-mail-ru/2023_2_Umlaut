@@ -360,6 +360,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto"
                         }
+                    },
+                    "414": {
+                        "description": "Request URI Too Long",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
                     }
                 }
             }
@@ -748,6 +754,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/premium/likes": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "like"
+                ],
+                "summary": "get users who have liked the user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "402": {
+                        "description": "Payment Required",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/recommendation": {
             "post": {
                 "consumes": [
@@ -1026,6 +1078,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/user/share": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "get user share link",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user/{id}": {
             "get": {
                 "consumes": [
@@ -1145,6 +1228,9 @@ const docTemplate = `{
                 "password"
             ],
             "properties": {
+                "invited_by": {
+                    "type": "string"
+                },
                 "mail": {
                     "type": "string"
                 },
@@ -1281,6 +1367,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "prefer_gender": {
+                    "type": "integer"
+                },
+                "role": {
                     "type": "integer"
                 },
                 "tags": {

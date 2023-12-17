@@ -80,6 +80,21 @@ func (mr *MockAuthorizationMockRecorder) GenerateCookie(ctx, id interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateCookie", reflect.TypeOf((*MockAuthorization)(nil).GenerateCookie), ctx, id)
 }
 
+// GetDecodeUserId mocks base method.
+func (m *MockAuthorization) GetDecodeUserId(ctx context.Context, message string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDecodeUserId", ctx, message)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDecodeUserId indicates an expected call of GetDecodeUserId.
+func (mr *MockAuthorizationMockRecorder) GetDecodeUserId(ctx, message interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDecodeUserId", reflect.TypeOf((*MockAuthorization)(nil).GetDecodeUserId), ctx, message)
+}
+
 // GetSessionValue mocks base method.
 func (m *MockAuthorization) GetSessionValue(ctx context.Context, session string) (int, error) {
 	m.ctrl.T.Helper()
@@ -134,10 +149,10 @@ func (m *MockFeed) EXPECT() *MockFeedMockRecorder {
 }
 
 // GetNextUser mocks base method.
-func (m *MockFeed) GetNextUser(ctx context.Context, params model.FilterParams) (model.User, error) {
+func (m *MockFeed) GetNextUser(ctx context.Context, params model.FilterParams) (model.FeedData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextUser", ctx, params)
-	ret0, _ := ret[0].(model.User)
+	ret0, _ := ret[0].(model.FeedData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -215,6 +230,22 @@ func (mr *MockUserMockRecorder) GetCurrentUser(ctx, userId interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentUser", reflect.TypeOf((*MockUser)(nil).GetCurrentUser), ctx, userId)
 }
 
+// GetUserShareCridentials mocks base method.
+func (m *MockUser) GetUserShareCridentials(ctx context.Context, userId int) (int, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserShareCridentials", ctx, userId)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetUserShareCridentials indicates an expected call of GetUserShareCridentials.
+func (mr *MockUserMockRecorder) GetUserShareCridentials(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserShareCridentials", reflect.TypeOf((*MockUser)(nil).GetUserShareCridentials), ctx, userId)
+}
+
 // UpdateUser mocks base method.
 func (m *MockUser) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
 	m.ctrl.T.Helper()
@@ -266,6 +297,22 @@ func (m *MockLike) CreateLike(ctx context.Context, like model.Like) (model.Dialo
 func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockLike)(nil).CreateLike), ctx, like)
+}
+
+// GetUserLikedToLikes mocks base method.
+func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) (bool, []model.PremiumLike, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserLikedToLikes", ctx, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].([]model.PremiumLike)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetUserLikedToLikes indicates an expected call of GetUserLikedToLikes.
+func (mr *MockLikeMockRecorder) GetUserLikedToLikes(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserLikedToLikes", reflect.TypeOf((*MockLike)(nil).GetUserLikedToLikes), ctx, userId)
 }
 
 // MockDialog is a mock of Dialog interface.
@@ -606,4 +653,55 @@ func (m *MockComplaint) GetNextComplaint(ctx context.Context) (model.Complaint, 
 func (mr *MockComplaintMockRecorder) GetNextComplaint(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextComplaint", reflect.TypeOf((*MockComplaint)(nil).GetNextComplaint), ctx)
+}
+
+// MockBackground is a mock of Background interface.
+type MockBackground struct {
+	ctrl     *gomock.Controller
+	recorder *MockBackgroundMockRecorder
+}
+
+// MockBackgroundMockRecorder is the mock recorder for MockBackground.
+type MockBackgroundMockRecorder struct {
+	mock *MockBackground
+}
+
+// NewMockBackground creates a new mock instance.
+func NewMockBackground(ctrl *gomock.Controller) *MockBackground {
+	mock := &MockBackground{ctrl: ctrl}
+	mock.recorder = &MockBackgroundMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockBackground) EXPECT() *MockBackgroundMockRecorder {
+	return m.recorder
+}
+
+// ResetDislike mocks base method.
+func (m *MockBackground) ResetDislike(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetDislike", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetDislike indicates an expected call of ResetDislike.
+func (mr *MockBackgroundMockRecorder) ResetDislike(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetDislike", reflect.TypeOf((*MockBackground)(nil).ResetDislike), ctx)
+}
+
+// ResetLikeCounter mocks base method.
+func (m *MockBackground) ResetLikeCounter(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetLikeCounter", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetLikeCounter indicates an expected call of ResetLikeCounter.
+func (mr *MockBackgroundMockRecorder) ResetLikeCounter(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetLikeCounter", reflect.TypeOf((*MockBackground)(nil).ResetLikeCounter), ctx)
 }

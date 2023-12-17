@@ -24,7 +24,9 @@ CREATE TABLE "user"
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
-    banned        BOOlEAN              DEFAULT FALSE,
+    role          SMALLINT    NOT NULL DEFAULT 1 CHECK (role BETWEEN 1 AND 3),
+    invited_by    INT         REFERENCES "user" (id) ON DELETE SET NULL,
+    like_counter  INT                  DEFAULT 50,
     online        BOOLEAN     NOT NULL DEFAULT FALSE,
     tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
     age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
@@ -89,8 +91,7 @@ CREATE TABLE complaint
     report_status     SMALLINT    DEFAULT 0,
     created_at        TIMESTAMPTZ DEFAULT timezone('Europe/Moscow'::text, NOW()),
     UNIQUE (reporter_user_id, reported_user_id),
-    CHECK (reporter_user_id != reported_user_id
-        )
+    CHECK (reporter_user_id != reported_user_id)
 );
 
 
@@ -165,8 +166,7 @@ CREATE
     RETURNS TRIGGER AS
 $$
 BEGIN
-    NEW.updated_at
-        = timezone('Europe/Moscow'::text, NOW());
+    NEW.updated_at = timezone('Europe/Moscow'::text, NOW());
     RETURN NEW;
 END;
 $$
@@ -204,7 +204,7 @@ CREATE
 $$
 BEGIN
     UPDATE "user"
-    SET banned = TRUE
+    SET role = 3
     WHERE id = NEW.reported_user_id;
     UPDATE dialog
     SET banned = TRUE
@@ -224,6 +224,53 @@ CREATE TRIGGER trigger_update_banned_user
     ON complaint
     FOR EACH ROW
 EXECUTE FUNCTION update_banned_user();
+
+
+CREATE
+    OR REPLACE FUNCTION update_user_role()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF NEW.invited_by IS NOT NULL AND
+       (SELECT count(id)
+        FROM "user"
+        WHERE invited_by = NEW.invited_by
+          AND description IS NOT NULL) = 5
+    THEN
+        UPDATE "user"
+        SET role = 2
+        WHERE id = NEW.invited_by;
+    END IF;
+    RETURN NEW;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_user_role
+    AFTER UPDATE
+    ON "user"
+    FOR EACH ROW
+EXECUTE FUNCTION update_user_role();
+
+
+CREATE
+    OR REPLACE FUNCTION update_user_like_counter()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE "user"
+    SET like_counter = like_counter - 1
+    WHERE id = NEW.liked_by_user_id;
+    RETURN NEW;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_user_like_counter
+    AFTER INSERT
+    ON "like"
+    FOR EACH ROW
+EXECUTE FUNCTION update_user_like_counter();
 
 
 -- fill db

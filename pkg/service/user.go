@@ -123,3 +123,19 @@ func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) e
 
 	return err
 }
+
+func (s *UserService) GetUserShareCridentials(ctx context.Context, userId int) (int, string, error) {
+	count, err := s.repoUser.GetUserInvites(ctx, userId)
+	if err != nil {
+		return 0, "", fmt.Errorf("GetUserShareLink error: %v", err)
+	}
+
+	encryptUserId, err := utils.EncryptString(fmt.Sprint(userId))
+	if err != nil {
+		return 0, "", fmt.Errorf("GetUserShareLink error: %v", err)
+	}
+
+	link := utils.GenerateUserShakeLink(encryptUserId)
+
+	return count, link, nil
+}

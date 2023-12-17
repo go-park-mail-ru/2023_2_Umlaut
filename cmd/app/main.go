@@ -62,13 +62,14 @@ func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, a
 // @host umlaut-bmstu.me
 // @BasePath /
 func main() {
+	initial.InitConfig()
 	logger, err := initial.InitLogger()
 	if err != nil {
 		log.Fatal(err)
 	}
 	logger.Info("Starting server...")
 	defer logger.Sync()
-	
+
 	ctx := context.Background()
 
 	db, err := initial.InitPostgres(ctx)
@@ -102,13 +103,21 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
 	}
 
-	hub := ws.NewHub()
+	hub := ws.NewHub(logger)
 	repos := repository.NewRepository(db, dbAdmin, sessionStore, fileClient)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services, hub, logger, authClient, feedConn, adminConn)
 
 	srv := new(umlaut.Server)
 	go hub.Run()
+	if err = services.Background.ResetDislike(ctx); err != nil {
+		logger.Error("initialize Background Service",
+			zap.String("Error", fmt.Sprintf("ResetDislike: %s", err.Error())))
+	}
+	if err = services.Background.ResetLikeCounter(ctx); err != nil {
+		logger.Error("initialize Background Service",
+			zap.String("Error", fmt.Sprintf("ResetLikeCounter: %s", err.Error())))
+	}
 
 	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
 		logger.Error("running http server",

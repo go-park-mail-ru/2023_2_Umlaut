@@ -16,10 +16,11 @@ type Authorization interface {
 	GetSessionValue(ctx context.Context, session string) (int, error)
 	CreateUser(ctx context.Context, user model.User) (int, error)
 	GetUser(ctx context.Context, mail, password string) (model.User, error)
+	GetDecodeUserId(ctx context.Context, message string) (int, error)
 }
 
 type Feed interface {
-	GetNextUser(ctx context.Context, params model.FilterParams) (model.User, error)
+	GetNextUser(ctx context.Context, params model.FilterParams) (model.FeedData, error)
 }
 
 type User interface {
@@ -27,10 +28,12 @@ type User interface {
 	UpdateUser(ctx context.Context, user model.User) (model.User, error)
 	CreateFile(ctx context.Context, userId int, file multipart.File, size int64) (string, error)
 	DeleteFile(ctx context.Context, userId int, link string) error
+	GetUserShareCridentials(ctx context.Context, userId int) (int, string, error)
 }
 
 type Like interface {
 	CreateLike(ctx context.Context, like model.Like) (model.Dialog, error)
+	GetUserLikedToLikes(ctx context.Context, userId int) (bool, []model.PremiumLike, error)
 }
 
 type Dialog interface {
@@ -63,6 +66,11 @@ type Complaint interface {
 	GetNextComplaint(ctx context.Context) (model.Complaint, error)
 }
 
+type Background interface {
+	ResetLikeCounter(ctx context.Context) error
+	ResetDislike(ctx context.Context) error
+}
+
 type Service struct {
 	Authorization Authorization
 	Feed          Feed
@@ -73,6 +81,7 @@ type Service struct {
 	Tag           Tag
 	Admin         Admin
 	Complaint     Complaint
+	Background    Background
 }
 
 func NewService(repo *repository.Repository) *Service {
@@ -80,11 +89,12 @@ func NewService(repo *repository.Repository) *Service {
 		Authorization: NewAuthService(repo.User, repo.Store, repo.Admin),
 		Feed:          NewFeedService(repo.User, repo.Store, repo.Dialog),
 		User:          NewUserService(repo.User, repo.Store, repo.FileServer),
-		Like:          NewLikeService(repo.Like, repo.Dialog),
+		Like:          NewLikeService(repo.Like, repo.Dialog, repo.User),
 		Dialog:        NewDialogService(repo.Dialog),
 		Message:       NewMessageService(repo.Message),
 		Tag:           NewTagService(repo.Tag),
 		Admin:         NewAdminService(repo.Admin, repo.User),
 		Complaint:     NewComplaintService(repo.Complaint),
+		Background:    NewBackgroundService(repo.User, repo.Like),
 	}
 }
