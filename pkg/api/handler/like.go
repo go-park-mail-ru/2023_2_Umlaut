@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core/chat"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
@@ -15,9 +15,9 @@ import (
 // @ID like
 // @Accept  json
 // @Produce  json
-// @Param input body model.Like true "Like data to update"
-// @Success 200 {object} ClientResponseDto[string]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Param input body coreLike true "Like data to update"
+// @Success 200 {object} dto.ClientResponseDto[string]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/like [post]
 func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -31,19 +31,19 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId := r.Context().Value(static2.KeyUserID).(int)
+	userId := r.Context().Value(constants.KeyUserID).(int)
 	like.LikedByUserId = userId
 
 	dialog, err := h.services.Like.CreateLike(r.Context(), like)
 	if err != nil {
-		if errors.Is(err, static2.ErrAlreadyExists) {
+		if errors.Is(err, constants.ErrAlreadyExists) {
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusOK, "already liked")
 			return
 		}
-		if errors.Is(err, static2.ErrMutualLike) {
+		if errors.Is(err, constants.ErrMutualLike) {
 
 			h.hub.Broadcast <- &chat.Notification{
-				Type:    static2.Match,
+				Type:    constants.Match,
 				Payload: dialog,
 			}
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusOK, "Mutual like")
@@ -59,11 +59,11 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 // @Tags like
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[model.PremiumLike]
-// @Failure 401,402,403,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[corePremiumLike]
+// @Failure 401,402,403,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/premium/likes [get]
 func (h *Handler) getPremiumLikes(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value(static2.KeyUserID).(int)
+	userId := r.Context().Value(constants.KeyUserID).(int)
 
 	show, likes, err := h.services.Like.GetUserLikedToLikes(r.Context(), userId)
 	if err != nil {

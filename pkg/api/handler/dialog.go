@@ -13,8 +13,8 @@ import (
 // @ID dialog
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[[]model.Dialog]
-// @Failure 401,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[[]core.Dialog]
+// @Failure 401,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/dialogs [get]
 func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(constants.KeyUserID).(int)
@@ -40,8 +40,8 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "dialog ID"
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[model.Dialog]
-// @Failure 401,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[core.Dialog]
+// @Failure 401,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/dialogs/{id} [get]
 func (h *Handler) getDialog(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -63,8 +63,8 @@ func (h *Handler) getDialog(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "Recipient ID"
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[[]model.Message]
-// @Failure 401,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[[]core.Message]
+// @Failure 401,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/dialogs/{id}/message [get]
 func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(constants.KeyUserID).(int)

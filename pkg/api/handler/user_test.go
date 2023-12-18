@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"mime/multipart"
@@ -49,7 +49,7 @@ func TestHandler_user(t *testing.T) {
 		{
 			name: "Banned user",
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, static2.ErrBannedUser)
+				r.EXPECT().GetCurrentUser(gomock.Any(), 1).Return(mockUser, constants.ErrBannedUser)
 			},
 			expectedStatusCode:   http.StatusForbidden,
 			expectedResponseBody: `{"status":403,"message":"this user is blocked","payload":""}`,
@@ -72,7 +72,7 @@ func TestHandler_user(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), static2.KeyUserID, 1)
+			ctx := context.WithValue(context.Background(), constants.KeyUserID, 1)
 			services := &service.Service{User: repo}
 			handler := Handler{services: services}
 
@@ -142,7 +142,7 @@ func TestHandler_updateUser(t *testing.T) {
 				PasswordHash: "passWord",
 			},
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, static2.ErrAlreadyExists)
+				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, constants.ErrAlreadyExists)
 			},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"account with this email already exists","payload":""}`,
@@ -156,7 +156,7 @@ func TestHandler_updateUser(t *testing.T) {
 				PasswordHash: "passWord",
 			},
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, static2.ErrInvalidUser)
+				r.EXPECT().UpdateUser(gomock.Any(), mockUser).Return(mockUser, constants.ErrInvalidUser)
 			},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"status":400,"message":"invalid field for update","payload":""}`,
@@ -185,7 +185,7 @@ func TestHandler_updateUser(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), static2.KeyUserID, 1)
+			ctx := context.WithValue(context.Background(), constants.KeyUserID, 1)
 			services := &service.Service{User: repo}
 			handler := Handler{services: services}
 
@@ -235,7 +235,7 @@ func TestHandler_updateUserPhoto(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), static2.KeyUserID, 1)
+			ctx := context.WithValue(context.Background(), constants.KeyUserID, 1)
 			services := &service.Service{User: repo}
 			handler := Handler{services: services}
 
@@ -295,7 +295,7 @@ func TestHandler_deleteUserPhoto(t *testing.T) {
 			name:      "banned user",
 			inputBody: `{"link": "photo.jpg"}`,
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(static2.ErrBannedUser)
+				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(constants.ErrBannedUser)
 			},
 			expectedStatusCode:   http.StatusForbidden,
 			expectedResponseBody: `{"status":403,"message":"this user is blocked","payload":""}`,
@@ -304,7 +304,7 @@ func TestHandler_deleteUserPhoto(t *testing.T) {
 			name:      "No photo",
 			inputBody: `{"link": "photo.jpg"}`,
 			mockBehavior: func(r *mock_service.MockUser) {
-				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(static2.ErrNoFiles)
+				r.EXPECT().DeleteFile(gomock.Any(), mockUserID, mockLink).Return(constants.ErrNoFiles)
 			},
 			expectedStatusCode:   http.StatusNotFound,
 			expectedResponseBody: `{"status":404,"message":"This user has no photos","payload":""}`,
@@ -328,7 +328,7 @@ func TestHandler_deleteUserPhoto(t *testing.T) {
 			repo := mock_service.NewMockUser(c)
 			test.mockBehavior(repo)
 
-			ctx := context.WithValue(context.Background(), static2.KeyUserID, 1)
+			ctx := context.WithValue(context.Background(), constants.KeyUserID, 1)
 			services := &service.Service{User: repo}
 			handler := Handler{services: services}
 

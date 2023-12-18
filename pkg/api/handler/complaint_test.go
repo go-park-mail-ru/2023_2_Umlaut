@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,7 +18,7 @@ import (
 
 func TestHandler_createComplaint(t *testing.T) {
 
-	mockComplaint := core2.Complaint{
+	mockComplaint := core.Complaint{
 		ReporterUserId:  1,
 		ReportedUserId:  2,
 		ComplaintTypeId: 1,
@@ -52,7 +52,7 @@ func TestHandler_createComplaint(t *testing.T) {
 			name:        "already exists",
 			requestBody: `{"reported_user_id": 2, "complaint_type_id": 1}`,
 			mockBehavior: func(r *mock_service.MockComplaint) {
-				r.EXPECT().CreateComplaint(gomock.Any(), mockComplaint).Return(1, static2.ErrAlreadyExists)
+				r.EXPECT().CreateComplaint(gomock.Any(), mockComplaint).Return(1, constants.ErrAlreadyExists)
 			},
 			expectedStatusCode:   http.StatusConflict,
 			expectedResponseBody: `{"status":409,"message":"complaint already exists","payload":""}`,
@@ -76,7 +76,7 @@ func TestHandler_createComplaint(t *testing.T) {
 			repoComplaint := mock_service.NewMockComplaint(c)
 			test.mockBehavior(repoComplaint)
 
-			ctx := context.WithValue(context.Background(), static2.KeyUserID, 1)
+			ctx := context.WithValue(context.Background(), constants.KeyUserID, 1)
 			services := &service.Service{Complaint: repoComplaint}
 			handler := Handler{services: services}
 
@@ -102,7 +102,7 @@ func TestHandler_getAllComplaintTypes(t *testing.T) {
 		{
 			name: "Ok",
 			mockBehavior: func(r *mock_service.MockComplaint) {
-				complaintTypes := []core2.ComplaintType{
+				complaintTypes := []core.ComplaintType{
 					{
 						Id:       1,
 						TypeName: "type1",
@@ -135,7 +135,7 @@ func TestHandler_getAllComplaintTypes(t *testing.T) {
 			complaintService := mock_service.NewMockComplaint(c)
 			test.mockBehavior(complaintService)
 
-			ctx := context.WithValue(context.Background(), static2.KeyUserID, 1)
+			ctx := context.WithValue(context.Background(), constants.KeyUserID, 1)
 			services := &service.Service{Complaint: complaintService}
 			handler := Handler{services: services}
 

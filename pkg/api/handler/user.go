@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
@@ -19,13 +19,13 @@ import (
 // @ID user
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[model.User]
-// @Failure 404,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[core.User]
+// @Failure 404,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(static2.KeyUserID).(int)
+	id := r.Context().Value(constants.KeyUserID).(int)
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
-	if errors.Is(err, static2.ErrBannedUser) {
+	if errors.Is(err, constants.ErrBannedUser) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
 		return
 	}
@@ -35,7 +35,7 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, _ := r.Cookie("session_id")
-	jwtToken := utils.NewJwtToken(static2.Secret)
+	jwtToken := utils.NewJwtToken(constants.Secret)
 	token, err := jwtToken.Create(session.Value, id, time.Now().Add(12*time.Hour).Unix())
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "csrf token creation error")
@@ -53,8 +53,8 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "user ID"
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[model.User]
-// @Failure 404,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[core.User]
+// @Failure 404,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/user/{id} [get]
 func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -65,7 +65,7 @@ func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
 
 	currentUser, err := h.services.User.GetCurrentUser(r.Context(), id)
 	currentUser.Mail = ""
-	if errors.Is(err, static2.ErrBannedUser) {
+	if errors.Is(err, constants.ErrBannedUser) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
 		return
 	}
@@ -82,9 +82,9 @@ func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
 // @ID user
 // @Accept  json
 // @Produce  json
-// @Param input body model.User true "User data to update"
-// @Success 200 {object} ClientResponseDto[model.User]
-// @Failure 401,404 {object} ClientResponseDto[string]
+// @Param input body core.User true "User data to update"
+// @Success 200 {object} dto.ClientResponseDto[core.User]
+// @Failure 401,404 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/user [post]
 func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -98,14 +98,14 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Id = r.Context().Value(static2.KeyUserID).(int)
+	user.Id = r.Context().Value(constants.KeyUserID).(int)
 	currentUser, err := h.services.User.UpdateUser(r.Context(), user)
 	if err != nil {
-		if errors.Is(err, static2.ErrAlreadyExists) {
+		if errors.Is(err, constants.ErrAlreadyExists) {
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "account with this email already exists")
 			return
 		}
-		if errors.Is(err, static2.ErrInvalidUser) {
+		if errors.Is(err, constants.ErrInvalidUser) {
 			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid field for update")
 			return
 		}
@@ -121,11 +121,11 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "file"
-// @Success 200 {object} ClientResponseDto[string]
-// @Failure 400,401,404 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[string]
+// @Failure 400,401,404 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/user/photo [post]
 func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(static2.KeyUserID).(int)
+	id := r.Context().Value(constants.KeyUserID).(int)
 	r.ParseMultipartForm(5 * 1024 * 1025)
 	file, head, err := r.FormFile("file")
 	if err != nil {
@@ -135,7 +135,7 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	link, err := h.services.User.CreateFile(r.Context(), id, file, head.Size)
-	if errors.Is(err, static2.ErrBannedUser) {
+	if errors.Is(err, constants.ErrBannedUser) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
 		return
 	}
@@ -150,8 +150,8 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Tags user
 // @Accept  json
 // @Param input body deleteLink true "link for deleting file"
-// @Success 200 {object} ClientResponseDto[string]
-// @Failure 400,401,404 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[string]
+// @Failure 400,401,404 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -165,14 +165,14 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.Context().Value(static2.KeyUserID).(int)
+	id := r.Context().Value(constants.KeyUserID).(int)
 
 	err = h.services.User.DeleteFile(r.Context(), id, link.Link)
-	if errors.Is(err, static2.ErrBannedUser) {
+	if errors.Is(err, constants.ErrBannedUser) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, err.Error())
 		return
 	}
-	if errors.Is(err, static2.ErrNoFiles) {
+	if errors.Is(err, constants.ErrNoFiles) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "This user has no photos")
 		return
 	}
@@ -186,11 +186,11 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Summary get user share link
 // @Tags user
 // @Accept  json
-// @Success 200 {object} ClientResponseDto[shareCridentialsOutput]
-// @Failure 401,500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[shareCridentialsOutput]
+// @Failure 401,500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/user/share [get]
 func (h *Handler) getUserShareCridentials(w http.ResponseWriter, r *http.Request) {
-	id := r.Context().Value(static2.KeyUserID).(int)
+	id := r.Context().Value(constants.KeyUserID).(int)
 	invitesCount, link, err := h.services.User.GetUserShareCridentials(r.Context(), id)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())

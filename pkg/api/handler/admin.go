@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
-	utils2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
 	"io"
 	"net/http"
 
@@ -16,9 +16,9 @@ import (
 // @ID Feedback
 // @Accept  json
 // @Produce  json
-// @Param input body model.Feedback true "Statistic data"
-// @Success 200 {object} ClientResponseDto[string]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Param input body core.Feedback true "Statistic data"
+// @Success 200 {object} dto.ClientResponseDto[string]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/feedback [post]
 func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -26,7 +26,7 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	var stat core2.Feedback
+	var stat core.Feedback
 	if err := stat.UnmarshalJSON(body); err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
@@ -35,14 +35,14 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		&proto.Feedback{
 			UserId:  int32(r.Context().Value(constants.KeyUserID).(int)),
-			Rating:  utils2.ModifyInt(stat.Rating),
-			Liked:   utils2.ModifyString(stat.Liked),
-			NeedFix: utils2.ModifyString(stat.NeedFix),
-			Comment: utils2.ModifyString(stat.Comment),
+			Rating:  utils.ModifyInt(stat.Rating),
+			Liked:   utils.ModifyString(stat.Liked),
+			NeedFix: utils.ModifyString(stat.NeedFix),
+			Comment: utils.ModifyString(stat.Comment),
 		})
 
 	if err != nil {
-		statusCode, message := utils2.ParseError(err)
+		statusCode, message := utils.ParseError(err)
 		dto.NewErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -54,9 +54,9 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 // @ID Recommendation
 // @Accept  json
 // @Produce  json
-// @Param input body model.Recommendation true "Recommendation data"
-// @Success 200 {object} ClientResponseDto[string]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Param input body core.Recommendation true "Recommendation data"
+// @Success 200 {object} dto.ClientResponseDto[string]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/recommendation [post]
 func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -64,7 +64,7 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	var rec core2.Recommendation
+	var rec core.Recommendation
 	if err := rec.UnmarshalJSON(body); err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
@@ -73,10 +73,10 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		&proto.Recommendation{
 			UserId: int32(r.Context().Value(constants.KeyUserID).(int)),
-			Rating: utils2.ModifyInt(rec.Rating),
+			Rating: utils.ModifyInt(rec.Rating),
 		})
 	if err != nil {
-		statusCode, message := utils2.ParseError(err)
+		statusCode, message := utils.ParseError(err)
 		dto.NewErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -88,9 +88,9 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 // @ID FeedFeedback
 // @Accept  json
 // @Produce  json
-// @Param input body model.Recommendation true "feed_feedback data"
-// @Success 200 {object} ClientResponseDto[string]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Param input body core.Recommendation true "feed_feedback data"
+// @Success 200 {object} dto.ClientResponseDto[string]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/feed-feedback [post]
 func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -98,7 +98,7 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	var rec core2.Recommendation
+	var rec core.Recommendation
 	if err := rec.UnmarshalJSON(body); err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
@@ -107,11 +107,11 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 		r.Context(),
 		&proto.Recommendation{
 			UserId: int32(r.Context().Value(constants.KeyUserID).(int)),
-			Rating: utils2.ModifyInt(rec.Rating),
+			Rating: utils.ModifyInt(rec.Rating),
 		})
 
 	if err != nil {
-		statusCode, message := utils2.ParseError(err)
+		statusCode, message := utils.ParseError(err)
 		dto.NewErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
@@ -123,8 +123,8 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 // @ID CSAT
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[int]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[int]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/show-csat [get]
 func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(constants.KeyUserID).(int)
@@ -142,18 +142,18 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 // @ID RecommendationStatistic
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[model.RecommendationStatistic]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[core.RecommendationStatistic]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/admin/recommendation [get]
 func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Request) {
 	recommend, err := h.adminMicroservice.GetRecommendationStatistic(r.Context(), &proto.AdminEmpty{})
 	if err != nil {
-		statusCode, message := utils2.ParseError(err)
+		statusCode, message := utils.ParseError(err)
 		dto.NewErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, &core2.RecommendationStatistic{
+	dto.NewSuccessClientResponseDto(r.Context(), w, &core.RecommendationStatistic{
 		AvgRecommend:   recommend.AvgRecommend,
 		NPS:            recommend.NPS,
 		RecommendCount: recommend.RecommendCount,
@@ -165,22 +165,22 @@ func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Requ
 // @ID FeedbackStatistic
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} ClientResponseDto[model.FeedbackStatistic]
-// @Failure 500 {object} ClientResponseDto[string]
+// @Success 200 {object} dto.ClientResponseDto[core.FeedbackStatistic]
+// @Failure 500 {object} dto.ClientResponseDto[string]
 // @Router /api/v1/admin/feedback [get]
 func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
 	feedbackStat, err := h.adminMicroservice.GetFeedbackStatistic(r.Context(), &proto.AdminEmpty{})
 	if err != nil {
-		statusCode, message := utils2.ParseError(err)
+		statusCode, message := utils.ParseError(err)
 		dto.NewErrorClientResponseDto(r.Context(), w, statusCode, message)
 		return
 	}
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, &core2.FeedbackStatistic{
+	dto.NewSuccessClientResponseDto(r.Context(), w, &core.FeedbackStatistic{
 		AvgRating:   feedbackStat.AvgRating,
 		RatingCount: feedbackStat.RatingCount,
-		LikedMap:    utils2.ModifyLikedMap(feedbackStat.LikedMap),
-		NeedFixMap:  utils2.ModifyNeedFixMap(feedbackStat.NeedFixMap),
+		LikedMap:    utils.ModifyLikedMap(feedbackStat.LikedMap),
+		NeedFixMap:  utils.ModifyNeedFixMap(feedbackStat.NeedFixMap),
 		Comments:    feedbackStat.Comments,
 	})
 }

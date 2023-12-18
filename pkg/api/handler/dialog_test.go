@@ -11,7 +11,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	// gmux "github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
