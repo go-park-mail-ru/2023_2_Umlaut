@@ -7,17 +7,17 @@ import (
 	"net/http"
 	"time"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc/keepalive"
 
 	initial "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/interceptors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/admin/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/interceptors"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/server"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/admin/server"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/service"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
@@ -58,8 +58,8 @@ func main() {
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			grpc.UnaryServerInterceptor(interceptors.PanicRecoveryInterceptor),
-			grpc.UnaryServerInterceptor(grpc_prometheus.UnaryServerInterceptor),
+			interceptors.PanicRecoveryInterceptor,
+			grpc_prometheus.UnaryServerInterceptor,
 		),
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
