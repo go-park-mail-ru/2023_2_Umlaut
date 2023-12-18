@@ -52,8 +52,8 @@ func main() {
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			interceptors.PanicRecoveryInterceptor,
-			grpc_prometheus.UnaryServerInterceptor,
+			grpc.UnaryServerInterceptor(interceptors.PanicRecoveryInterceptor),
+			grpc.UnaryServerInterceptor(grpc_prometheus.UnaryServerInterceptor),
 		),
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
