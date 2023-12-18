@@ -20,7 +20,7 @@ mod:
 
 tests:
 	go test -coverpkg=./... -coverprofile=cover.out.tmp ./...
-	cat cover.out.tmp | grep -v "mocks\|cmd\|configs\|db\|docs\|model\|monitoring\|static\|utils\|dto.go\|service.go\|handler.go\|repository.go\|server\|.pb.go\|.pb\|proto\|middleware.go" > cover.out
+	cat cover.out.tmp | grep -v "mocks\|cmd\|configs\|db\|docs\|model\|monitoring\|constants\|utils\|service.go\|handler.go\|repository.go\|server.go|.pb.go\|.pb\|proto\|middleware.go" > cover.out
 	go tool cover -func=cover.out
 
 mock:
