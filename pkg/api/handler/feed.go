@@ -15,8 +15,8 @@ import (
 // @Param min_age query integer false "Minimum age filter"
 // @Param max_age query integer false "Maximum age filter"
 // @Param tags query string false "Tags filter"
-// @Success 200 {object} dto.ClientResponseDto[model.FeedData]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[dto.FeedData]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed [get]
 func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	feed, err := h.feedMicroservice.Feed(

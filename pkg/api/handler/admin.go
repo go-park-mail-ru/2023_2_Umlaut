@@ -17,8 +17,8 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param input body core.Feedback true "Statistic data"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feedback [post]
 func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -55,8 +55,8 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body core.Recommendation true "Recommendation data"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/recommendation [post]
 func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -89,8 +89,8 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body core.Recommendation true "feed_feedback data"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/feed-feedback [post]
 func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -123,8 +123,8 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 // @ID CSAT
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[int]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[int]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/show-csat [get]
 func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(constants.KeyUserID).(int)
@@ -142,8 +142,8 @@ func (h *Handler) showCSAT(w http.ResponseWriter, r *http.Request) {
 // @ID RecommendationStatistic
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[core.RecommendationStatistic]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[core.RecommendationStatistic]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/admin/recommendation [get]
 func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Request) {
 	recommend, err := h.adminMicroservice.GetRecommendationStatistic(r.Context(), &proto.AdminEmpty{})
@@ -165,8 +165,8 @@ func (h *Handler) getRecommendationStatistic(w http.ResponseWriter, r *http.Requ
 // @ID FeedbackStatistic
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[core.FeedbackStatistic]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[core.FeedbackStatistic]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/admin/feedback [get]
 func (h *Handler) getFeedbackStatistic(w http.ResponseWriter, r *http.Request) {
 	feedbackStat, err := h.adminMicroservice.GetFeedbackStatistic(r.Context(), &proto.AdminEmpty{})

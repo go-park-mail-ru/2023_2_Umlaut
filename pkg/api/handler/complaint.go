@@ -19,8 +19,8 @@ import (
 // @ID complaintTypes
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[[]core.ComplaintType]
-// @Failure 401,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[[]core.ComplaintType]
+// @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/complaint_types [get]
 func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 
@@ -39,8 +39,8 @@ func (h *Handler) getAllComplaintTypes(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body core.Complaint true "Complaint data to create"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 400,401,409,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,401,409,500 {object} ClientResponseDto[string]
 // @Router /api/v1/complaint [post]
 func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -73,8 +73,8 @@ func (h *Handler) createComplaint(w http.ResponseWriter, r *http.Request) {
 // @Tags complaint
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[core.Complaint]
-// @Failure 401,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[core.Complaint]
+// @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/admin/complaint [get]
 func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 	complaint, err := h.adminMicroservice.GetNextComplaint(r.Context(), &proto.AdminEmpty{})
@@ -100,8 +100,8 @@ func (h *Handler) getNextComplaint(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "complaint ID"
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 401,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/admin/complaint/{id} [delete]
 func (h *Handler) deleteComplaint(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -123,8 +123,8 @@ func (h *Handler) deleteComplaint(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "complaint ID"
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 401,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/admin/complaint/{id} [get]
 func (h *Handler) acceptComplaint(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])

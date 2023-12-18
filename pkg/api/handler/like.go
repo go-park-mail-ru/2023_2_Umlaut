@@ -15,9 +15,9 @@ import (
 // @ID like
 // @Accept  json
 // @Produce  json
-// @Param input body coreLike true "Like data to update"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 500 {object} dto.ClientResponseDto[string]
+// @Param input body core.Like true "Like data to update"
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 500 {object} ClientResponseDto[string]
 // @Router /api/v1/like [post]
 func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -26,7 +26,7 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var like core.Like
-	if err := like.UnmarshalJSON(body); err != nil {
+	if err = like.UnmarshalJSON(body); err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
@@ -59,8 +59,8 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 // @Tags like
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[corePremiumLike]
-// @Failure 401,402,403,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[dto.PremiumLike]
+// @Failure 401,402,403,500 {object} ClientResponseDto[string]
 // @Router /api/v1/premium/likes [get]
 func (h *Handler) getPremiumLikes(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(constants.KeyUserID).(int)

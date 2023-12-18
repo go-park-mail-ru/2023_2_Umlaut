@@ -1,44 +1,6 @@
 basePath: /
 definitions:
-  handler.ClientResponseDto:
-    properties:
-      message:
-        type: string
-      payload: {}
-      status:
-        type: integer
-    type: object
-  handler.deleteLink:
-    properties:
-      link:
-        type: string
-    type: object
-  handler.signInInput:
-    properties:
-      mail:
-        type: string
-      password:
-        type: string
-    required:
-    - mail
-    - password
-    type: object
-  handler.signUpInput:
-    properties:
-      invited_by:
-        type: string
-      mail:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-    required:
-    - mail
-    - name
-    - password
-    type: object
-  model.Complaint:
+  core.Complaint:
     properties:
       complaint_text:
         type: string
@@ -53,7 +15,33 @@ definitions:
       reporter_user_id:
         type: integer
     type: object
-  model.Feedback:
+  core.ComplaintType:
+    properties:
+      id:
+        type: integer
+      type_name:
+        type: string
+    type: object
+  core.Dialog:
+    properties:
+      banned:
+        type: boolean
+      companion:
+        type: string
+      id:
+        type: integer
+      last_message:
+        $ref: '#/definitions/core.Message'
+      user1_id:
+        type: integer
+      user2_id:
+        type: integer
+      сompanion_image_paths:
+        items:
+          type: string
+        type: array
+    type: object
+  core.Feedback:
     properties:
       comment:
         type: string
@@ -70,14 +58,61 @@ definitions:
       user_id:
         type: integer
     type: object
-  model.Like:
+  core.FeedbackStatistic:
+    properties:
+      avg-rating:
+        type: number
+      comments:
+        items:
+          type: string
+        type: array
+      liked-map:
+        additionalProperties:
+          type: integer
+        type: object
+      need-fix-map:
+        additionalProperties:
+          $ref: '#/definitions/core.NeedFixObject'
+        type: object
+      rating-count:
+        items:
+          type: integer
+        type: array
+    type: object
+  core.Like:
     properties:
       is_like:
         type: boolean
       liked_to_user_id:
         type: integer
     type: object
-  model.Recommendation:
+  core.Message:
+    properties:
+      created_at:
+        type: string
+      dialog_id:
+        type: integer
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      message_text:
+        type: string
+      recipient_id:
+        type: integer
+      sender_id:
+        type: integer
+    type: object
+  core.NeedFixObject:
+    properties:
+      comment_fix:
+        items:
+          type: string
+        type: array
+      count:
+        type: integer
+    type: object
+  core.Recommendation:
     properties:
       created_at:
         type: string
@@ -88,7 +123,18 @@ definitions:
       user_id:
         type: integer
     type: object
-  model.User:
+  core.RecommendationStatistic:
+    properties:
+      avg-recommend:
+        type: number
+      nps:
+        type: number
+      recommend-count:
+        items:
+          type: integer
+        type: array
+    type: object
+  core.User:
     properties:
       age:
         type: integer
@@ -131,6 +177,210 @@ definitions:
     - name
     - password
     type: object
+  dto.DeleteLink:
+    properties:
+      link:
+        type: string
+    type: object
+  dto.FeedData:
+    properties:
+      like_counter:
+        type: integer
+      user:
+        $ref: '#/definitions/core.User'
+    type: object
+  dto.IdResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  dto.PremiumLike:
+    properties:
+      image_paths:
+        items:
+          type: string
+        type: array
+      liked_by_user_id:
+        type: integer
+    type: object
+  dto.ShareCridentialsOutput:
+    properties:
+      invites_count:
+        type: integer
+      share_link:
+        type: string
+    required:
+    - invites_count
+    - share_link
+    type: object
+  dto.SignInInput:
+    properties:
+      mail:
+        type: string
+      password:
+        type: string
+    required:
+    - mail
+    - password
+    type: object
+  dto.SignUpInput:
+    properties:
+      invited_by:
+        type: string
+      mail:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - mail
+    - name
+    - password
+    type: object
+  handler.ClientResponseDto-array_core_ComplaintType:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/core.ComplaintType'
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-array_core_Dialog:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/core.Dialog'
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-array_core_Message:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          $ref: '#/definitions/core.Message'
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-array_string:
+    properties:
+      message:
+        type: string
+      payload:
+        items:
+          type: string
+        type: array
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-core_Complaint:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/core.Complaint'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-core_Dialog:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/core.Dialog'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-core_FeedbackStatistic:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/core.FeedbackStatistic'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-core_RecommendationStatistic:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/core.RecommendationStatistic'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-core_User:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/core.User'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-dto_FeedData:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/dto.FeedData'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-dto_IdResponse:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/dto.IdResponse'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-dto_PremiumLike:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/dto.PremiumLike'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-dto_ShareCridentialsOutput:
+    properties:
+      message:
+        type: string
+      payload:
+        $ref: '#/definitions/dto.ShareCridentialsOutput'
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-int:
+    properties:
+      message:
+        type: string
+      payload:
+        type: integer
+      status:
+        type: integer
+    type: object
+  handler.ClientResponseDto-string:
+    properties:
+      message:
+        type: string
+      payload:
+        type: string
+      status:
+        type: integer
+    type: object
 host: umlaut-bmstu.me
 info:
   contact: {}
@@ -148,15 +398,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_Complaint'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get next complaint
       tags:
       - complaint
@@ -176,15 +426,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: delete complaint
       tags:
       - complaint
@@ -203,15 +453,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: accept complaint
       tags:
       - complaint
@@ -226,11 +476,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_FeedbackStatistic'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: statistic by feedback
       tags:
       - statistic
@@ -245,11 +495,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_RecommendationStatistic'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: statistic by recommendation
       tags:
       - statistic
@@ -264,22 +514,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/handler.signInInput'
+          $ref: '#/definitions/dto.SignInInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: log in to admin
       tags:
       - auth
@@ -294,22 +544,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/handler.signInInput'
+          $ref: '#/definitions/dto.SignInInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: log in to account
       tags:
       - auth
@@ -324,15 +574,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: log out of account
       tags:
       - auth
@@ -347,26 +597,26 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/handler.signUpInput'
+          $ref: '#/definitions/dto.SignUpInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-dto_IdResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "414":
           description: Request URI Too Long
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: sign up account
       tags:
       - auth
@@ -381,30 +631,30 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/model.Complaint'
+          $ref: '#/definitions/core.Complaint'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: create complaint
       tags:
       - complaint
@@ -419,15 +669,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-array_core_ComplaintType'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get all complaint types
       tags:
       - complaint
@@ -442,15 +692,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-array_core_Dialog'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user dialogs
       tags:
       - dialog
@@ -471,15 +721,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_Dialog'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get dialog by id
       tags:
       - dialog
@@ -499,15 +749,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-array_core_Message'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get dialog message
       tags:
       - dialog
@@ -535,11 +785,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-dto_FeedData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user for feed
       tags:
       - feed
@@ -554,18 +804,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/model.Recommendation'
+          $ref: '#/definitions/core.Recommendation'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: create feed feedback
       tags:
       - statistic
@@ -580,18 +830,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/model.Feedback'
+          $ref: '#/definitions/core.Feedback'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: create statistic
       tags:
       - statistic
@@ -606,18 +856,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/model.Like'
+          $ref: '#/definitions/core.Like'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: create user like
       tags:
       - like
@@ -631,23 +881,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-dto_PremiumLike'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "402":
           description: Payment Required
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get users who have liked the user
       tags:
       - like
@@ -662,18 +912,18 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/model.Recommendation'
+          $ref: '#/definitions/core.Recommendation'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: create recommendation
       tags:
       - statistic
@@ -688,11 +938,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-int'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: show csat for user
       tags:
       - statistic
@@ -707,15 +957,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-array_string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get all tags
       tags:
       - tag
@@ -730,15 +980,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_User'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user information
       tags:
       - user
@@ -752,22 +1002,22 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/core.User'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_User'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: update user
       tags:
       - user
@@ -788,15 +1038,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-core_User'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user information by id
       tags:
       - user
@@ -810,24 +1060,24 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/handler.deleteLink'
+          $ref: '#/definitions/dto.DeleteLink'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: delete user photo
       tags:
       - user
@@ -846,19 +1096,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: update user photo
       tags:
       - user
@@ -870,15 +1120,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-dto_ShareCridentialsOutput'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: get user share link
       tags:
       - user
@@ -894,11 +1144,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handler.ClientResponseDto'
+            $ref: '#/definitions/handler.ClientResponseDto-string'
       summary: register user to WebSocket hub
       tags:
       - websocket

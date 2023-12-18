@@ -19,8 +19,8 @@ import (
 // @ID user
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[core.User]
-// @Failure 404,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[core.User]
+// @Failure 404,500 {object} ClientResponseDto[string]
 // @Router /api/v1/user [get]
 func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(constants.KeyUserID).(int)
@@ -53,8 +53,8 @@ func (h *Handler) user(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Param id path integer true "user ID"
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[core.User]
-// @Failure 404,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[core.User]
+// @Failure 404,500 {object} ClientResponseDto[string]
 // @Router /api/v1/user/{id} [get]
 func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -83,8 +83,8 @@ func (h *Handler) userById(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body core.User true "User data to update"
-// @Success 200 {object} dto.ClientResponseDto[core.User]
-// @Failure 401,404 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[core.User]
+// @Failure 401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user [post]
 func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -121,8 +121,8 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "file"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 400,401,404 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [post]
 func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(constants.KeyUserID).(int)
@@ -149,9 +149,9 @@ func (h *Handler) updateUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Summary delete user photo
 // @Tags user
 // @Accept  json
-// @Param input body deleteLink true "link for deleting file"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 400,401,404 {object} dto.ClientResponseDto[string]
+// @Param input body dto.DeleteLink true "link for deleting file"
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,401,404 {object} ClientResponseDto[string]
 // @Router /api/v1/user/photo [delete]
 func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -186,8 +186,8 @@ func (h *Handler) deleteUserPhoto(w http.ResponseWriter, r *http.Request) {
 // @Summary get user share link
 // @Tags user
 // @Accept  json
-// @Success 200 {object} dto.ClientResponseDto[shareCridentialsOutput]
-// @Failure 401,500 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[dto.ShareCridentialsOutput]
+// @Failure 401,500 {object} ClientResponseDto[string]
 // @Router /api/v1/user/share [get]
 func (h *Handler) getUserShareCridentials(w http.ResponseWriter, r *http.Request) {
 	id := r.Context().Value(constants.KeyUserID).(int)

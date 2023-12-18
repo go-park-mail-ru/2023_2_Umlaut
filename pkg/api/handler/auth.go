@@ -17,8 +17,8 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param input body dto.SignInInput true "Sign-in input parameters"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 400,404 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/admin [post]
 func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -53,8 +53,8 @@ func (h *Handler) logInAdmin(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body dto.SignInInput true "Sign-in input parameters"
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 400,404 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/login [post]
 func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
@@ -88,8 +88,8 @@ func (h *Handler) signIn(w http.ResponseWriter, r *http.Request) {
 // @ID logout
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.ClientResponseDto[string]
-// @Failure 400,404 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[string]
+// @Failure 400,404 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/logout [get]
 func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
@@ -121,8 +121,8 @@ func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
 // @Accept  json
 // @Produce  json
 // @Param input body dto.SignUpInput true "Sign-up input user"
-// @Success 200 {object} dto.ClientResponseDto[idResponse]
-// @Failure 400,404,414 {object} dto.ClientResponseDto[string]
+// @Success 200 {object} ClientResponseDto[dto.IdResponse]
+// @Failure 400,404,414 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/sign-up [post]
 func (h *Handler) signUp(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
