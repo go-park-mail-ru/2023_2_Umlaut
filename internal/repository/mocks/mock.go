@@ -6,11 +6,12 @@ package mock_repository
 
 import (
 	context "context"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
 	io "io"
 	reflect "reflect"
 	time "time"
 
+	core "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	dto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/dto"
 	gomock "github.com/golang/mock/gomock"
 	pgx "github.com/jackc/pgx/v5"
 	pgconn "github.com/jackc/pgx/v5/pgconn"
@@ -40,7 +41,7 @@ func (m *MockUser) EXPECT() *MockUserMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockUser) CreateUser(ctx context.Context, user core2.User) (int, error) {
+func (m *MockUser) CreateUser(ctx context.Context, user core.User) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, user)
 	ret0, _ := ret[0].(int)
@@ -55,10 +56,10 @@ func (mr *MockUserMockRecorder) CreateUser(ctx, user interface{}) *gomock.Call {
 }
 
 // GetNextUser mocks base method.
-func (m *MockUser) GetNextUser(ctx context.Context, user core2.User, params core2.FilterParams) (core2.User, error) {
+func (m *MockUser) GetNextUser(ctx context.Context, user core.User, params dto.FilterParams) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextUser", ctx, user, params)
-	ret0, _ := ret[0].(core2.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -70,10 +71,10 @@ func (mr *MockUserMockRecorder) GetNextUser(ctx, user, params interface{}) *gomo
 }
 
 // GetUser mocks base method.
-func (m *MockUser) GetUser(ctx context.Context, mail string) (core2.User, error) {
+func (m *MockUser) GetUser(ctx context.Context, mail string) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUser", ctx, mail)
-	ret0, _ := ret[0].(core2.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -85,10 +86,10 @@ func (mr *MockUserMockRecorder) GetUser(ctx, mail interface{}) *gomock.Call {
 }
 
 // GetUserById mocks base method.
-func (m *MockUser) GetUserById(ctx context.Context, id int) (core2.User, error) {
+func (m *MockUser) GetUserById(ctx context.Context, id int) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserById", ctx, id)
-	ret0, _ := ret[0].(core2.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -144,10 +145,10 @@ func (mr *MockUserMockRecorder) ShowCSAT(ctx, userId interface{}) *gomock.Call {
 }
 
 // UpdateUser mocks base method.
-func (m *MockUser) UpdateUser(ctx context.Context, user core2.User) (core2.User, error) {
+func (m *MockUser) UpdateUser(ctx context.Context, user core.User) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", ctx, user)
-	ret0, _ := ret[0].(core2.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -159,7 +160,7 @@ func (mr *MockUserMockRecorder) UpdateUser(ctx, user interface{}) *gomock.Call {
 }
 
 // UpdateUserPassword mocks base method.
-func (m *MockUser) UpdateUserPassword(ctx context.Context, user core2.User) error {
+func (m *MockUser) UpdateUserPassword(ctx context.Context, user core.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUserPassword", ctx, user)
 	ret0, _ := ret[0].(error)
@@ -196,10 +197,10 @@ func (m *MockLike) EXPECT() *MockLikeMockRecorder {
 }
 
 // CreateLike mocks base method.
-func (m *MockLike) CreateLike(ctx context.Context, like core2.Like) (core2.Like, error) {
+func (m *MockLike) CreateLike(ctx context.Context, like core.Like) (core.Like, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateLike", ctx, like)
-	ret0, _ := ret[0].(core2.Like)
+	ret0, _ := ret[0].(core.Like)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -211,10 +212,10 @@ func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 }
 
 // GetUserLikedToLikes mocks base method.
-func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) ([]core2.PremiumLike, error) {
+func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) ([]dto.PremiumLike, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserLikedToLikes", ctx, userId)
-	ret0, _ := ret[0].([]core2.PremiumLike)
+	ret0, _ := ret[0].([]dto.PremiumLike)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -226,7 +227,7 @@ func (mr *MockLikeMockRecorder) GetUserLikedToLikes(ctx, userId interface{}) *go
 }
 
 // IsMutualLike mocks base method.
-func (m *MockLike) IsMutualLike(ctx context.Context, like core2.Like) (bool, error) {
+func (m *MockLike) IsMutualLike(ctx context.Context, like core.Like) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsMutualLike", ctx, like)
 	ret0, _ := ret[0].(bool)
@@ -278,7 +279,7 @@ func (m *MockDialog) EXPECT() *MockDialogMockRecorder {
 }
 
 // CreateDialog mocks base method.
-func (m *MockDialog) CreateDialog(ctx context.Context, dialog core2.Dialog) (int, error) {
+func (m *MockDialog) CreateDialog(ctx context.Context, dialog core.Dialog) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateDialog", ctx, dialog)
 	ret0, _ := ret[0].(int)
@@ -293,10 +294,10 @@ func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.
 }
 
 // GetDialogById mocks base method.
-func (m *MockDialog) GetDialogById(ctx context.Context, id int) (core2.Dialog, error) {
+func (m *MockDialog) GetDialogById(ctx context.Context, id int) (core.Dialog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDialogById", ctx, id)
-	ret0, _ := ret[0].(core2.Dialog)
+	ret0, _ := ret[0].(core.Dialog)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -308,10 +309,10 @@ func (mr *MockDialogMockRecorder) GetDialogById(ctx, id interface{}) *gomock.Cal
 }
 
 // GetDialogs mocks base method.
-func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]core2.Dialog, error) {
+func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDialogs", ctx, userId)
-	ret0, _ := ret[0].([]core2.Dialog)
+	ret0, _ := ret[0].([]core.Dialog)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -346,10 +347,10 @@ func (m *MockMessage) EXPECT() *MockMessageMockRecorder {
 }
 
 // CreateMessage mocks base method.
-func (m *MockMessage) CreateMessage(ctx context.Context, message core2.Message) (core2.Message, error) {
+func (m *MockMessage) CreateMessage(ctx context.Context, message core.Message) (core.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMessage", ctx, message)
-	ret0, _ := ret[0].(core2.Message)
+	ret0, _ := ret[0].(core.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -361,10 +362,10 @@ func (mr *MockMessageMockRecorder) CreateMessage(ctx, message interface{}) *gomo
 }
 
 // GetDialogMessages mocks base method.
-func (m *MockMessage) GetDialogMessages(ctx context.Context, userId, recipientId int) ([]core2.Message, error) {
+func (m *MockMessage) GetDialogMessages(ctx context.Context, userId, recipientId int) ([]core.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, userId, recipientId)
-	ret0, _ := ret[0].([]core2.Message)
+	ret0, _ := ret[0].([]core.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -376,10 +377,10 @@ func (mr *MockMessageMockRecorder) GetDialogMessages(ctx, userId, recipientId in
 }
 
 // UpdateMessage mocks base method.
-func (m *MockMessage) UpdateMessage(ctx context.Context, message core2.Message) (core2.Message, error) {
+func (m *MockMessage) UpdateMessage(ctx context.Context, message core.Message) (core.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateMessage", ctx, message)
-	ret0, _ := ret[0].(core2.Message)
+	ret0, _ := ret[0].(core.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -452,7 +453,7 @@ func (m *MockAdmin) EXPECT() *MockAdminMockRecorder {
 }
 
 // CreateFeedFeedback mocks base method.
-func (m *MockAdmin) CreateFeedFeedback(ctx context.Context, rec core2.Recommendation) (int, error) {
+func (m *MockAdmin) CreateFeedFeedback(ctx context.Context, rec core.Recommendation) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeedFeedback", ctx, rec)
 	ret0, _ := ret[0].(int)
@@ -467,7 +468,7 @@ func (mr *MockAdminMockRecorder) CreateFeedFeedback(ctx, rec interface{}) *gomoc
 }
 
 // CreateFeedback mocks base method.
-func (m *MockAdmin) CreateFeedback(ctx context.Context, stat core2.Feedback) (int, error) {
+func (m *MockAdmin) CreateFeedback(ctx context.Context, stat core.Feedback) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeedback", ctx, stat)
 	ret0, _ := ret[0].(int)
@@ -482,7 +483,7 @@ func (mr *MockAdminMockRecorder) CreateFeedback(ctx, stat interface{}) *gomock.C
 }
 
 // CreateRecommendation mocks base method.
-func (m *MockAdmin) CreateRecommendation(ctx context.Context, rec core2.Recommendation) (int, error) {
+func (m *MockAdmin) CreateRecommendation(ctx context.Context, rec core.Recommendation) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRecommendation", ctx, rec)
 	ret0, _ := ret[0].(int)
@@ -497,10 +498,10 @@ func (mr *MockAdminMockRecorder) CreateRecommendation(ctx, rec interface{}) *gom
 }
 
 // GetAdmin mocks base method.
-func (m *MockAdmin) GetAdmin(ctx context.Context, mail string) (core2.Admin, error) {
+func (m *MockAdmin) GetAdmin(ctx context.Context, mail string) (core.Admin, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAdmin", ctx, mail)
-	ret0, _ := ret[0].(core2.Admin)
+	ret0, _ := ret[0].(core.Admin)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -512,10 +513,10 @@ func (mr *MockAdminMockRecorder) GetAdmin(ctx, mail interface{}) *gomock.Call {
 }
 
 // GetFeedbacks mocks base method.
-func (m *MockAdmin) GetFeedbacks(ctx context.Context) ([]core2.Feedback, error) {
+func (m *MockAdmin) GetFeedbacks(ctx context.Context) ([]core.Feedback, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeedbacks", ctx)
-	ret0, _ := ret[0].([]core2.Feedback)
+	ret0, _ := ret[0].([]core.Feedback)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -527,10 +528,10 @@ func (mr *MockAdminMockRecorder) GetFeedbacks(ctx interface{}) *gomock.Call {
 }
 
 // GetRecommendations mocks base method.
-func (m *MockAdmin) GetRecommendations(ctx context.Context) ([]core2.Recommendation, error) {
+func (m *MockAdmin) GetRecommendations(ctx context.Context) ([]core.Recommendation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRecommendations", ctx)
-	ret0, _ := ret[0].([]core2.Recommendation)
+	ret0, _ := ret[0].([]core.Recommendation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -727,10 +728,10 @@ func (m *MockComplaint) EXPECT() *MockComplaintMockRecorder {
 }
 
 // AcceptComplaint mocks base method.
-func (m *MockComplaint) AcceptComplaint(ctx context.Context, complaintId int) (core2.Complaint, error) {
+func (m *MockComplaint) AcceptComplaint(ctx context.Context, complaintId int) (core.Complaint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AcceptComplaint", ctx, complaintId)
-	ret0, _ := ret[0].(core2.Complaint)
+	ret0, _ := ret[0].(core.Complaint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -742,7 +743,7 @@ func (mr *MockComplaintMockRecorder) AcceptComplaint(ctx, complaintId interface{
 }
 
 // CreateComplaint mocks base method.
-func (m *MockComplaint) CreateComplaint(ctx context.Context, complaint core2.Complaint) (int, error) {
+func (m *MockComplaint) CreateComplaint(ctx context.Context, complaint core.Complaint) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateComplaint", ctx, complaint)
 	ret0, _ := ret[0].(int)
@@ -771,10 +772,10 @@ func (mr *MockComplaintMockRecorder) DeleteComplaint(ctx, complaintId interface{
 }
 
 // GetComplaintTypes mocks base method.
-func (m *MockComplaint) GetComplaintTypes(ctx context.Context) ([]core2.ComplaintType, error) {
+func (m *MockComplaint) GetComplaintTypes(ctx context.Context) ([]core.ComplaintType, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetComplaintTypes", ctx)
-	ret0, _ := ret[0].([]core2.ComplaintType)
+	ret0, _ := ret[0].([]core.ComplaintType)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -786,10 +787,10 @@ func (mr *MockComplaintMockRecorder) GetComplaintTypes(ctx interface{}) *gomock.
 }
 
 // GetNextComplaint mocks base method.
-func (m *MockComplaint) GetNextComplaint(ctx context.Context) (core2.Complaint, error) {
+func (m *MockComplaint) GetNextComplaint(ctx context.Context) (core.Complaint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextComplaint", ctx)
-	ret0, _ := ret[0].(core2.Complaint)
+	ret0, _ := ret[0].(core.Complaint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

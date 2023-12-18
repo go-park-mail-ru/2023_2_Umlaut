@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+
 	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
-	"strings"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/dto"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -66,7 +68,7 @@ func (r *LikePostgres) IsMutualLike(ctx context.Context, like core.Like) (bool, 
 	return true, err
 }
 
-func (r *LikePostgres) GetUserLikedToLikes(ctx context.Context, userId int) ([]core.PremiumLike, error) {
+func (r *LikePostgres) GetUserLikedToLikes(ctx context.Context, userId int) ([]dto.PremiumLike, error) {
 	query, args, err := psql.Select("liked_by_user_id", "u.image_paths").
 		From(likeTable).
 		Join(userTable + " u ON liked_by_user_id = u.id").
@@ -80,8 +82,8 @@ func (r *LikePostgres) GetUserLikedToLikes(ctx context.Context, userId int) ([]c
 	if err != nil {
 		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
 	}
-
-	var likes []core.PremiumLike
+	
+	var likes []dto.PremiumLike
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
@@ -102,11 +104,11 @@ func (r *LikePostgres) ResetDislike(ctx context.Context) error {
 
 }
 
-func scanPremiumLikes(rows pgx.Rows) ([]core.PremiumLike, error) {
-	var likes []core.PremiumLike
+func scanPremiumLikes(rows pgx.Rows) ([]dto.PremiumLike, error) {
+	var likes []dto.PremiumLike
 	var err error
 	for rows.Next() {
-		var like core.PremiumLike
+		var like dto.PremiumLike
 		err = rows.Scan(
 			&like.LikedByUserId,
 			&like.ImagePaths,

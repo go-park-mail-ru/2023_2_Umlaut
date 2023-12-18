@@ -2,7 +2,8 @@ package repository
 
 import (
 	"context"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/dto"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"io"
@@ -17,34 +18,34 @@ import (
 //go:generate mockgen -source=repository.go -destination=mocks/mock.go
 
 type User interface {
-	CreateUser(ctx context.Context, user core2.User) (int, error)
-	GetUser(ctx context.Context, mail string) (core2.User, error)
-	GetUserById(ctx context.Context, id int) (core2.User, error)
-	GetNextUser(ctx context.Context, user core2.User, params core2.FilterParams) (core2.User, error)
-	UpdateUser(ctx context.Context, user core2.User) (core2.User, error)
-	UpdateUserPassword(ctx context.Context, user core2.User) error
+	CreateUser(ctx context.Context, user core.User) (int, error)
+	GetUser(ctx context.Context, mail string) (core.User, error)
+	GetUserById(ctx context.Context, id int) (core.User, error)
+	GetNextUser(ctx context.Context, user core.User, params dto.FilterParams) (core.User, error)
+	UpdateUser(ctx context.Context, user core.User) (core.User, error)
+	UpdateUserPassword(ctx context.Context, user core.User) error
 	ShowCSAT(ctx context.Context, userId int) (bool, error)
 	GetUserInvites(ctx context.Context, userId int) (int, error)
 	ResetLikeCounter(ctx context.Context) error
 }
 
 type Like interface {
-	CreateLike(ctx context.Context, like core2.Like) (core2.Like, error)
-	IsMutualLike(ctx context.Context, like core2.Like) (bool, error)
-	GetUserLikedToLikes(ctx context.Context, userId int) ([]core2.PremiumLike, error)
+	CreateLike(ctx context.Context, like core.Like) (core.Like, error)
+	IsMutualLike(ctx context.Context, like core.Like) (bool, error)
+	GetUserLikedToLikes(ctx context.Context, userId int) ([]dto.PremiumLike, error)
 	ResetDislike(ctx context.Context) error
 }
 
 type Dialog interface {
-	CreateDialog(ctx context.Context, dialog core2.Dialog) (int, error)
-	GetDialogs(ctx context.Context, userId int) ([]core2.Dialog, error)
-	GetDialogById(ctx context.Context, id int) (core2.Dialog, error)
+	CreateDialog(ctx context.Context, dialog core.Dialog) (int, error)
+	GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error)
+	GetDialogById(ctx context.Context, id int) (core.Dialog, error)
 }
 
 type Message interface {
-	GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]core2.Message, error)
-	CreateMessage(ctx context.Context, message core2.Message) (core2.Message, error)
-	UpdateMessage(ctx context.Context, message core2.Message) (core2.Message, error)
+	GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]core.Message, error)
+	CreateMessage(ctx context.Context, message core.Message) (core.Message, error)
+	UpdateMessage(ctx context.Context, message core.Message) (core.Message, error)
 }
 
 type Tag interface {
@@ -52,12 +53,12 @@ type Tag interface {
 }
 
 type Admin interface {
-	GetAdmin(ctx context.Context, mail string) (core2.Admin, error)
-	CreateFeedback(ctx context.Context, stat core2.Feedback) (int, error)
-	CreateRecommendation(ctx context.Context, rec core2.Recommendation) (int, error)
-	CreateFeedFeedback(ctx context.Context, rec core2.Recommendation) (int, error)
-	GetFeedbacks(ctx context.Context) ([]core2.Feedback, error)
-	GetRecommendations(ctx context.Context) ([]core2.Recommendation, error)
+	GetAdmin(ctx context.Context, mail string) (core.Admin, error)
+	CreateFeedback(ctx context.Context, stat core.Feedback) (int, error)
+	CreateRecommendation(ctx context.Context, rec core.Recommendation) (int, error)
+	CreateFeedFeedback(ctx context.Context, rec core.Recommendation) (int, error)
+	GetFeedbacks(ctx context.Context) ([]core.Feedback, error)
+	GetRecommendations(ctx context.Context) ([]core.Recommendation, error)
 	ShowFeedback(ctx context.Context, userId int) (bool, error)
 	ShowRecommendation(ctx context.Context, userId int) (bool, error)
 }
@@ -75,11 +76,11 @@ type FileServer interface {
 }
 
 type Complaint interface {
-	GetComplaintTypes(ctx context.Context) ([]core2.ComplaintType, error)
-	CreateComplaint(ctx context.Context, complaint core2.Complaint) (int, error)
-	GetNextComplaint(ctx context.Context) (core2.Complaint, error)
+	GetComplaintTypes(ctx context.Context) ([]core.ComplaintType, error)
+	CreateComplaint(ctx context.Context, complaint core.Complaint) (int, error)
+	GetNextComplaint(ctx context.Context) (core.Complaint, error)
 	DeleteComplaint(ctx context.Context, complaintId int) error
-	AcceptComplaint(ctx context.Context, complaintId int) (core2.Complaint, error)
+	AcceptComplaint(ctx context.Context, complaintId int) (core.Complaint, error)
 }
 
 type Repository struct {

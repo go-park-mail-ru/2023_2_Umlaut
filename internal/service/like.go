@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/constants"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/dto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/repository"
 )
 
@@ -17,34 +19,34 @@ func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog, repo
 	return &LikeService{repoLike: repoLike, repoDialog: repoDialog, repoUser: repoUser}
 }
 
-func (s *LikeService) CreateLike(ctx context.Context, like core2.Like) (core2.Dialog, error) {
+func (s *LikeService) CreateLike(ctx context.Context, like core.Like) (core.Dialog, error) {
 	_, err := s.repoLike.CreateLike(ctx, like)
 	if err != nil {
-		return core2.Dialog{}, err
+		return core.Dialog{}, err
 	}
 	if !like.IsLike {
-		return core2.Dialog{}, nil
+		return core.Dialog{}, nil
 	}
 	mutual, err := s.repoLike.IsMutualLike(ctx, like)
 	if err != nil {
-		return core2.Dialog{}, err
+		return core.Dialog{}, err
 	}
 	if mutual {
-		id, err := s.repoDialog.CreateDialog(ctx, core2.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId})
+		id, err := s.repoDialog.CreateDialog(ctx, core.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId})
 		if err != nil {
-			return core2.Dialog{}, err
+			return core.Dialog{}, err
 		}
 		dialog, err := s.repoDialog.GetDialogById(ctx, id)
 		if err != nil {
-			return core2.Dialog{}, err
+			return core.Dialog{}, err
 		}
 		return dialog, constants.ErrMutualLike
 	}
 
-	return core2.Dialog{}, err
+	return core.Dialog{}, err
 }
 
-func (s *LikeService) GetUserLikedToLikes(ctx context.Context, userId int) (bool, []core2.PremiumLike, error) {
+func (s *LikeService) GetUserLikedToLikes(ctx context.Context, userId int) (bool, []dto.PremiumLike, error) {
 	user, err := s.repoUser.GetUserById(ctx, userId)
 	if err != nil {
 		return false, nil, err

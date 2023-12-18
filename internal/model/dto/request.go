@@ -14,18 +14,6 @@ type RequestInfo struct {
 	Message string
 }
 
-type SignInInput struct {
-	Mail     string `json:"mail" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type SignUpInput struct {
-	Name      string  `json:"name" binding:"required"`
-	Mail      string  `json:"mail" binding:"required"`
-	Password  string  `json:"password" binding:"required"`
-	InvitedBy *string `json:"invited_by"`
-}
-
 type ShareCridentialsOutput struct {
 	InvitesCount int    `json:"invites_count" binding:"required"`
 	ShareLink    string `json:"share_link" binding:"required"`

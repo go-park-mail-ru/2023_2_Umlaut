@@ -33,7 +33,7 @@ func (h *Handler) feed(w http.ResponseWriter, r *http.Request) {
 	preferGender := int(feed.User.PreferGender)
 	age := int(feed.User.Age)
 
-	dto.NewSuccessClientResponseDto(r.Context(), w, core.FeedData{
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.FeedData{
 		User: core.User{
 			Id:           int(feed.User.Id),
 			Name:         feed.User.Name,

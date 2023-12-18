@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/constants"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -20,7 +20,7 @@ func NewDialogPostgres(db PgxPoolInterface) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 
-func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog core2.Dialog) (int, error) {
+func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog core.Dialog) (int, error) {
 	if dialog.User1Id > dialog.User2Id {
 		tmp := dialog.User1Id
 		dialog.User1Id = dialog.User2Id
@@ -42,13 +42,13 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog core2.Dialog) 
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, static2.ErrAlreadyExists
+			return 0, constants.ErrAlreadyExists
 		}
 	}
 	return id, err
 }
 
-func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]core2.Dialog, error) {
+func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error) {
 	query, args, err := psql.
 		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.recipient_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
 		From(dialogTable + " d").
@@ -78,7 +78,7 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]core2.Di
 	return dialogs, nil
 }
 
-func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (core2.Dialog, error) {
+func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (core.Dialog, error) {
 	query, args, err := psql.
 		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.recipient_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
 		From(dialogTable + " d").
@@ -88,29 +88,29 @@ func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (core2.Dialo
 		ToSql()
 
 	if err != nil {
-		return core2.Dialog{}, err
+		return core.Dialog{}, err
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return core2.Dialog{}, fmt.Errorf("failed to get dialog with id %d. err: %w", id, err)
+		return core.Dialog{}, fmt.Errorf("failed to get dialog with id %d. err: %w", id, err)
 	}
 	defer rows.Close()
-	dialog, err := scanDialogs(rows, ctx.Value(static2.KeyUserID).(int))
+	dialog, err := scanDialogs(rows, ctx.Value(constants.KeyUserID).(int))
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return core2.Dialog{}, fmt.Errorf("dialog with id: %d not found", id)
+		return core.Dialog{}, fmt.Errorf("dialog with id: %d not found", id)
 	}
 
 	return dialog[0], err
 }
 
-func scanDialogs(rows pgx.Rows, userId int) ([]core2.Dialog, error) {
-	var dialogs []core2.Dialog
+func scanDialogs(rows pgx.Rows, userId int) ([]core.Dialog, error) {
+	var dialogs []core.Dialog
 	var err error
 	for rows.Next() {
-		var dialog core2.Dialog
-		var lastMessage core2.Message
+		var dialog core.Dialog
+		var lastMessage core.Message
 		err = rows.Scan(
 			&dialog.Id,
 			&dialog.User1Id,

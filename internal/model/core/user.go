@@ -74,8 +74,3 @@ func (u *User) Sanitize() {
 	u.PasswordHash = ""
 	u.Salt = ""
 }
-
-type FeedData struct {
-	User        User `json:"user"`
-	LikeCounter int  `json:"like_counter"`
-}

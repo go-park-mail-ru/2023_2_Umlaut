@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/constants"
-	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/dto"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -22,7 +23,7 @@ func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
-func (r *UserPostgres) CreateUser(ctx context.Context, user core2.User) (int, error) {
+func (r *UserPostgres) CreateUser(ctx context.Context, user core.User) (int, error) {
 	var id int
 	query, args, err := psql.Insert(userTable).
 		Columns("name", "mail", "password_hash", "salt", "invited_by").
@@ -38,39 +39,17 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user core2.User) (int, er
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, static2.ErrAlreadyExists
+			return 0, constants.ErrAlreadyExists
 		}
 		return 0, err
 	}
 	return id, err
 }
 
-func (r *UserPostgres) GetUser(ctx context.Context, mail string) (core2.User, error) {
-	var user core2.User
+func (r *UserPostgres) GetUser(ctx context.Context, mail string) (core.User, error) {
+	var user core.User
 
-	query, args, err := psql.Select(static2.UserDbField).From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
-
-	if err != nil {
-		return user, err
-	}
-
-	row := r.db.QueryRow(ctx, query, args...)
-	err = scanUser(row, &user)
-
-	if errors.Is(err, pgx.ErrNoRows) {
-		return core2.User{}, fmt.Errorf("user with mail: %s not found", mail)
-	}
-	if user.Role == static2.Banned {
-		return core2.User{}, static2.ErrBannedUser
-	}
-
-	return user, err
-}
-
-func (r *UserPostgres) GetUserById(ctx context.Context, id int) (core2.User, error) {
-	var user core2.User
-
-	query, args, err := psql.Select(static2.UserDbField).From(userTable).Where(sq.Eq{"id": id}).ToSql()
+	query, args, err := psql.Select(constants.UserDbField).From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -80,19 +59,41 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (core2.User, err
 	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return core2.User{}, fmt.Errorf("user with id: %d not found", id)
+		return core.User{}, fmt.Errorf("user with mail: %s not found", mail)
 	}
-	if user.Role == static2.Banned {
-		return core2.User{}, static2.ErrBannedUser
+	if user.Role == constants.Banned {
+		return core.User{}, constants.ErrBannedUser
 	}
 
 	return user, err
 }
 
-func (r *UserPostgres) GetNextUser(ctx context.Context, user core2.User, params core2.FilterParams) (core2.User, error) {
-	var nextUser core2.User
+func (r *UserPostgres) GetUserById(ctx context.Context, id int) (core.User, error) {
+	var user core.User
 
-	queryBuilder := psql.Select(static2.UserDbField).
+	query, args, err := psql.Select(constants.UserDbField).From(userTable).Where(sq.Eq{"id": id}).ToSql()
+
+	if err != nil {
+		return user, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = scanUser(row, &user)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return core.User{}, fmt.Errorf("user with id: %d not found", id)
+	}
+	if user.Role == constants.Banned {
+		return core.User{}, constants.ErrBannedUser
+	}
+
+	return user, err
+}
+
+func (r *UserPostgres) GetNextUser(ctx context.Context, user core.User, params dto.FilterParams) (core.User, error) {
+	var nextUser core.User
+
+	queryBuilder := psql.Select(constants.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
 		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)).
@@ -121,7 +122,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user core2.User, params 
 	err = scanUser(row, &nextUser)
 
 	if errors.Is(err, pgx.ErrNoRows) || nextUser.Id == 0 {
-		return core2.User{}, fmt.Errorf("user for: %s not found", user.Mail)
+		return core.User{}, fmt.Errorf("user for: %s not found", user.Mail)
 	}
 
 	return nextUser, err
@@ -138,7 +139,7 @@ func buildTagArray(tags []string) string {
 	return arrayString
 }
 
-func (r *UserPostgres) UpdateUser(ctx context.Context, user core2.User) (core2.User, error) {
+func (r *UserPostgres) UpdateUser(ctx context.Context, user core.User) (core.User, error) {
 	query, args, err := psql.Update(userTable).
 		Set("name", user.Name).
 		Set("mail", user.Mail).
@@ -155,24 +156,24 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user core2.User) (core2.U
 		ToSql()
 
 	if err != nil {
-		return core2.User{}, err
+		return core.User{}, err
 	}
 
-	query += fmt.Sprintf(" RETURNING %s", static2.UserDbField)
-	var updatedUser core2.User
+	query += fmt.Sprintf(" RETURNING %s", constants.UserDbField)
+	var updatedUser core.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return updatedUser, static2.ErrAlreadyExists
+			return updatedUser, constants.ErrAlreadyExists
 		}
 	}
 
 	return updatedUser, err
 }
 
-func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core2.User) error {
+func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core.User) error {
 	query, args, err := psql.Update(userTable).
 		Set("password_hash", user.PasswordHash).
 		Set("salt", user.Salt).
@@ -183,8 +184,8 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core2.User) 
 		return err
 	}
 
-	query += fmt.Sprintf(" RETURNING %s", static2.UserDbField)
-	var updatedUser core2.User
+	query += fmt.Sprintf(" RETURNING %s", constants.UserDbField)
+	var updatedUser core.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
 
@@ -240,7 +241,7 @@ func (r *UserPostgres) ResetLikeCounter(ctx context.Context) error {
 	return err
 }
 
-func scanUser(row pgx.Row, user *core2.User) error {
+func scanUser(row pgx.Row, user *core.User) error {
 	err := row.Scan(
 		&user.Id,
 		&user.Name,

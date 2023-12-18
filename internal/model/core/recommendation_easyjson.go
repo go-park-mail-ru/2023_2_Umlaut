@@ -18,7 +18,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel(in *jlexer.Lexer, out *RecommendationStatistic) {
+func easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautInternalModelCore(in *jlexer.Lexer, out *RecommendationStatistic) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -74,7 +74,7 @@ func easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel(in *jlexer.Lexe
 		in.Consumed()
 	}
 }
-func easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel(out *jwriter.Writer, in RecommendationStatistic) {
+func easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautInternalModelCore(out *jwriter.Writer, in RecommendationStatistic) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -110,27 +110,27 @@ func easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel(out *jwriter.Wr
 // MarshalJSON supports json.Marshaler interface
 func (v RecommendationStatistic) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel(&w, v)
+	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautInternalModelCore(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v RecommendationStatistic) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel(w, v)
+	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautInternalModelCore(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *RecommendationStatistic) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel(&r, v)
+	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautInternalModelCore(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *RecommendationStatistic) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel(l, v)
+	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautInternalModelCore(l, v)
 }
-func easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel1(in *jlexer.Lexer, out *Recommendation) {
+func easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautInternalModelCore1(in *jlexer.Lexer, out *Recommendation) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -185,7 +185,7 @@ func easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel1(in *jlexer.Lex
 		in.Consumed()
 	}
 }
-func easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel1(out *jwriter.Writer, in Recommendation) {
+func easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautInternalModelCore1(out *jwriter.Writer, in Recommendation) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -223,23 +223,23 @@ func easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel1(out *jwriter.W
 // MarshalJSON supports json.Marshaler interface
 func (v Recommendation) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel1(&w, v)
+	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautInternalModelCore1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Recommendation) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautModel1(w, v)
+	easyjson5c54f0e1EncodeGithubComGoParkMailRu20232UmlautInternalModelCore1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Recommendation) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel1(&r, v)
+	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautInternalModelCore1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Recommendation) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautModel1(l, v)
+	easyjson5c54f0e1DecodeGithubComGoParkMailRu20232UmlautInternalModelCore1(l, v)
 }
