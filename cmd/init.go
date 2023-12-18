@@ -2,10 +2,16 @@ package initial
 
 import (
 	"context"
+	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/admin/proto"
+	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/auth/proto"
+	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/feed/proto"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"strconv"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
@@ -76,4 +82,37 @@ func InitMinioClient() (*minio.Client, error) {
 		SSLMode:  viper.GetBool("minio.sslmode"),
 		Endpoint: viper.GetString("minio.endpoint"),
 	})
+}
+
+func InitMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, adminProto.AdminClient, error) {
+	grpc_prometheus.EnableHandlingTimeHistogram()
+	authConn, err := grpc.Dial(
+		viper.GetString("authorization.host")+":"+viper.GetString("authorization.port"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
+	)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	feedConn, err := grpc.Dial(
+		viper.GetString("feed.host")+":"+viper.GetString("feed.port"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
+	)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	adminConn, err := grpc.Dial(
+		viper.GetString("admin.host")+":"+viper.GetString("admin.port"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
+	)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return authProto.NewAuthorizationClient(authConn), feedProto.NewFeedClient(feedConn), adminProto.NewAdminClient(adminConn), nil
 }

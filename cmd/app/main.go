@@ -3,57 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
+	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut/internal/api"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/api/handler"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core/chat"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	initial "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model/ws"
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-
-	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/handler"
-	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
-	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
-	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/service"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
-
-func initMicroservices() (authProto.AuthorizationClient, feedProto.FeedClient, adminProto.AdminClient, error) {
-	grpc_prometheus.EnableHandlingTimeHistogram()
-	authConn, err := grpc.Dial(
-		viper.GetString("authorization.host")+":"+viper.GetString("authorization.port"),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
-		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-	)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	feedConn, err := grpc.Dial(
-		viper.GetString("feed.host")+":"+viper.GetString("feed.port"),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
-		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-	)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	adminConn, err := grpc.Dial(
-		viper.GetString("admin.host")+":"+viper.GetString("admin.port"),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
-		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-	)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	return authProto.NewAuthorizationClient(authConn), feedProto.NewFeedClient(feedConn), adminProto.NewAdminClient(adminConn), nil
-}
 
 // @title Umlaut API
 // @version 1.0
@@ -97,13 +60,13 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize Minio: %s", err.Error())))
 	}
 
-	authClient, feedConn, adminConn, err := initMicroservices()
+	authClient, feedConn, adminConn, err := initial.InitMicroservices()
 	if err != nil {
 		logger.Error("initialize Microservices",
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
 	}
 
-	hub := ws.NewHub(logger)
+	hub := chat.NewHub(logger)
 	repos := repository.NewRepository(db, dbAdmin, sessionStore, fileClient)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services, hub, logger, authClient, feedConn, adminConn)
@@ -118,9 +81,20 @@ func main() {
 		logger.Error("initialize Background Service",
 			zap.String("Error", fmt.Sprintf("ResetLikeCounter: %s", err.Error())))
 	}
+	go func() {
+		if err = srv.Serve(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+			logger.Error("running http server",
+				zap.String("Error", fmt.Sprintf("error occured while running http server: %s", err.Error())))
+		}
+	}()
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
 
-	if err = srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logger.Error("running http server",
-			zap.String("Error", fmt.Sprintf("error occured while running http server: %s", err.Error())))
+	logger.Info("TodoApp Shutting Down")
+
+	if err = srv.Shutdown(context.Background()); err != nil {
+		logger.Error("error occured on server shutting down: %s",
+			zap.Error(err))
 	}
 }

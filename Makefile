@@ -24,8 +24,8 @@ tests:
 	go tool cover -func=cover.out
 
 mock:
-	mockgen -source=pkg/repository/repository.go -destination=pkg/repository/mocks/mock.go \
-	&& mockgen -source=pkg/service/service.go -destination=pkg/service/mocks/mock.go
+	mockgen -source=internal/repository/repository.go -destination=internal/repository/mocks/mock.go \
+	&& mockgen -source=internal/service/service.go -destination=internal/service/mocks/mock.go
 
 swag:
 	swag init -g cmd/app/main.go
