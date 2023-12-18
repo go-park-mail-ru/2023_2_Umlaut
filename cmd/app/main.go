@@ -3,17 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
-	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut/internal/api"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/api/handler"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/model/core/chat"
+	umlaut "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/api"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/api/handler"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core/chat"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	initial "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/repository"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/service"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )

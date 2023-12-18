@@ -2,16 +2,16 @@ package initial
 
 import (
 	"context"
-	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/admin/proto"
-	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/auth/proto"
-	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/internal/microservices/feed/proto"
+	adminProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
+	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
+	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"strconv"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/internal/repository"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
