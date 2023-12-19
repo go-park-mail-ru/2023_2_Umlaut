@@ -25,12 +25,6 @@ func (h *Handler) getDialogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//err = h.addDialogsToUserHub(w, r, userId, dialogs)
-	//if err != nil {
-	//	NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, err.Error())
-	//	return
-	//}
-
 	dto.NewSuccessClientResponseDto(r.Context(), w, dialogs)
 }
 
@@ -52,6 +46,15 @@ func (h *Handler) getDialog(w http.ResponseWriter, r *http.Request) {
 	dialog, err := h.services.Dialog.GetDialog(r.Context(), id)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if dialog.Id == 0 {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "dialog not found")
+		return
+	}
+	userId := r.Context().Value(constants.KeyUserID).(int)
+	if dialog.User1Id != userId && dialog.User2Id != userId {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "denied")
 		return
 	}
 
@@ -79,7 +82,7 @@ func (h *Handler) getDialogMessage(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	} else if len(messages) > 0 && *messages[0].RecipientId != userId && *messages[0].SenderId != userId {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "нет доступа")
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "denied")
 	}
 
 	dto.NewSuccessClientResponseDto(r.Context(), w, messages)

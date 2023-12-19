@@ -26,7 +26,8 @@ func (h *Handler) createLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var like core.Like
-	if err = like.UnmarshalJSON(body); err != nil {
+	err = like.UnmarshalJSON(body)
+	if err != nil || like.LikedToUserId == 0 {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
