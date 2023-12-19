@@ -8,27 +8,27 @@ import (
 )
 
 type ComplaintService struct {
-	repoComplaint repository.Complaint
+	RepoComplaint repository.Complaint
 }
 
 func NewComplaintService(repoComplaint repository.Complaint) *ComplaintService {
-	return &ComplaintService{repoComplaint: repoComplaint}
+	return &ComplaintService{RepoComplaint: repoComplaint}
 }
 
 func (s *ComplaintService) GetComplaintTypes(ctx context.Context) ([]core.ComplaintType, error) {
-	return s.repoComplaint.GetComplaintTypes(ctx)
+	return s.RepoComplaint.GetComplaintTypes(ctx)
 }
 
 func (s *ComplaintService) CreateComplaint(ctx context.Context, complaint core.Complaint) (int, error) {
-	return s.repoComplaint.CreateComplaint(ctx, complaint)
+	return s.RepoComplaint.CreateComplaint(ctx, complaint)
 }
 
 func (s *ComplaintService) GetNextComplaint(ctx context.Context) (core.Complaint, error) {
-	return s.repoComplaint.GetNextComplaint(ctx)
+	return s.RepoComplaint.GetNextComplaint(ctx)
 }
 
 func (s *ComplaintService) AcceptComplaint(ctx context.Context, complaintId int) error {
-	_, err := s.repoComplaint.AcceptComplaint(ctx, complaintId)
+	_, err := s.RepoComplaint.AcceptComplaint(ctx, complaintId)
 	if err != nil {
 		return fmt.Errorf("AcceptComplaint error: %v", err)
 	}
@@ -37,5 +37,5 @@ func (s *ComplaintService) AcceptComplaint(ctx context.Context, complaintId int)
 }
 
 func (s *ComplaintService) DeleteComplaint(ctx context.Context, complaintId int) error {
-	return s.repoComplaint.DeleteComplaint(ctx, complaintId)
+	return s.RepoComplaint.DeleteComplaint(ctx, complaintId)
 }

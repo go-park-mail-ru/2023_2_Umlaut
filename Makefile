@@ -25,7 +25,10 @@ tests:
 
 mock:
 	mockgen -source=pkg/repository/repository.go -destination=pkg/repository/mocks/mock.go \
-	&& mockgen -source=pkg/service/service.go -destination=pkg/service/mocks/mock.go
+	&& mockgen -source=pkg/service/service.go -destination=pkg/service/mocks/mock.go \
+	&& mockgen -source=pkg/microservices/admin/proto/admin_grpc.pb.go -destination=pkg/microservices/admin/proto/mocks/mock.go \
+	&& mockgen -source=pkg/microservices/auth/proto/auth_grpc.pb.go -destination=pkg/microservices/auth/proto/mocks/mock.go \
+	&& mockgen -source=pkg/microservices/feed/proto/feed_grpc.pb.go -destination=pkg/microservices/feed/proto/mocks/mock.go
 
 swag:
 	swag init -g cmd/app/main.go

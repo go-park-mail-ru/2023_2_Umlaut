@@ -50,7 +50,7 @@ func TestAdminService_CreateRecommendation(t *testing.T) {
 			repoAdmin := mock_repository.NewMockAdmin(ctrl)
 			test.mockBehavior(repoAdmin)
 
-			service := &AdminService{repoAdmin: repoAdmin}
+			service := &AdminService{RepoAdmin: repoAdmin}
 			result, err := service.CreateRecommendation(context.Background(), test.inputRec)
 
 			assert.Equal(t, test.expectedResult, result)
@@ -97,7 +97,7 @@ func TestAdminService_CreateFeedFeedback(t *testing.T) {
 			repoAdmin := mock_repository.NewMockAdmin(ctrl)
 			test.mockBehavior(repoAdmin)
 
-			service := &AdminService{repoAdmin: repoAdmin}
+			service := &AdminService{RepoAdmin: repoAdmin}
 			result, err := service.CreateFeedFeedback(context.Background(), test.inputRec)
 
 			assert.Equal(t, test.expectedResult, result)
@@ -144,7 +144,7 @@ func TestAdminService_CreateFeedback(t *testing.T) {
 			repoAdmin := mock_repository.NewMockAdmin(ctrl)
 			test.mockBehavior(repoAdmin)
 
-			service := &AdminService{repoAdmin: repoAdmin}
+			service := &AdminService{RepoAdmin: repoAdmin}
 			result, err := service.CreateFeedback(context.Background(), test.inputStat)
 
 			assert.Equal(t, test.expectedResult, result)
@@ -244,7 +244,7 @@ func TestAdminService_GetCSATType(t *testing.T) {
 			repoUser := mock_repository.NewMockUser(ctrl)
 			test.mockBehavior(repoAdmin, repoUser)
 
-			service := &AdminService{repoAdmin: repoAdmin, repoUser: repoUser}
+			service := &AdminService{RepoAdmin: repoAdmin, RepoUser: repoUser}
 			result, err := service.GetCSATType(context.Background(), test.userID)
 
 			assert.Equal(t, test.expectedResult, result)
