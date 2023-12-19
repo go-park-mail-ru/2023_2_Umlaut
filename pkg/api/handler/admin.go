@@ -27,7 +27,8 @@ func (h *Handler) createFeedback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var stat core.Feedback
-	if err := stat.UnmarshalJSON(body); err != nil {
+	err = stat.UnmarshalJSON(body)
+	if err != nil || stat.UserId == 0 {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
@@ -65,7 +66,8 @@ func (h *Handler) createRecommendation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var rec core.Recommendation
-	if err := rec.UnmarshalJSON(body); err != nil {
+	err = rec.UnmarshalJSON(body)
+	if err != nil || rec.UserId == 0 {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}
@@ -99,7 +101,8 @@ func (h *Handler) createFeedFeedback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var rec core.Recommendation
-	if err := rec.UnmarshalJSON(body); err != nil {
+	err = rec.UnmarshalJSON(body)
+	if err != nil || rec.UserId == 0 {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid input body")
 		return
 	}

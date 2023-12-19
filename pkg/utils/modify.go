@@ -19,6 +19,18 @@ func ModifyInt(data *int) int32 {
 	return int32(*data)
 }
 
+func ToPtrInt(number int) *int {
+	return &number
+}
+
+func ToPtrString(str string) *string {
+	return &str
+}
+
+//func ToPtrTime(timing time.Time) *time.Time {
+//	return &timing
+//}
+
 func ModifyArray(data *[]string) []string {
 	if data == nil {
 		return []string{}

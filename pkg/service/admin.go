@@ -8,28 +8,28 @@ import (
 )
 
 type AdminService struct {
-	repoAdmin repository.Admin
-	repoUser  repository.User
+	RepoAdmin repository.Admin
+	RepoUser  repository.User
 }
 
 func NewAdminService(repoAdmin repository.Admin, repoUser repository.User) *AdminService {
-	return &AdminService{repoAdmin: repoAdmin, repoUser: repoUser}
+	return &AdminService{RepoAdmin: repoAdmin, RepoUser: repoUser}
 }
 
 func (s *AdminService) CreateRecommendation(ctx context.Context, rec core.Recommendation) (int, error) {
-	return s.repoAdmin.CreateRecommendation(ctx, rec)
+	return s.RepoAdmin.CreateRecommendation(ctx, rec)
 }
 
 func (s *AdminService) CreateFeedFeedback(ctx context.Context, rec core.Recommendation) (int, error) {
-	return s.repoAdmin.CreateFeedFeedback(ctx, rec)
+	return s.RepoAdmin.CreateFeedFeedback(ctx, rec)
 }
 
 func (s *AdminService) CreateFeedback(ctx context.Context, stat core.Feedback) (int, error) {
-	return s.repoAdmin.CreateFeedback(ctx, stat)
+	return s.RepoAdmin.CreateFeedback(ctx, stat)
 }
 
 func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error) {
-	ok, err := s.repoUser.ShowCSAT(ctx, userId)
+	ok, err := s.RepoUser.ShowCSAT(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}
@@ -37,7 +37,7 @@ func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error)
 		return 0, nil
 	}
 
-	ok, err = s.repoAdmin.ShowFeedback(ctx, userId)
+	ok, err = s.RepoAdmin.ShowFeedback(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}
@@ -45,7 +45,7 @@ func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error)
 		return 1, nil
 	}
 
-	ok, err = s.repoAdmin.ShowRecommendation(ctx, userId)
+	ok, err = s.RepoAdmin.ShowRecommendation(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}
@@ -57,7 +57,7 @@ func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error)
 }
 
 func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (core.RecommendationStatistic, error) {
-	recommendations, err := s.repoAdmin.GetRecommendations(ctx)
+	recommendations, err := s.RepoAdmin.GetRecommendations(ctx)
 	var recommendationsStat core.RecommendationStatistic
 	var counter [11]int32
 	sum := 0
@@ -73,7 +73,7 @@ func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (core.R
 }
 
 func (s *AdminService) GetFeedbackStatistics(ctx context.Context) (core.FeedbackStatistic, error) {
-	feedbacks, err := s.repoAdmin.GetFeedbacks(ctx)
+	feedbacks, err := s.RepoAdmin.GetFeedbacks(ctx)
 	if err != nil {
 		return core.FeedbackStatistic{}, err
 	}

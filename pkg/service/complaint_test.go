@@ -49,7 +49,7 @@ func TestComplaintService_GetComplaintTypes(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			complaintTypes, err := service.GetComplaintTypes(context.Background())
 
 			assert.Equal(t, test.expectedResult, complaintTypes)
@@ -96,7 +96,7 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			complaintID, err := service.CreateComplaint(context.Background(), test.inputComplaint)
 
 			assert.Equal(t, test.expectedResult, complaintID)
@@ -143,7 +143,7 @@ func TestComplaintService_GetNextComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			complaint, err := service.GetNextComplaint(context.Background())
 
 			assert.Equal(t, test.expectedResult, complaint)
@@ -185,7 +185,7 @@ func TestComplaintService_AcceptComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			err := service.AcceptComplaint(context.Background(), test.complaintID)
 
 			assert.Equal(t, test.expectedError, err)
@@ -226,7 +226,7 @@ func TestComplaintService_DeleteComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			err := service.DeleteComplaint(context.Background(), test.complaintID)
 
 			assert.Equal(t, test.expectedError, err)
