@@ -166,7 +166,5 @@ func createCookie(name, SID string) *http.Cookie {
 		Expires:  time.Now().Add(10 * time.Hour),
 		Path:     "/",
 		HttpOnly: true,
-		//SameSite: http.SameSiteNoneMode,
-		//Secure:   true,
 	}
 }
