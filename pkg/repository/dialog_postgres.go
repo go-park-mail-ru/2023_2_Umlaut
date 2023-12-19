@@ -101,8 +101,11 @@ func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (core.Dialog
 	if errors.Is(err, pgx.ErrNoRows) {
 		return core.Dialog{}, fmt.Errorf("dialog with id: %d not found", id)
 	}
-
-	return dialog[0], err
+	if len(dialog) > 0 {
+		return dialog[0], err
+	} else {
+		return core.Dialog{}, nil
+	}
 }
 
 func scanDialogs(rows pgx.Rows, userId int) ([]core.Dialog, error) {
