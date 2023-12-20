@@ -50,7 +50,7 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 			repoMessage := mock_repository.NewMockMessage(ctrl)
 			test.mockBehavior(repoMessage)
 
-			service := &MessageService{repoMessage: repoMessage}
+			service := NewMessageService(repoMessage)
 			messages, err := service.GetDialogMessages(context.Background(), 1, 2)
 
 			assert.Equal(t, test.expectedResult, messages)
@@ -110,7 +110,7 @@ func TestMessageService_SaveOrUpdateMessage(t *testing.T) {
 			repoMessage := mock_repository.NewMockMessage(ctrl)
 			test.mockBehavior(repoMessage)
 
-			service := &MessageService{repoMessage: repoMessage}
+			service := NewMessageService(repoMessage)
 			resultMessage, err := service.SaveOrUpdateMessage(context.Background(), test.inputMessage)
 
 			assert.Equal(t, test.expectedResult, resultMessage)

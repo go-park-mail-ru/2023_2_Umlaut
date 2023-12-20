@@ -44,7 +44,7 @@ func TestTagService_GetAllTags(t *testing.T) {
 			repoTag := mock_repository.NewMockTag(c)
 			test.mockBehavior(repoTag)
 
-			service := &TagService{repoTag: repoTag}
+			service := NewTagService(repoTag)
 			tags, err := service.GetAllTags(context.Background())
 
 			assert.Equal(t, test.expectedList, tags)
