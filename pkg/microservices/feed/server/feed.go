@@ -42,6 +42,9 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 	if errors.Is(err, constants.ErrBannedUser) {
 		return nil, status.Error(codes.PermissionDenied, err.Error())
 	}
+	if errors.Is(err, constants.ErrNoAccess) {
+		return nil, status.Error(codes.ResourceExhausted, err.Error())
+	}
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
