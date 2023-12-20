@@ -57,7 +57,7 @@ func (h *Hub) Run() {
 					)
 				}
 			case constants.Match:
-				if match, ok := m.Payload.(*core.Dialog); ok {
+				if match, ok := m.Payload.(core.Dialog); ok {
 					if user1, user1Exists := h.Users[match.User1Id]; user1Exists {
 						user1.Notifications <- m
 					}
@@ -65,7 +65,7 @@ func (h *Hub) Run() {
 						user2.Notifications <- m
 					}
 				} else {
-					h.Logger.Info("[WS] (*Dialog)",
+					h.Logger.Info("[WS] (Dialog)",
 						zap.String("Message", "Ошибка преобразования типа"),
 					)
 				}
