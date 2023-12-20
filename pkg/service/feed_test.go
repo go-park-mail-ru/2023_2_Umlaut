@@ -17,9 +17,11 @@ func TestFeedService_GetNextUser(t *testing.T) {
 	mockUser := core.User{
 		Id:   1,
 		Name: "TestUser",
+		LikeCounter: 50,
 	}
 	mockFeedData := dto.FeedData{
 		User: mockUser,
+		LikeCounter: 50,
 	}
 
 	tests := []struct {
