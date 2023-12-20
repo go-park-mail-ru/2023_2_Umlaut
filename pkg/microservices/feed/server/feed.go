@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
@@ -24,6 +25,13 @@ func NewFeedServer(feed *service.FeedService) *FeedServer {
 	return &FeedServer{FeedService: feed}
 }
 
+func convertTime(data *time.Time) time.Time {
+	if data == nil {
+		return time.Time{}
+	}
+	return *data
+}
+
 func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*proto.FeedData, error) {
 	feed, err := fs.FeedService.GetNextUser(ctx, dto.FilterParams{
 		UserId: int(params.UserId),
@@ -38,7 +46,7 @@ func (fs *FeedServer) Feed(ctx context.Context, params *proto.FilterParams) (*pr
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 
-	birthdayProto := timestamppb.New(*feed.User.Birthday)
+	birthdayProto := timestamppb.New(convertTime(feed.User.Birthday))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
