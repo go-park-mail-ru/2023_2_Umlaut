@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	static2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 
@@ -33,13 +33,13 @@ func (r *LikePostgres) CreateLike(ctx context.Context, like core.Like) (core.Lik
 		return core.Like{}, fmt.Errorf("failed to create like. err: %w", err)
 	}
 
-	query += fmt.Sprintf(" RETURNING %s", static2.LikeDbField)
+	query += fmt.Sprintf(" RETURNING %s", constants.LikeDbField)
 	var newLike core.Like
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanLike(row, &newLike)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return newLike, static2.ErrAlreadyExists
+			return newLike, constants.ErrAlreadyExists
 		}
 	}
 
@@ -51,7 +51,7 @@ func (r *LikePostgres) IsMutualLike(ctx context.Context, like core.Like) (bool, 
 	like.LikedToUserId = like.LikedByUserId
 	like.LikedByUserId = tmp
 
-	query, args, err := psql.Select(static2.LikeDbField).
+	query, args, err := psql.Select(constants.LikeDbField).
 		From(likeTable).
 		Where(sq.Eq{"liked_by_user_id": like.LikedByUserId, "liked_to_user_id": like.LikedToUserId, "is_like": like.IsLike}).
 		ToSql()
@@ -82,7 +82,7 @@ func (r *LikePostgres) GetUserLikedToLikes(ctx context.Context, userId int) ([]d
 	if err != nil {
 		return nil, fmt.Errorf("failed to get premium likes. err: %w", err)
 	}
-	
+
 	var likes []dto.PremiumLike
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {

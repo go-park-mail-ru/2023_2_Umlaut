@@ -28,6 +28,9 @@ func (s *FeedService) GetNextUser(ctx context.Context, params dto.FilterParams) 
 	if err != nil {
 		return dto.FeedData{}, fmt.Errorf("GetNextUser error: %v", err)
 	}
+	if user.LikeCounter == 0 {
+		return dto.FeedData{}, constants.ErrNoAccess
+	}
 	nextUser, err := s.repoUser.GetNextUser(ctx, user, params)
 	if err != nil {
 		return dto.FeedData{}, fmt.Errorf("GetNextUser error: %v", err)

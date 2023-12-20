@@ -27,6 +27,8 @@ func ParseError(err error) (int, string) {
 			return http.StatusForbidden, code.Message()
 		case codes.DataLoss:
 			return http.StatusRequestURITooLong, code.Message()
+		case codes.ResourceExhausted:
+			return http.StatusPaymentRequired, code.Message()
 		}
 	}
 	if err != nil {

@@ -238,7 +238,7 @@ BEGIN
           AND description IS NOT NULL) = 5
     THEN
         UPDATE "user"
-        SET role = 2
+        SET role = 2, like_counter = -1
         WHERE id = NEW.invited_by;
     END IF;
     RETURN NEW;
@@ -260,7 +260,7 @@ $$
 BEGIN
     UPDATE "user"
     SET like_counter = like_counter - 1
-    WHERE id = NEW.liked_by_user_id;
+    WHERE id = NEW.liked_by_user_id AND role != 2;
     RETURN NEW;
 END;
 $$
