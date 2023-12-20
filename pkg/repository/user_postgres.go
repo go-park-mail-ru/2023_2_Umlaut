@@ -237,7 +237,7 @@ func (r *UserPostgres) GetUserInvites(ctx context.Context, userId int) (int, err
 }
 
 func (r *UserPostgres) ResetLikeCounter(ctx context.Context) error {
-	_, err := r.db.Exec(ctx, fmt.Sprintf("update %s set like_counter = default;", userTable))
+	_, err := r.db.Exec(ctx, fmt.Sprintf("update %s set like_counter = default where role != 2;", userTable))
 	return err
 }
 
