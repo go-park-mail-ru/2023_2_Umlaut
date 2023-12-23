@@ -620,6 +620,59 @@ paths:
       summary: sign up account
       tags:
       - auth
+  /api/v1/auth/vk-login:
+    get:
+      consumes:
+      - application/json
+      operationId: vk-login
+      parameters:
+      - description: invite_by value
+        in: query
+        name: invite_by
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: log out of account
+      tags:
+      - vk-auth
+  /api/v1/auth/vk-sign-up:
+    get:
+      consumes:
+      - application/json
+      operationId: vk-sign-up
+      parameters:
+      - description: code from oauth
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: invite_by param
+        in: query
+        name: invite_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-dto_IdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "414":
+          description: Request URI Too Long
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+      summary: log out of account
+      tags:
+      - vk-auth
   /api/v1/complaint:
     post:
       consumes:
@@ -786,6 +839,22 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-dto_FeedData'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "402":
+          description: Payment Required
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ClientResponseDto-string'
         "500":
           description: Internal Server Error
           schema:
