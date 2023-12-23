@@ -19,6 +19,7 @@ import (
 
 type User interface {
 	CreateUser(ctx context.Context, user core.User) (int, error)
+	InsertOrUpdateUser(ctx context.Context, user core.User) (int, error)
 	GetUser(ctx context.Context, mail string) (core.User, error)
 	GetUserById(ctx context.Context, id int) (core.User, error)
 	GetNextUser(ctx context.Context, user core.User, params dto.FilterParams) (core.User, error)

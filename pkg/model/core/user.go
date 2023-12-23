@@ -29,6 +29,7 @@ type User struct {
 	InvitedBy    *int       `json:"-" db:"invited_by" swaggerignore:"true"`
 	LikeCounter  int        `json:"-" db:"like_counter" swaggerignore:"true"`
 	Tags         *[]string  `json:"tags" db:"tags"`
+	OauthId      *int       `json:"oauthId" db:"oauth_id"`
 }
 
 func (u *User) IsValid() bool {

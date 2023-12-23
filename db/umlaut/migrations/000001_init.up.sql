@@ -12,26 +12,27 @@ $$
 CREATE TABLE "user"
 (
     id            SERIAL PRIMARY KEY,
-    name          TEXT        NOT NULL,
-    mail          TEXT UNIQUE NOT NULL,
-    password_hash TEXT        NOT NULL,
-    salt          TEXT        NOT NULL,
+    name          TEXT     NOT NULL,
+    mail          TEXT UNIQUE,
+    password_hash TEXT     NOT NULL,
+    salt          TEXT     NOT NULL,
     user_gender   SMALLINT CHECK (user_gender BETWEEN 0 AND 1),
     prefer_gender SMALLINT CHECK (prefer_gender BETWEEN 0 AND 1),
     description   TEXT,
     looking       TEXT,
-    image_paths   TEXT[]               DEFAULT ARRAY []::TEXT[],
+    image_paths   TEXT[]            DEFAULT ARRAY []::TEXT[],
     education     TEXT,
     hobbies       TEXT,
     birthday      DATE,
-    role          SMALLINT    NOT NULL DEFAULT 1 CHECK (role BETWEEN 1 AND 3),
-    invited_by    INT         REFERENCES "user" (id) ON DELETE SET NULL,
-    like_counter  INT                  DEFAULT 50,
-    online        BOOLEAN     NOT NULL DEFAULT FALSE,
-    tags          TEXT[]               DEFAULT ARRAY []::TEXT[],
+    role          SMALLINT NOT NULL DEFAULT 1 CHECK (role BETWEEN 1 AND 3),
+    invited_by    INT      REFERENCES "user" (id) ON DELETE SET NULL,
+    like_counter  INT               DEFAULT 50,
+    online        BOOLEAN  NOT NULL DEFAULT FALSE,
+    tags          TEXT[]            DEFAULT ARRAY []::TEXT[],
+    oauth_id      INT UNIQUE,
     age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
-    created_at    TIMESTAMPTZ          DEFAULT timezone('Europe/Moscow'::text, NOW()),
-    updated_at    TIMESTAMPTZ          DEFAULT timezone('Europe/Moscow'::text, NOW())
+    created_at    TIMESTAMPTZ       DEFAULT timezone('Europe/Moscow'::text, NOW()),
+    updated_at    TIMESTAMPTZ       DEFAULT timezone('Europe/Moscow'::text, NOW())
 );
 
 CREATE TABLE tag
@@ -238,7 +239,8 @@ BEGIN
           AND description IS NOT NULL) = 5
     THEN
         UPDATE "user"
-        SET role = 2, like_counter = -1
+        SET role         = 2,
+            like_counter = -1
         WHERE id = NEW.invited_by;
     END IF;
     RETURN NEW;
@@ -260,7 +262,8 @@ $$
 BEGIN
     UPDATE "user"
     SET like_counter = like_counter - 1
-    WHERE id = NEW.liked_by_user_id AND role != 2;
+    WHERE id = NEW.liked_by_user_id
+      AND role != 2;
     RETURN NEW;
 END;
 $$

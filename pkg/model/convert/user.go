@@ -14,13 +14,6 @@ func IntoCoreVkUser(vkUser dto.VkUser) core.User {
 		gender = vkUser.Sex - 1
 	}
 
-	var mail string
-	if len(vkUser.Email) > 0 {
-		mail = vkUser.Email
-	} else {
-		mail = constants.Empty
-	}
-
 	var data *time.Time
 	birthDate, err := time.Parse("02.01.2006", vkUser.BirthDate)
 	if err != nil {
@@ -36,11 +29,12 @@ func IntoCoreVkUser(vkUser dto.VkUser) core.User {
 
 	return core.User{
 		Name:         vkUser.Name,
-		Mail:         mail,
+		Mail:         vkUser.Email,
 		UserGender:   &gender,
 		Birthday:     data,
 		PasswordHash: constants.Empty,
 		Salt:         constants.Empty,
 		ImagePaths:   &photo,
+		OauthId:      &vkUser.Id,
 	}
 }

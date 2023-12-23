@@ -6,10 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/convert"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
 	"golang.org/x/oauth2"
 	"net/http"
 )
@@ -64,40 +62,19 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := convert.IntoCoreVkUser(vkUser)
-
-	userId, err := h.authMicroservice.SignUp(
-		r.Context(),
-		&proto.SignUpInput{
-			Mail:      utils.GenerateUuid(),
-			Password:  user.PasswordHash,
-			Name:      user.Name,
-			InvitedBy: invite,
-		},
-	)
-
+	id, err := h.services.Authorization.OAuth(r.Context(), user, invite)
 	if err != nil {
-		statusCode, message := utils.ParseError(err)
-		dto.NewErrorClientResponseDto(r.Context(), w, statusCode, message)
-		return
-	}
-	user.Id = int(userId.Id)
-	user.PasswordHash = ""
-	_, err = h.services.User.UpdateUser(r.Context(), user)
-	if err != nil {
-		if errors.Is(err, constants.ErrAlreadyExists) {
-			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "account with this email already exists")
-			return
-		}
-		if errors.Is(err, constants.ErrInvalidUser) {
-			dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid field for update")
-			return
-		}
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
+	cookie, err := h.services.Authorization.GenerateCookie(r.Context(), id)
+	if err != nil {
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "cookie error")
+		return
+	}
 
-	http.SetCookie(w, createCookie("session_id", userId.Cookie.Cookie))
-	dto.NewSuccessClientResponseDto(r.Context(), w, dto.IdResponse{Id: int(userId.Id)})
+	http.SetCookie(w, createCookie("session_id", cookie))
+	dto.NewSuccessClientResponseDto(r.Context(), w, dto.IdResponse{Id: id})
 }
 
 func fetchVkUserData(token *oauth2.Token) (dto.VkUser, error) {

@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
 	"strconv"
-	"time"
-
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 )
 
 type AuthService struct {
@@ -68,9 +66,21 @@ func (s *AuthService) GetAdmin(ctx context.Context, mail, password string) (core
 	return admin, nil
 }
 
+func (s *AuthService) OAuth(ctx context.Context, user core.User, invite string) (int, error) {
+	tmp, _ := s.GetDecodeUserId(ctx, invite)
+	if tmp > 0 {
+		user.InvitedBy = &tmp
+	}
+	id, err := s.repoUser.InsertOrUpdateUser(ctx, user)
+	if errors.Is(err, constants.ErrAlreadyExists) {
+		fmt.Println("account with this email already exists")
+	}
+	return id, err
+}
+
 func (s *AuthService) GenerateCookie(ctx context.Context, id int) (string, error) {
 	SID := utils.GenerateUuid()
-	if err := s.repoStore.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
+	if err := s.repoStore.SetSession(ctx, SID, id, constants.CookieExpire); err != nil {
 		return SID, err
 	}
 

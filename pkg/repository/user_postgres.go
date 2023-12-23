@@ -25,9 +25,10 @@ func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 
 func (r *UserPostgres) CreateUser(ctx context.Context, user core.User) (int, error) {
 	var id int
+
 	query, args, err := psql.Insert(userTable).
-		Columns("name", "mail", "password_hash", "salt", "invited_by").
-		Values(user.Name, user.Mail, user.PasswordHash, user.Salt, user.InvitedBy).
+		Columns("name", "mail", "password_hash", "salt", "user_gender", "birthday", "image_paths", "invited_by", "oauth_id").
+		Values(user.Name, user.Mail, user.PasswordHash, user.Salt, user.UserGender, user.Birthday, user.ImagePaths, user.InvitedBy, user.OauthId).
 		ToSql()
 
 	if err != nil {
@@ -44,6 +45,26 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user core.User) (int, err
 		return 0, err
 	}
 	return id, err
+}
+
+func (r *UserPostgres) InsertOrUpdateUser(ctx context.Context, user core.User) (int, error) {
+	var id int
+	query, args, err := psql.Select("id").From(userTable).
+		Where(sq.Eq{"oauth_id": user.OauthId}).ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return r.CreateUser(ctx, user)
+	} else if err != nil || id > 0 {
+		return id, err
+	}
+
+	return r.CreateUser(ctx, user)
 }
 
 func (r *UserPostgres) GetUser(ctx context.Context, mail string) (core.User, error) {

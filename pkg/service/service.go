@@ -14,6 +14,7 @@ import (
 
 type Authorization interface {
 	GenerateCookie(ctx context.Context, id int) (string, error)
+	OAuth(ctx context.Context, user core.User, invite string) (int, error)
 	DeleteCookie(ctx context.Context, session string) error
 	GetSessionValue(ctx context.Context, session string) (int, error)
 	CreateUser(ctx context.Context, user core.User) (int, error)

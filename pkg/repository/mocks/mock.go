@@ -115,6 +115,21 @@ func (mr *MockUserMockRecorder) GetUserInvites(ctx, userId interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInvites", reflect.TypeOf((*MockUser)(nil).GetUserInvites), ctx, userId)
 }
 
+// InsertOrUpdateUser mocks base method.
+func (m *MockUser) InsertOrUpdateUser(ctx context.Context, user core.User) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertOrUpdateUser", ctx, user)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertOrUpdateUser indicates an expected call of InsertOrUpdateUser.
+func (mr *MockUserMockRecorder) InsertOrUpdateUser(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertOrUpdateUser", reflect.TypeOf((*MockUser)(nil).InsertOrUpdateUser), ctx, user)
+}
+
 // ResetLikeCounter mocks base method.
 func (m *MockUser) ResetLikeCounter(ctx context.Context) error {
 	m.ctrl.T.Helper()
