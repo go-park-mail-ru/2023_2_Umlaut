@@ -57,7 +57,7 @@ func (h *Handler) InitRoutes() http.Handler {
 	authRouter.HandleFunc("/login", h.signIn).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/sign-up", h.signUp).Methods("POST", "OPTIONS")
 	authRouter.HandleFunc("/vk-login", h.vkLogin)
-	authRouter.HandleFunc("/vk-login", h.vkSignUp)
+	authRouter.HandleFunc("/vk-sign-up", h.vkSignUp)
 	authRouter.HandleFunc("/logout", h.logout)
 	authRouter.HandleFunc("/admin", h.logInAdmin)
 
