@@ -126,6 +126,21 @@ func (mr *MockAuthorizationMockRecorder) GetUser(ctx, mail, password interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockAuthorization)(nil).GetUser), ctx, mail, password)
 }
 
+// OAuth mocks base method.
+func (m *MockAuthorization) OAuth(ctx context.Context, user core.User, invite string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OAuth", ctx, user, invite)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OAuth indicates an expected call of OAuth.
+func (mr *MockAuthorizationMockRecorder) OAuth(ctx, user, invite interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OAuth", reflect.TypeOf((*MockAuthorization)(nil).OAuth), ctx, user, invite)
+}
+
 // MockFeed is a mock of Feed interface.
 type MockFeed struct {
 	ctrl     *gomock.Controller
