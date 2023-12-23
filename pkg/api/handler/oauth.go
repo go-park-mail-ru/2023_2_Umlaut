@@ -60,7 +60,7 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 	vkUser, err := fetchVkUserData(token)
 	if err != nil {
-		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "code error")
+		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "fetch data error")
 		return
 	}
 	user := convert.IntoCoreVkUser(vkUser)
