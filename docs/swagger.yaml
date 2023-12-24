@@ -158,6 +158,8 @@ definitions:
         type: string
       name:
         type: string
+      oauthId:
+        type: integer
       online:
         type: boolean
       password:
@@ -633,7 +635,7 @@ paths:
       produces:
       - application/json
       responses: {}
-      summary: log out of account
+      summary: redirect to VK
       tags:
       - vk-auth
   /api/v1/auth/vk-sign-up:
@@ -670,7 +672,7 @@ paths:
           description: Request URI Too Long
           schema:
             $ref: '#/definitions/handler.ClientResponseDto-string'
-      summary: log out of account
+      summary: need call after redirect VK
       tags:
       - vk-auth
   /api/v1/complaint:

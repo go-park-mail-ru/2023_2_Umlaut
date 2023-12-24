@@ -12,6 +12,7 @@ require (
 	github.com/gorilla/websocket v1.5.1
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/jackc/pgx/v5 v5.5.1
+	github.com/joho/godotenv v1.5.1
 	github.com/minio/minio-go/v7 v7.0.65
 	github.com/pashagolub/pgxmock/v3 v3.2.0
 	github.com/prometheus/client_golang v1.17.0

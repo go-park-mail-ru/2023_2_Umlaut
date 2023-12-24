@@ -11,4 +11,7 @@ var (
 	Empty        = "empty"
 	VkFields     = "id,photo_max,email,sex,bdate"
 	CookieExpire = 30 * 24 * time.Hour
+	ClientId     = "CLIENT_ID"
+	ClientSecret = "CLIENT_SECRET"
+	RedirectUrl  = "REDIRECT_URL"
 )
