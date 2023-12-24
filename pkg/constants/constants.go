@@ -8,7 +8,6 @@ var (
 	Message      = "message"
 	Match        = "match"
 	Banned       = 3
-	Empty        = "empty"
 	VkFields     = "id,photo_max,email,sex,bdate"
 	CookieExpire = 30 * 24 * time.Hour
 	ClientId     = "CLIENT_ID"
