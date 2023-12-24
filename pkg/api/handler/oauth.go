@@ -37,14 +37,11 @@ func getVkOauthConfig() *oauth2.Config {
 // @Success 200 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/vk-login [get]
 func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
-	h.logger.Info("Request vkLogin",
-		zap.String("ClientId", os.Getenv(constants.ClientId)),
-	)
 	vkOauthConfig := getVkOauthConfig()
 	invite := r.URL.Query().Get("invite_by")
 	url := vkOauthConfig.AuthCodeURL(invite)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-	//dto.NewSuccessClientResponseDto(r.Context(), w, url)
+	//http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	dto.NewSuccessClientResponseDto(r.Context(), w, url)
 }
 
 // @Summary need call after redirect VK
