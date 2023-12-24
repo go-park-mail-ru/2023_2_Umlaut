@@ -40,7 +40,6 @@ func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
 	vkOauthConfig := getVkOauthConfig()
 	invite := r.URL.Query().Get("invite_by")
 	url := vkOauthConfig.AuthCodeURL(invite)
-	//http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	dto.NewSuccessClientResponseDto(r.Context(), w, url)
 }
 
