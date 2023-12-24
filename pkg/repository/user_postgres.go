@@ -26,9 +26,13 @@ func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 func (r *UserPostgres) CreateUser(ctx context.Context, user core.User) (int, error) {
 	var id int
 
+	var mail *string
+	if len(user.Mail) > 1 {
+		mail = &user.Mail
+	}
 	query, args, err := psql.Insert(userTable).
 		Columns("name", "mail", "password_hash", "salt", "user_gender", "birthday", "image_paths", "invited_by", "oauth_id").
-		Values(user.Name, user.Mail, user.PasswordHash, user.Salt, user.UserGender, user.Birthday, user.ImagePaths, user.InvitedBy, user.OauthId).
+		Values(user.Name, mail, user.PasswordHash, user.Salt, user.UserGender, user.Birthday, user.ImagePaths, user.InvitedBy, user.OauthId).
 		ToSql()
 
 	if err != nil {
