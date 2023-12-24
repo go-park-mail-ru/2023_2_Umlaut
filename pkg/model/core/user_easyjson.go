@@ -18,7 +18,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautInternalModelCore(in *jlexer.Lexer, out *User) {
+func easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautPkgModelCore(in *jlexer.Lexer, out *User) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -193,6 +193,16 @@ func easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautInternalModelCore(in 
 					in.Delim(']')
 				}
 			}
+		case "oauthId":
+			if in.IsNull() {
+				in.Skip()
+				out.OauthId = nil
+			} else {
+				if out.OauthId == nil {
+					out.OauthId = new(int)
+				}
+				*out.OauthId = int(in.Int())
+			}
 		default:
 			in.SkipRecursive()
 		}
@@ -203,7 +213,7 @@ func easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautInternalModelCore(in 
 		in.Consumed()
 	}
 }
-func easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautInternalModelCore(out *jwriter.Writer, in User) {
+func easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautPkgModelCore(out *jwriter.Writer, in User) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -349,29 +359,38 @@ func easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautInternalModelCore(out
 			}
 		}
 	}
+	{
+		const prefix string = ",\"oauthId\":"
+		out.RawString(prefix)
+		if in.OauthId == nil {
+			out.RawString("null")
+		} else {
+			out.Int(int(*in.OauthId))
+		}
+	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
 func (v User) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautInternalModelCore(&w, v)
+	easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautPkgModelCore(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v User) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautInternalModelCore(w, v)
+	easyjson9e1087fdEncodeGithubComGoParkMailRu20232UmlautPkgModelCore(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *User) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautInternalModelCore(&r, v)
+	easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautPkgModelCore(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautInternalModelCore(l, v)
+	easyjson9e1087fdDecodeGithubComGoParkMailRu20232UmlautPkgModelCore(l, v)
 }
