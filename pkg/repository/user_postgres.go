@@ -165,9 +165,13 @@ func buildTagArray(tags []string) string {
 }
 
 func (r *UserPostgres) UpdateUser(ctx context.Context, user core.User) (core.User, error) {
+	var mail *string
+	if len(user.Mail) > 1 {
+		mail = &user.Mail
+	}
 	query, args, err := psql.Update(userTable).
 		Set("name", user.Name).
-		Set("mail", user.Mail).
+		Set("mail", mail).
 		Set("user_gender", user.UserGender).
 		Set("prefer_gender", user.PreferGender).
 		Set("description", user.Description).

@@ -77,6 +77,9 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 
 	for {
 		_, m, err := c.Conn.ReadMessage()
+		if string(m) == "" {
+			continue
+		}
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				c.Logger.Info("WS",
