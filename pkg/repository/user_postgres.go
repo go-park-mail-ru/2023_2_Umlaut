@@ -267,10 +267,11 @@ func (r *UserPostgres) ResetLikeCounter(ctx context.Context) error {
 }
 
 func scanUser(row pgx.Row, user *core.User) error {
+	var mail *string
 	err := row.Scan(
 		&user.Id,
 		&user.Name,
-		&user.Mail,
+		&mail,
 		&user.PasswordHash,
 		&user.Salt,
 		&user.UserGender,
@@ -287,6 +288,9 @@ func scanUser(row pgx.Row, user *core.User) error {
 		&user.Tags,
 		&user.OauthId,
 	)
+	if mail != nil {
+		user.Mail = *mail
+	}
 
 	user.CalculateAge()
 	return err
