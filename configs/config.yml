@@ -48,7 +48,8 @@ cors:
     "http://umlaut-bmstu.me",
     "http://umlaut-bmstu.me:8000",
     "https://umlaut-bmstu.me",
-    "https://umlaut-bmstu.me:8000"
+    "https://umlaut-bmstu.me:8000",
+    "https://id.vk.com"
   ]
   methods: [
     "GET",
