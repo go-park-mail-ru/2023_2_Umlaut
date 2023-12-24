@@ -35,6 +35,9 @@ func getVkOauthConfig() *oauth2.Config {
 // @Param invite_by query string false "invite_by value"
 // @Router /api/v1/auth/vk-login [get]
 func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
+	h.logger.Debug("Request vkLogin",
+		zap.String("ClientId", os.Getenv(constants.ClientId)),
+	)
 	vkOauthConfig := getVkOauthConfig()
 	invite := r.URL.Query().Get("invite_by")
 	url := vkOauthConfig.AuthCodeURL(invite)
