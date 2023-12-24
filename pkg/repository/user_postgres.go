@@ -281,6 +281,7 @@ func scanUser(row pgx.Row, user *core.User) error {
 		&user.LikeCounter,
 		&user.Online,
 		&user.Tags,
+		&user.OauthId,
 	)
 
 	user.CalculateAge()
