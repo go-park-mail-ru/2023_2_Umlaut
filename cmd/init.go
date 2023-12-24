@@ -6,6 +6,7 @@ import (
 	authProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
 	feedProto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/feed/proto"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
@@ -21,9 +22,13 @@ import (
 )
 
 func InitConfig() {
+	err := godotenv.Load("configs/.env")
+	if err != nil {
+		log.Fatalf("Ошибка при загрузке файла .env: %s", err)
+	}
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
-	err := viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
 	"io"
@@ -163,7 +164,7 @@ func createCookie(name, SID string) *http.Cookie {
 	return &http.Cookie{
 		Name:     name,
 		Value:    SID,
-		Expires:  time.Now().Add(10 * time.Hour),
+		Expires:  time.Now().Add(constants.CookieExpire),
 		Path:     "/",
 		HttpOnly: true,
 	}

@@ -10,22 +10,23 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"golang.org/x/oauth2"
 	"net/http"
+	"os"
 )
 
-var (
-	vkOauthConfig = &oauth2.Config{
-		ClientID:     "51820172",
-		ClientSecret: "BWzMJDcxBMQOkcZapM6V",
-		RedirectURL:  "https://umlaut-bmstu.me/feed",
+func getVkOauthConfig() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv(constants.ClientId),
+		ClientSecret: os.Getenv(constants.ClientSecret),
+		RedirectURL:  os.Getenv(constants.RedirectUrl),
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://oauth.vk.com/authorize",
 			TokenURL: "https://oauth.vk.com/access_token",
 		},
 		Scopes: []string{"email"},
 	}
-)
+}
 
-// @Summary log out of account
+// @Summary redirect to VK
 // @Tags vk-auth
 // @ID vk-login
 // @Accept  json
@@ -33,12 +34,13 @@ var (
 // @Param invite_by query string false "invite_by value"
 // @Router /api/v1/auth/vk-login [get]
 func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
+	vkOauthConfig := getVkOauthConfig()
 	invite := r.URL.Query().Get("invite_by")
 	url := vkOauthConfig.AuthCodeURL(invite)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-// @Summary log out of account
+// @Summary need call after redirect VK
 // @Tags vk-auth
 // @ID vk-sign-up
 // @Accept  json
@@ -49,6 +51,7 @@ func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404,414 {object} ClientResponseDto[string]
 // @Router /api/v1/auth/vk-sign-up [get]
 func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
+	vkOauthConfig := getVkOauthConfig()
 	code := r.URL.Query().Get("code")
 	invite := r.URL.Query().Get("invite_by")
 	token, err := vkOauthConfig.Exchange(r.Context(), code)
@@ -56,7 +59,7 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "code error")
 		return
 	}
-	vkUser, err := fetchVkUserData(token)
+	vkUser, err := fetchVkUserData(token, vkOauthConfig)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "fetch data error")
 		return
@@ -77,7 +80,7 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 	dto.NewSuccessClientResponseDto(r.Context(), w, dto.IdResponse{Id: id})
 }
 
-func fetchVkUserData(token *oauth2.Token) (dto.VkUser, error) {
+func fetchVkUserData(token *oauth2.Token, vkOauthConfig *oauth2.Config) (dto.VkUser, error) {
 	httpClient := vkOauthConfig.Client(context.Background(), token)
 
 	resp, err := httpClient.Get(

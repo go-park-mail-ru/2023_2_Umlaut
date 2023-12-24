@@ -381,7 +381,7 @@ const docTemplate = `{
                 "tags": [
                     "vk-auth"
                 ],
-                "summary": "log out of account",
+                "summary": "redirect to VK",
                 "operationId": "vk-login",
                 "parameters": [
                     {
@@ -405,7 +405,7 @@ const docTemplate = `{
                 "tags": [
                     "vk-auth"
                 ],
-                "summary": "log out of account",
+                "summary": "need call after redirect VK",
                 "operationId": "vk-sign-up",
                 "parameters": [
                     {
@@ -1535,6 +1535,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "oauthId": {
+                    "type": "integer"
                 },
                 "online": {
                     "type": "boolean"
