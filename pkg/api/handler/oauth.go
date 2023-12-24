@@ -11,7 +11,6 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/convert"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
-	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 )
 
@@ -40,7 +39,6 @@ func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
 	vkOauthConfig := getVkOauthConfig()
 	invite := r.URL.Query().Get("invite_by")
 	url := vkOauthConfig.AuthCodeURL(invite)
-	//http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	dto.NewSuccessClientResponseDto(r.Context(), w, url)
 }
 
@@ -59,11 +57,6 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	invite := r.URL.Query().Get("invite_by")
 
-	h.logger.Info("Request vkSignUp",
-		zap.String("code", code),
-		zap.String("invite_by", invite),
-	)
-
 	token, err := vkOauthConfig.Exchange(r.Context(), code)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "code error")
@@ -75,35 +68,18 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Info("Request vkSignUp",
-		zap.String("vkUser", fmt.Sprintf("%v", vkUser)),
-	)
-
 	user := convert.IntoCoreVkUser(vkUser)
-
-	h.logger.Info("Request vkSignUp",
-		zap.String("user", fmt.Sprintf("%v", user)),
-	)
-
 	id, err := h.services.Authorization.OAuth(r.Context(), user, invite)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	h.logger.Info("Request vkSignUp",
-		zap.String("id", fmt.Sprintf("%v", id)),
-	)
-
 	cookie, err := h.services.Authorization.GenerateCookie(r.Context(), id)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "cookie error")
 		return
 	}
-
-	h.logger.Info("Request vkSignUp",
-		zap.String("cookie", fmt.Sprintf("%v", cookie)),
-	)
 
 	http.SetCookie(w, createCookie("session_id", cookie))
 	dto.NewSuccessClientResponseDto(r.Context(), w, dto.IdResponse{Id: id})
@@ -124,7 +100,7 @@ func fetchVkUserData(token *oauth2.Token, vkOauthConfig *oauth2.Config) (dto.VkU
 		Response []dto.VkUser `json:"response"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&userData); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&userData); err != nil {
 		return dto.VkUser{}, fmt.Errorf("error decoding user data: %v", err)
 	}
 
