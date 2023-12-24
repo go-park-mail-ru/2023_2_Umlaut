@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/convert"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
-	"net/http"
-	"os"
 )
 
 func getVkOauthConfig() *oauth2.Config {
@@ -35,7 +36,7 @@ func getVkOauthConfig() *oauth2.Config {
 // @Param invite_by query string false "invite_by value"
 // @Router /api/v1/auth/vk-login [get]
 func (h *Handler) vkLogin(w http.ResponseWriter, r *http.Request) {
-	h.logger.Debug("Request vkLogin",
+	h.logger.Info("Request vkLogin",
 		zap.String("ClientId", os.Getenv(constants.ClientId)),
 	)
 	vkOauthConfig := getVkOauthConfig()
@@ -59,7 +60,7 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 	invite := r.URL.Query().Get("invite_by")
 
-	h.logger.Debug("Request vkSignUp",
+	h.logger.Info("Request vkSignUp",
 		zap.String("code", code),
 		zap.String("invite_by", invite),
 	)
@@ -75,13 +76,13 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Debug("Request vkSignUp",
+	h.logger.Info("Request vkSignUp",
 		zap.String("vkUser", fmt.Sprintf("%v", vkUser)),
 	)
 
 	user := convert.IntoCoreVkUser(vkUser)
 
-	h.logger.Debug("Request vkSignUp",
+	h.logger.Info("Request vkSignUp",
 		zap.String("user", fmt.Sprintf("%v", user)),
 	)
 
@@ -91,7 +92,7 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Debug("Request vkSignUp",
+	h.logger.Info("Request vkSignUp",
 		zap.String("id", fmt.Sprintf("%v", id)),
 	)
 
@@ -101,7 +102,7 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.logger.Debug("Request vkSignUp",
+	h.logger.Info("Request vkSignUp",
 		zap.String("cookie", fmt.Sprintf("%v", cookie)),
 	)
 
