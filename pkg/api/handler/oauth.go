@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/convert"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 	"net/http"
 	"os"
@@ -54,6 +55,12 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 	vkOauthConfig := getVkOauthConfig()
 	code := r.URL.Query().Get("code")
 	invite := r.URL.Query().Get("invite_by")
+
+	h.logger.Debug("Request vkSignUp",
+		zap.String("code", code),
+		zap.String("invite_by", invite),
+	)
+
 	token, err := vkOauthConfig.Exchange(r.Context(), code)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "code error")
@@ -64,17 +71,36 @@ func (h *Handler) vkSignUp(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "fetch data error")
 		return
 	}
+
+	h.logger.Debug("Request vkSignUp",
+		zap.String("vkUser", fmt.Sprintf("%v", vkUser)),
+	)
+
 	user := convert.IntoCoreVkUser(vkUser)
+
+	h.logger.Debug("Request vkSignUp",
+		zap.String("user", fmt.Sprintf("%v", user)),
+	)
+
 	id, err := h.services.Authorization.OAuth(r.Context(), user, invite)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	h.logger.Debug("Request vkSignUp",
+		zap.String("id", fmt.Sprintf("%v", id)),
+	)
+
 	cookie, err := h.services.Authorization.GenerateCookie(r.Context(), id)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, "cookie error")
 		return
 	}
+
+	h.logger.Debug("Request vkSignUp",
+		zap.String("cookie", fmt.Sprintf("%v", cookie)),
+	)
 
 	http.SetCookie(w, createCookie("session_id", cookie))
 	dto.NewSuccessClientResponseDto(r.Context(), w, dto.IdResponse{Id: id})
