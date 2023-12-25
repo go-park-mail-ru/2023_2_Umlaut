@@ -26,7 +26,7 @@ func TestUserPostgres_CreateUser(t *testing.T) {
 	}
 
 	mock.ExpectQuery(`INSERT INTO "user"`).
-		WithArgs(testUser.Name, &testUser.Mail, testUser.PasswordHash, testUser.Salt, testUser.UserGender, testUser.Birthday, testUser.ImagePaths, testUser.InvitedBy, testUser.OauthId).
+		WithArgs(testUser.Name, &testUser.Mail, testUser.PasswordHash, testUser.Salt, testUser.UserGender, testUser.PreferGender, testUser.Birthday, testUser.ImagePaths, testUser.InvitedBy, testUser.OauthId).
 		WillReturnRows(pgxmock.NewRows([]string{"id"}).AddRow(1))
 
 	createdID, err := userRepo.CreateUser(context.Background(), testUser)
