@@ -31,8 +31,8 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user core.User) (int, err
 		mail = &user.Mail
 	}
 	query, args, err := psql.Insert(userTable).
-		Columns("name", "mail", "password_hash", "salt", "user_gender", "birthday", "image_paths", "invited_by", "oauth_id").
-		Values(user.Name, mail, user.PasswordHash, user.Salt, user.UserGender, user.Birthday, user.ImagePaths, user.InvitedBy, user.OauthId).
+		Columns("name", "mail", "password_hash", "salt", "user_gender", "prefer_gender", "birthday", "image_paths", "invited_by", "oauth_id").
+		Values(user.Name, mail, user.PasswordHash, user.Salt, user.UserGender, user.PreferGender, user.Birthday, user.ImagePaths, user.InvitedBy, user.OauthId).
 		ToSql()
 
 	if err != nil {
