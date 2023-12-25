@@ -1,6 +1,7 @@
 package convert
 
 import (
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"time"
@@ -8,9 +9,15 @@ import (
 
 func IntoCoreVkUser(vkUser dto.VkUser) core.User {
 
-	var gender int
+	var userGender, preferGender *int
 	if vkUser.Sex > 0 {
-		gender = vkUser.Sex - 1
+		gender := vkUser.Sex - 1
+		userGender = &gender
+		if gender == constants.ManGender {
+			preferGender = &constants.WomanGender
+		} else {
+			preferGender = &constants.ManGender
+		}
 	}
 
 	var data *time.Time
@@ -25,11 +32,12 @@ func IntoCoreVkUser(vkUser dto.VkUser) core.User {
 	}
 
 	return core.User{
-		Name:       vkUser.Name,
-		Mail:       vkUser.Email,
-		UserGender: &gender,
-		Birthday:   data,
-		ImagePaths: &photo,
-		OauthId:    &vkUser.Id,
+		Name:         vkUser.Name,
+		Mail:         vkUser.Email,
+		UserGender:   userGender,
+		PreferGender: preferGender,
+		Birthday:     data,
+		ImagePaths:   &photo,
+		OauthId:      &vkUser.Id,
 	}
 }

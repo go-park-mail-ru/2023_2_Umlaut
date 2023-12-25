@@ -95,10 +95,6 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			isEdit = true
 		}
 		if err != nil {
-			c.Logger.Info("WS",
-				zap.String("Message", "error"),
-				zap.Error(err),
-			)
 			continue
 		}
 		newMessage, err := services.Message.SaveOrUpdateMessage(ctx, core.Message{

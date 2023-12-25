@@ -110,9 +110,3 @@ func (h *Handler) InitRoutes() http.Handler {
 
 	return r
 }
-
-//type ClientResponseDto[K comparable] struct {
-//	Status  int    `json:"status"`
-//	Message string `json:"message"`
-//	Payload K      `json:"payload"`
-//}
