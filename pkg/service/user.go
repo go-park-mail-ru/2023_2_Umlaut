@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
+	"log"
 	"mime/multipart"
 	"net/http"
 
@@ -112,7 +113,7 @@ func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) e
 
 	err = s.repoMinio.DeleteFile(ctx, utils.GetBucketName(userId), link)
 	if err != nil {
-		return fmt.Errorf("DeleteFile error: %v", err)
+		log.Printf("DeleteFile error: %v", err)
 	}
 	*currentUser.ImagePaths = utils.Remove(*currentUser.ImagePaths, link)
 
