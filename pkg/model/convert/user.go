@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
+	"log"
 	"time"
 )
 
@@ -13,10 +14,14 @@ func IntoCoreVkUser(vkUser dto.VkUser) core.User {
 	if vkUser.Sex > 0 {
 		gender := vkUser.Sex - 1
 		userGender = &gender
+		log.Printf("[VK] %d gender == constants.ManGender: %v", gender, gender == constants.ManGender)
+		log.Printf("[VK] %d gender == constants.WomanGender: %v", gender, gender == constants.WomanGender)
 		if gender == constants.ManGender {
 			preferGender = &constants.WomanGender
+			log.Printf("[VK] %d", *preferGender)
 		} else {
 			preferGender = &constants.ManGender
+			log.Printf("[VK] %d", *preferGender)
 		}
 	}
 
