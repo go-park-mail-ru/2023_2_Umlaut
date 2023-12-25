@@ -21,7 +21,6 @@ func TestComplaintPostgres_GetAllTags(t *testing.T) {
 
 	testTags := []string{"type1", "type2"}
 
-	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "tag"`, "name")).
 		WillReturnRows(pgxmock.NewRows([]string{"name"}).
 			AddRow("type1").AddRow("type2"))
@@ -31,7 +30,6 @@ func TestComplaintPostgres_GetAllTags(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, tags, testTags)
 
-	// Проверка других случаев ошибок
 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "tag"`, "name")).
 		WillReturnError(errors.New("some other error"))
 
@@ -39,6 +37,5 @@ func TestComplaintPostgres_GetAllTags(t *testing.T) {
 
 	assert.Error(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

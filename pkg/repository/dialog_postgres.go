@@ -50,10 +50,10 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog core.Dialog) (
 
 func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error) {
 	query, args, err := psql.
-		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.recipient_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
+		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "messageText.id", "messageText.sender_id", "messageText.recipient_id", "messageText.dialog_id", "messageText.message_text", "messageText.is_read", "messageText.created_at").
 		From(dialogTable + " d").
 		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
-		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
+		LeftJoin(fmt.Sprintf("%s messageText ON d.last_message_id = messageText.id", messageTable)).
 		Where(sq.And{
 			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
 			sq.NotEq{"u.id": userId},
@@ -78,13 +78,16 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]core.Dia
 	return dialogs, nil
 }
 
-func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (core.Dialog, error) {
+func (r *DialogPostgres) GetDialogById(ctx context.Context, id int, userId int) (core.Dialog, error) {
 	query, args, err := psql.
-		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.recipient_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
+		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "messageText.id", "messageText.sender_id", "messageText.recipient_id", "messageText.dialog_id", "messageText.message_text", "messageText.is_read", "messageText.created_at").
 		From(dialogTable + " d").
 		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
-		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
-		Where(sq.Eq{"d.id": id}).
+		LeftJoin(fmt.Sprintf("%s messageText ON d.last_message_id = messageText.id", messageTable)).
+		Where(sq.And{
+			sq.Eq{"d.id": id},
+			sq.NotEq{"u.id": userId},
+		}).
 		ToSql()
 
 	if err != nil {
@@ -96,7 +99,7 @@ func (r *DialogPostgres) GetDialogById(ctx context.Context, id int) (core.Dialog
 		return core.Dialog{}, fmt.Errorf("failed to get dialog with id %d. err: %w", id, err)
 	}
 	defer rows.Close()
-	dialog, err := scanDialogs(rows, ctx.Value(constants.KeyUserID).(int))
+	dialog, err := scanDialogs(rows, userId)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return core.Dialog{}, fmt.Errorf("dialog with id: %d not found", id)

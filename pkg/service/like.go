@@ -21,25 +21,20 @@ func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog, repo
 
 func (s *LikeService) CreateLike(ctx context.Context, like core.Like) (core.Dialog, error) {
 	_, err := s.repoLike.CreateLike(ctx, like)
-	if err != nil {
+	if !like.IsLike || err != nil {
 		return core.Dialog{}, err
-	}
-	if !like.IsLike {
-		return core.Dialog{}, nil
 	}
 	mutual, err := s.repoLike.IsMutualLike(ctx, like)
 	if err != nil {
 		return core.Dialog{}, err
 	}
 	if mutual {
-		id, err := s.repoDialog.CreateDialog(ctx, core.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId})
+		dialog := core.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId}
+		id, err := s.repoDialog.CreateDialog(ctx, dialog)
 		if err != nil {
 			return core.Dialog{}, err
 		}
-		dialog, err := s.repoDialog.GetDialogById(ctx, id)
-		if err != nil {
-			return core.Dialog{}, err
-		}
+		dialog.Id = id
 		return dialog, constants.ErrMutualLike
 	}
 

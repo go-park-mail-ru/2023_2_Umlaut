@@ -370,18 +370,18 @@ func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.
 }
 
 // GetDialog mocks base method.
-func (m *MockDialog) GetDialog(ctx context.Context, id int) (core.Dialog, error) {
+func (m *MockDialog) GetDialog(ctx context.Context, id, userId int) (core.Dialog, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDialog", ctx, id)
+	ret := m.ctrl.Call(m, "GetDialog", ctx, id, userId)
 	ret0, _ := ret[0].(core.Dialog)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetDialog indicates an expected call of GetDialog.
-func (mr *MockDialogMockRecorder) GetDialog(ctx, id interface{}) *gomock.Call {
+func (mr *MockDialogMockRecorder) GetDialog(ctx, id, userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialog", reflect.TypeOf((*MockDialog)(nil).GetDialog), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialog", reflect.TypeOf((*MockDialog)(nil).GetDialog), ctx, id, userId)
 }
 
 // GetDialogs mocks base method.

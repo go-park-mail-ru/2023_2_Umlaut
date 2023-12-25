@@ -3,10 +3,11 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"runtime/debug"
 	"time"
+
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
 	"github.com/gorilla/websocket"
@@ -77,9 +78,6 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 
 	for {
 		_, m, err := c.Conn.ReadMessage()
-		if string(m) == "" {
-			continue
-		}
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				c.Logger.Info("WS",
@@ -97,11 +95,7 @@ func (c *Client) ReadMessage(ctx context.Context, hub *Hub, services *service.Se
 			isEdit = true
 		}
 		if err != nil {
-			c.Logger.Info("WS",
-				zap.String("Message", "error"),
-				zap.Error(err),
-			)
-			break
+			continue
 		}
 		newMessage, err := services.Message.SaveOrUpdateMessage(ctx, core.Message{
 			Id:          &receivedMessage.Id,

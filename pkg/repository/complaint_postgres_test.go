@@ -33,7 +33,6 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 		ComplaintText:   &complaintText,
 	}
 
-	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(`INSERT INTO "complaint"`).
 		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintTypeId, testComplaint.ComplaintText).
 		WillReturnRows(pgxmock.NewRows([]string{"id"}).AddRow(1))
@@ -43,7 +42,6 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, createdID)
 
-	// Проверяем ситуацию с дубликатом
 	mock.ExpectQuery(`INSERT INTO "complaint"`).
 		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintTypeId, testComplaint.ComplaintText).
 		WillReturnError(static2.ErrAlreadyExists)
@@ -52,7 +50,6 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 
 	assert.ErrorIs(t, err, static2.ErrAlreadyExists)
 
-	// Проверка других случаев ошибок
 	mock.ExpectQuery(`INSERT INTO "complaint"`).
 		WithArgs(testComplaint.ReporterUserId, testComplaint.ReportedUserId, testComplaint.ComplaintTypeId, testComplaint.ComplaintText).
 		WillReturnError(errors.New("some other error"))
@@ -61,7 +58,6 @@ func TestComplaintPostgres_CreateComplaint(t *testing.T) {
 
 	assert.Error(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -85,7 +81,6 @@ func TestComplaintPostgres_GetComplaintTypes(t *testing.T) {
 		},
 	}
 
-	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "complaint_type"`, static2.ComplaintTypeDbFiend)).
 		WillReturnRows(pgxmock.NewRows([]string{"id", "type_name"}).
 			AddRow(1, "type1").AddRow(2, "type2"))
@@ -95,7 +90,6 @@ func TestComplaintPostgres_GetComplaintTypes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, complaintTypes, testComplaint)
 
-	// Проверка других случаев ошибок
 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "complaint_type"`, static2.ComplaintTypeDbFiend)).
 		WillReturnError(errors.New("some other error"))
 
@@ -103,7 +97,6 @@ func TestComplaintPostgres_GetComplaintTypes(t *testing.T) {
 
 	assert.Error(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -116,7 +109,6 @@ func TestComplaintPostgres_DeleteComplaint(t *testing.T) {
 
 	complaintRepo := NewComplaintPostgres(mock)
 
-	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(`DELETE FROM "complaint"`).
 		WithArgs(1).
 		WillReturnRows(pgxmock.NewRows([]string{"DELETE", "id"}).
@@ -126,7 +118,6 @@ func TestComplaintPostgres_DeleteComplaint(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -141,7 +132,6 @@ func TestComplaintPostgres_AcceptComplaint(t *testing.T) {
 
 	testComplaintText := "complaint"
 
-	// Ожидаем успешное создание диалога
 	mock.ExpectQuery(`UPDATE "complaint"`).
 		WithArgs(1, 1).
 		WillReturnRows(pgxmock.NewRows([]string{"id", "reporter_user_id", "reported_user_id", "complaint_type_id", "complaint_text", "created_at"}).
@@ -151,7 +141,6 @@ func TestComplaintPostgres_AcceptComplaint(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	// Проверка других случаев ошибок
 	mock.ExpectQuery(fmt.Sprintf(`SELECT %s FROM "complaint_type"`, static2.ComplaintTypeDbFiend)).
 		WillReturnError(errors.New("some other error"))
 
@@ -159,7 +148,6 @@ func TestComplaintPostgres_AcceptComplaint(t *testing.T) {
 
 	assert.Error(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -191,7 +179,6 @@ func TestComplaintPostgres_GetNextComplaint(t *testing.T) {
 	complaint, _ := complaintRepo.GetNextComplaint(context.Background())
 	assert.Equal(t, testComplaint, complaint)
 
-	// Проверяем ситуацию с дубликатом
 	mock.ExpectQuery(`SELECT`).
 		WithArgs(0).
 		WillReturnError(pgx.ErrNoRows)
@@ -200,7 +187,6 @@ func TestComplaintPostgres_GetNextComplaint(t *testing.T) {
 
 	assert.ErrorIs(t, err, static2.ErrNoData)
 
-	// Проверка других случаев ошибок
 	mock.ExpectQuery(`SELECT`).
 		WithArgs(0).
 		WillReturnError(errors.New("some error"))
@@ -209,6 +195,5 @@ func TestComplaintPostgres_GetNextComplaint(t *testing.T) {
 
 	assert.Error(t, err)
 
-	// Проверяем, что не остались ожидающие запросы
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

@@ -22,6 +22,6 @@ func (s *DialogService) GetDialogs(ctx context.Context, userId int) ([]core.Dial
 	return s.repoDialog.GetDialogs(ctx, userId)
 }
 
-func (s *DialogService) GetDialog(ctx context.Context, id int) (core.Dialog, error) {
-	return s.repoDialog.GetDialogById(ctx, id)
+func (s *DialogService) GetDialog(ctx context.Context, id int, userId int) (core.Dialog, error) {
+	return s.repoDialog.GetDialogById(ctx, id, userId)
 }

@@ -42,7 +42,7 @@ type Like interface {
 type Dialog interface {
 	CreateDialog(ctx context.Context, dialog core.Dialog) (int, error)
 	GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error)
-	GetDialog(ctx context.Context, id int) (core.Dialog, error)
+	GetDialog(ctx context.Context, id int, userId int) (core.Dialog, error)
 }
 
 type Message interface {

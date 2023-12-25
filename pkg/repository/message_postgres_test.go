@@ -12,15 +12,15 @@ import (
 
 var (
 	id          = 1
-	m           = "Test message"
-	b           = false
-	t           = time.Now()
+	messageText = "Test message"
+	isRead      = false
+	createAt    = time.Now()
 	testMessage = core.Message{
 		SenderId:  &id,
 		DialogId:  &id,
-		Text:      &m,
-		IsRead:    &b,
-		CreatedAt: &t,
+		Text:      &messageText,
+		IsRead:    &isRead,
+		CreatedAt: &createAt,
 	}
 )
 
@@ -36,7 +36,7 @@ func TestMessagePostgres_CreateMessage(t *testing.T) {
 	mock.ExpectQuery(`INSERT INTO "message"`).
 		WithArgs(testMessage.SenderId, testMessage.RecipientId, testMessage.DialogId, testMessage.Text).
 		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "recipient_id", "message_text", "is_read", "created_at"}).
-			AddRow(&id, &id, &id, &id, &m, &b, nil))
+			AddRow(&id, &id, &id, &id, &messageText, &isRead, nil))
 
 	newMessage, err := messageRepo.CreateMessage(context.Background(), testMessage)
 
@@ -56,7 +56,7 @@ func TestMessagePostgres_UpdateMessage(t *testing.T) {
 	mock.ExpectQuery(`UPDATE "message"`).
 		WithArgs(testMessage.Text, testMessage.IsRead).
 		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "recipient_id", "message_text", "is_read", "created_at"}).
-			AddRow(&id, &id, &id, &id, &m, &b, nil))
+			AddRow(&id, &id, &id, &id, &messageText, &isRead, nil))
 
 	updatedMessage, err := messageRepo.UpdateMessage(context.Background(), testMessage)
 
