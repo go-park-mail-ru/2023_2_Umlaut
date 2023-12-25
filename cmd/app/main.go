@@ -66,9 +66,9 @@ func main() {
 			zap.String("Error", fmt.Sprintf("failed to initialize microservices: %s", err.Error())))
 	}
 
-	hub := chat.NewHub(logger)
 	repos := repository.NewRepository(db, dbAdmin, sessionStore, fileClient)
 	services := service.NewService(repos)
+	hub := chat.NewHub(logger, services)
 	handlers := handler.NewHandler(services, hub, logger, authClient, feedConn, adminConn)
 
 	srv := new(umlaut.Server)

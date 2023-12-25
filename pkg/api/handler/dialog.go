@@ -43,7 +43,8 @@ func (h *Handler) getDialog(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusBadRequest, "invalid params")
 		return
 	}
-	dialog, err := h.services.Dialog.GetDialog(r.Context(), id)
+	userId := r.Context().Value(constants.KeyUserID).(int)
+	dialog, err := h.services.Dialog.GetDialog(r.Context(), id, userId)
 	if err != nil {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusInternalServerError, err.Error())
 		return
@@ -52,7 +53,6 @@ func (h *Handler) getDialog(w http.ResponseWriter, r *http.Request) {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusNotFound, "dialog not found")
 		return
 	}
-	userId := r.Context().Value(constants.KeyUserID).(int)
 	if dialog.User1Id != userId && dialog.User2Id != userId {
 		dto.NewErrorClientResponseDto(r.Context(), w, http.StatusForbidden, "denied")
 		return
