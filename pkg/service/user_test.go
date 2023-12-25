@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
-	mock_repository "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
