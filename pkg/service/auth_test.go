@@ -3,16 +3,16 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestAuthService_CreateUser(t *testing.T) {
-	mockUser := model.User{
+	mockUser := core.User{
 		Mail:         "test@example.com",
 		PasswordHash: "password",
 		Name:         "TestUser",
@@ -43,10 +43,10 @@ func TestAuthService_CreateUser(t *testing.T) {
 		{
 			name: "Already Exists",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(0, static.ErrAlreadyExists)
+				r.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Return(0, constants.ErrAlreadyExists)
 			},
 			expectedID:    0,
-			expectedError: static.ErrAlreadyExists,
+			expectedError: constants.ErrAlreadyExists,
 		},
 	}
 
@@ -68,7 +68,7 @@ func TestAuthService_CreateUser(t *testing.T) {
 }
 
 func TestAuthService_GetUser(t *testing.T) {
-	mockUser := model.User{
+	mockUser := core.User{
 		Mail:         "test@example.com",
 		PasswordHash: "",
 		Name:         "TestUser",
@@ -78,15 +78,15 @@ func TestAuthService_GetUser(t *testing.T) {
 	tests := []struct {
 		name          string
 		mockBehavior  func(r *mock_repository.MockUser)
-		expectedUser  model.User
+		expectedUser  core.User
 		expectedError error
 	}{
 		{
 			name: "User Not Found",
 			mockBehavior: func(r *mock_repository.MockUser) {
-				r.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(model.User{}, errors.New("user not found"))
+				r.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(core.User{}, errors.New("user not found"))
 			},
-			expectedUser:  model.User{},
+			expectedUser:  core.User{},
 			expectedError: errors.New("user not found"),
 		},
 		{

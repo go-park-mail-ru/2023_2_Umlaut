@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -20,7 +20,7 @@ func NewDialogPostgres(db PgxPoolInterface) *DialogPostgres {
 	return &DialogPostgres{db: db}
 }
 
-func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) (int, error) {
+func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog core.Dialog) (int, error) {
 	if dialog.User1Id > dialog.User2Id {
 		tmp := dialog.User1Id
 		dialog.User1Id = dialog.User2Id
@@ -42,18 +42,18 @@ func (r *DialogPostgres) CreateDialog(ctx context.Context, dialog model.Dialog) 
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, static.ErrAlreadyExists
+			return 0, constants.ErrAlreadyExists
 		}
 	}
 	return id, err
 }
 
-func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
+func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error) {
 	query, args, err := psql.
-		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "m.id", "m.sender_id", "m.dialog_id", "m.message_text", "m.is_read", "m.created_at").
+		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "messageText.id", "messageText.sender_id", "messageText.recipient_id", "messageText.dialog_id", "messageText.message_text", "messageText.is_read", "messageText.created_at").
 		From(dialogTable + " d").
 		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
-		LeftJoin(fmt.Sprintf("%s m ON d.last_message_id = m.id", messageTable)).
+		LeftJoin(fmt.Sprintf("%s messageText ON d.last_message_id = messageText.id", messageTable)).
 		Where(sq.And{
 			sq.Or{sq.Eq{"d.user1_id": userId}, sq.Eq{"d.user2_id": userId}},
 			sq.NotEq{"u.id": userId},
@@ -78,21 +78,55 @@ func (r *DialogPostgres) GetDialogs(ctx context.Context, userId int) ([]model.Di
 	return dialogs, nil
 }
 
-func scanDialogs(rows pgx.Rows, userId int) ([]model.Dialog, error) {
-	var dialogs []model.Dialog
+func (r *DialogPostgres) GetDialogById(ctx context.Context, id int, userId int) (core.Dialog, error) {
+	query, args, err := psql.
+		Select("d.id", "d.user1_id", "d.user2_id", "d.banned", "u.name", "u.image_paths", "messageText.id", "messageText.sender_id", "messageText.recipient_id", "messageText.dialog_id", "messageText.message_text", "messageText.is_read", "messageText.created_at").
+		From(dialogTable + " d").
+		LeftJoin(fmt.Sprintf("%s u on d.user1_id = u.id or d.user2_id = u.id", userTable)).
+		LeftJoin(fmt.Sprintf("%s messageText ON d.last_message_id = messageText.id", messageTable)).
+		Where(sq.And{
+			sq.Eq{"d.id": id},
+			sq.NotEq{"u.id": userId},
+		}).
+		ToSql()
+
+	if err != nil {
+		return core.Dialog{}, err
+	}
+
+	rows, err := r.db.Query(ctx, query, args...)
+	if err != nil {
+		return core.Dialog{}, fmt.Errorf("failed to get dialog with id %d. err: %w", id, err)
+	}
+	defer rows.Close()
+	dialog, err := scanDialogs(rows, userId)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return core.Dialog{}, fmt.Errorf("dialog with id: %d not found", id)
+	}
+	if len(dialog) > 0 {
+		return dialog[0], err
+	} else {
+		return core.Dialog{}, nil
+	}
+}
+
+func scanDialogs(rows pgx.Rows, userId int) ([]core.Dialog, error) {
+	var dialogs []core.Dialog
 	var err error
 	for rows.Next() {
-		var dialog model.Dialog
-		var lastMessage model.Message
+		var dialog core.Dialog
+		var lastMessage core.Message
 		err = rows.Scan(
 			&dialog.Id,
 			&dialog.User1Id,
 			&dialog.User2Id,
 			&dialog.Banned,
-			&dialog.Сompanion,
-			&dialog.СompanionImagePaths,
+			&dialog.Companion,
+			&dialog.CompanionImagePaths,
 			&lastMessage.Id,
 			&lastMessage.SenderId,
+			&lastMessage.RecipientId,
 			&lastMessage.DialogId,
 			&lastMessage.Text,
 			&lastMessage.IsRead,

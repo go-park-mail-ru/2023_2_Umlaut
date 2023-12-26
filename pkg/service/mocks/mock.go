@@ -9,7 +9,8 @@ import (
 	multipart "mime/multipart"
 	reflect "reflect"
 
-	model "github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	core "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	dto "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -37,7 +38,7 @@ func (m *MockAuthorization) EXPECT() *MockAuthorizationMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockAuthorization) CreateUser(ctx context.Context, user model.User) (int, error) {
+func (m *MockAuthorization) CreateUser(ctx context.Context, user core.User) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, user)
 	ret0, _ := ret[0].(int)
@@ -80,6 +81,21 @@ func (mr *MockAuthorizationMockRecorder) GenerateCookie(ctx, id interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateCookie", reflect.TypeOf((*MockAuthorization)(nil).GenerateCookie), ctx, id)
 }
 
+// GetDecodeUserId mocks base method.
+func (m *MockAuthorization) GetDecodeUserId(ctx context.Context, message string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDecodeUserId", ctx, message)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDecodeUserId indicates an expected call of GetDecodeUserId.
+func (mr *MockAuthorizationMockRecorder) GetDecodeUserId(ctx, message interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDecodeUserId", reflect.TypeOf((*MockAuthorization)(nil).GetDecodeUserId), ctx, message)
+}
+
 // GetSessionValue mocks base method.
 func (m *MockAuthorization) GetSessionValue(ctx context.Context, session string) (int, error) {
 	m.ctrl.T.Helper()
@@ -96,10 +112,10 @@ func (mr *MockAuthorizationMockRecorder) GetSessionValue(ctx, session interface{
 }
 
 // GetUser mocks base method.
-func (m *MockAuthorization) GetUser(ctx context.Context, mail, password string) (model.User, error) {
+func (m *MockAuthorization) GetUser(ctx context.Context, mail, password string) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUser", ctx, mail, password)
-	ret0, _ := ret[0].(model.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -108,6 +124,21 @@ func (m *MockAuthorization) GetUser(ctx context.Context, mail, password string) 
 func (mr *MockAuthorizationMockRecorder) GetUser(ctx, mail, password interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockAuthorization)(nil).GetUser), ctx, mail, password)
+}
+
+// OAuth mocks base method.
+func (m *MockAuthorization) OAuth(ctx context.Context, user core.User, invite string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OAuth", ctx, user, invite)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// OAuth indicates an expected call of OAuth.
+func (mr *MockAuthorizationMockRecorder) OAuth(ctx, user, invite interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OAuth", reflect.TypeOf((*MockAuthorization)(nil).OAuth), ctx, user, invite)
 }
 
 // MockFeed is a mock of Feed interface.
@@ -134,10 +165,10 @@ func (m *MockFeed) EXPECT() *MockFeedMockRecorder {
 }
 
 // GetNextUser mocks base method.
-func (m *MockFeed) GetNextUser(ctx context.Context, params model.FilterParams) (model.User, error) {
+func (m *MockFeed) GetNextUser(ctx context.Context, params dto.FilterParams) (dto.FeedData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextUser", ctx, params)
-	ret0, _ := ret[0].(model.User)
+	ret0, _ := ret[0].(dto.FeedData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -201,10 +232,10 @@ func (mr *MockUserMockRecorder) DeleteFile(ctx, userId, link interface{}) *gomoc
 }
 
 // GetCurrentUser mocks base method.
-func (m *MockUser) GetCurrentUser(ctx context.Context, userId int) (model.User, error) {
+func (m *MockUser) GetCurrentUser(ctx context.Context, userId int) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCurrentUser", ctx, userId)
-	ret0, _ := ret[0].(model.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -215,11 +246,27 @@ func (mr *MockUserMockRecorder) GetCurrentUser(ctx, userId interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentUser", reflect.TypeOf((*MockUser)(nil).GetCurrentUser), ctx, userId)
 }
 
+// GetUserShareCridentials mocks base method.
+func (m *MockUser) GetUserShareCridentials(ctx context.Context, userId int) (int, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserShareCridentials", ctx, userId)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetUserShareCridentials indicates an expected call of GetUserShareCridentials.
+func (mr *MockUserMockRecorder) GetUserShareCridentials(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserShareCridentials", reflect.TypeOf((*MockUser)(nil).GetUserShareCridentials), ctx, userId)
+}
+
 // UpdateUser mocks base method.
-func (m *MockUser) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+func (m *MockUser) UpdateUser(ctx context.Context, user core.User) (core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", ctx, user)
-	ret0, _ := ret[0].(model.User)
+	ret0, _ := ret[0].(core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -254,17 +301,34 @@ func (m *MockLike) EXPECT() *MockLikeMockRecorder {
 }
 
 // CreateLike mocks base method.
-func (m *MockLike) CreateLike(ctx context.Context, like model.Like) error {
+func (m *MockLike) CreateLike(ctx context.Context, like core.Like) (core.Dialog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateLike", ctx, like)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(core.Dialog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateLike indicates an expected call of CreateLike.
 func (mr *MockLikeMockRecorder) CreateLike(ctx, like interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockLike)(nil).CreateLike), ctx, like)
+}
+
+// GetUserLikedToLikes mocks base method.
+func (m *MockLike) GetUserLikedToLikes(ctx context.Context, userId int) (bool, []dto.PremiumLike, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserLikedToLikes", ctx, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].([]dto.PremiumLike)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetUserLikedToLikes indicates an expected call of GetUserLikedToLikes.
+func (mr *MockLikeMockRecorder) GetUserLikedToLikes(ctx, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserLikedToLikes", reflect.TypeOf((*MockLike)(nil).GetUserLikedToLikes), ctx, userId)
 }
 
 // MockDialog is a mock of Dialog interface.
@@ -291,7 +355,7 @@ func (m *MockDialog) EXPECT() *MockDialogMockRecorder {
 }
 
 // CreateDialog mocks base method.
-func (m *MockDialog) CreateDialog(ctx context.Context, dialog model.Dialog) (int, error) {
+func (m *MockDialog) CreateDialog(ctx context.Context, dialog core.Dialog) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateDialog", ctx, dialog)
 	ret0, _ := ret[0].(int)
@@ -305,11 +369,26 @@ func (mr *MockDialogMockRecorder) CreateDialog(ctx, dialog interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockDialog)(nil).CreateDialog), ctx, dialog)
 }
 
+// GetDialog mocks base method.
+func (m *MockDialog) GetDialog(ctx context.Context, id, userId int) (core.Dialog, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDialog", ctx, id, userId)
+	ret0, _ := ret[0].(core.Dialog)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDialog indicates an expected call of GetDialog.
+func (mr *MockDialogMockRecorder) GetDialog(ctx, id, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialog", reflect.TypeOf((*MockDialog)(nil).GetDialog), ctx, id, userId)
+}
+
 // GetDialogs mocks base method.
-func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]model.Dialog, error) {
+func (m *MockDialog) GetDialogs(ctx context.Context, userId int) ([]core.Dialog, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDialogs", ctx, userId)
-	ret0, _ := ret[0].([]model.Dialog)
+	ret0, _ := ret[0].([]core.Dialog)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -344,25 +423,25 @@ func (m *MockMessage) EXPECT() *MockMessageMockRecorder {
 }
 
 // GetDialogMessages mocks base method.
-func (m *MockMessage) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
+func (m *MockMessage) GetDialogMessages(ctx context.Context, userId, recipientId int) ([]core.Message, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, dialogId)
-	ret0, _ := ret[0].([]model.Message)
+	ret := m.ctrl.Call(m, "GetDialogMessages", ctx, userId, recipientId)
+	ret0, _ := ret[0].([]core.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetDialogMessages indicates an expected call of GetDialogMessages.
-func (mr *MockMessageMockRecorder) GetDialogMessages(ctx, dialogId interface{}) *gomock.Call {
+func (mr *MockMessageMockRecorder) GetDialogMessages(ctx, userId, recipientId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockMessage)(nil).GetDialogMessages), ctx, dialogId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogMessages", reflect.TypeOf((*MockMessage)(nil).GetDialogMessages), ctx, userId, recipientId)
 }
 
 // SaveOrUpdateMessage mocks base method.
-func (m *MockMessage) SaveOrUpdateMessage(ctx context.Context, message model.Message) (model.Message, error) {
+func (m *MockMessage) SaveOrUpdateMessage(ctx context.Context, message core.Message) (core.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveOrUpdateMessage", ctx, message)
-	ret0, _ := ret[0].(model.Message)
+	ret0, _ := ret[0].(core.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -435,7 +514,7 @@ func (m *MockAdmin) EXPECT() *MockAdminMockRecorder {
 }
 
 // CreateFeedFeedback mocks base method.
-func (m *MockAdmin) CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error) {
+func (m *MockAdmin) CreateFeedFeedback(ctx context.Context, rec core.Recommendation) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeedFeedback", ctx, rec)
 	ret0, _ := ret[0].(int)
@@ -450,7 +529,7 @@ func (mr *MockAdminMockRecorder) CreateFeedFeedback(ctx, rec interface{}) *gomoc
 }
 
 // CreateFeedback mocks base method.
-func (m *MockAdmin) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
+func (m *MockAdmin) CreateFeedback(ctx context.Context, stat core.Feedback) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFeedback", ctx, stat)
 	ret0, _ := ret[0].(int)
@@ -465,7 +544,7 @@ func (mr *MockAdminMockRecorder) CreateFeedback(ctx, stat interface{}) *gomock.C
 }
 
 // CreateRecommendation mocks base method.
-func (m *MockAdmin) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
+func (m *MockAdmin) CreateRecommendation(ctx context.Context, rec core.Recommendation) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRecommendation", ctx, rec)
 	ret0, _ := ret[0].(int)
@@ -495,10 +574,10 @@ func (mr *MockAdminMockRecorder) GetCSATType(ctx, userId interface{}) *gomock.Ca
 }
 
 // GetFeedbackStatistics mocks base method.
-func (m *MockAdmin) GetFeedbackStatistics(ctx context.Context) (model.FeedbackStatistic, error) {
+func (m *MockAdmin) GetFeedbackStatistics(ctx context.Context) (core.FeedbackStatistic, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeedbackStatistics", ctx)
-	ret0, _ := ret[0].(model.FeedbackStatistic)
+	ret0, _ := ret[0].(core.FeedbackStatistic)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -510,10 +589,10 @@ func (mr *MockAdminMockRecorder) GetFeedbackStatistics(ctx interface{}) *gomock.
 }
 
 // GetRecommendationsStatistics mocks base method.
-func (m *MockAdmin) GetRecommendationsStatistics(ctx context.Context) (model.RecommendationStatistic, error) {
+func (m *MockAdmin) GetRecommendationsStatistics(ctx context.Context) (core.RecommendationStatistic, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRecommendationsStatistics", ctx)
-	ret0, _ := ret[0].(model.RecommendationStatistic)
+	ret0, _ := ret[0].(core.RecommendationStatistic)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -548,7 +627,7 @@ func (m *MockComplaint) EXPECT() *MockComplaintMockRecorder {
 }
 
 // CreateComplaint mocks base method.
-func (m *MockComplaint) CreateComplaint(ctx context.Context, complaint model.Complaint) (int, error) {
+func (m *MockComplaint) CreateComplaint(ctx context.Context, complaint core.Complaint) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateComplaint", ctx, complaint)
 	ret0, _ := ret[0].(int)
@@ -563,10 +642,10 @@ func (mr *MockComplaintMockRecorder) CreateComplaint(ctx, complaint interface{})
 }
 
 // GetComplaintTypes mocks base method.
-func (m *MockComplaint) GetComplaintTypes(ctx context.Context) ([]model.ComplaintType, error) {
+func (m *MockComplaint) GetComplaintTypes(ctx context.Context) ([]core.ComplaintType, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetComplaintTypes", ctx)
-	ret0, _ := ret[0].([]model.ComplaintType)
+	ret0, _ := ret[0].([]core.ComplaintType)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -578,10 +657,10 @@ func (mr *MockComplaintMockRecorder) GetComplaintTypes(ctx interface{}) *gomock.
 }
 
 // GetNextComplaint mocks base method.
-func (m *MockComplaint) GetNextComplaint(ctx context.Context) (model.Complaint, error) {
+func (m *MockComplaint) GetNextComplaint(ctx context.Context) (core.Complaint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNextComplaint", ctx)
-	ret0, _ := ret[0].(model.Complaint)
+	ret0, _ := ret[0].(core.Complaint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -590,4 +669,55 @@ func (m *MockComplaint) GetNextComplaint(ctx context.Context) (model.Complaint, 
 func (mr *MockComplaintMockRecorder) GetNextComplaint(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextComplaint", reflect.TypeOf((*MockComplaint)(nil).GetNextComplaint), ctx)
+}
+
+// MockBackground is a mock of Background interface.
+type MockBackground struct {
+	ctrl     *gomock.Controller
+	recorder *MockBackgroundMockRecorder
+}
+
+// MockBackgroundMockRecorder is the mock recorder for MockBackground.
+type MockBackgroundMockRecorder struct {
+	mock *MockBackground
+}
+
+// NewMockBackground creates a new mock instance.
+func NewMockBackground(ctrl *gomock.Controller) *MockBackground {
+	mock := &MockBackground{ctrl: ctrl}
+	mock.recorder = &MockBackgroundMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockBackground) EXPECT() *MockBackgroundMockRecorder {
+	return m.recorder
+}
+
+// ResetDislike mocks base method.
+func (m *MockBackground) ResetDislike(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetDislike", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetDislike indicates an expected call of ResetDislike.
+func (mr *MockBackgroundMockRecorder) ResetDislike(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetDislike", reflect.TypeOf((*MockBackground)(nil).ResetDislike), ctx)
+}
+
+// ResetLikeCounter mocks base method.
+func (m *MockBackground) ResetLikeCounter(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetLikeCounter", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetLikeCounter indicates an expected call of ResetLikeCounter.
+func (mr *MockBackgroundMockRecorder) ResetLikeCounter(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetLikeCounter", reflect.TypeOf((*MockBackground)(nil).ResetLikeCounter), ctx)
 }

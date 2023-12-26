@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 	"errors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
-	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -22,7 +22,7 @@ type AdminServer struct {
 
 func NewAdminServer(admin *service.AdminService, complaint *service.ComplaintService) *AdminServer {
 	return &AdminServer{
-		AdminService: admin,
+		AdminService:     admin,
 		ComplaintService: complaint,
 	}
 }
@@ -47,35 +47,35 @@ func (as *AdminServer) DeleteComplaint(ctx context.Context, complaint *proto.Com
 
 func (as *AdminServer) GetNextComplaint(ctx context.Context, _ *proto.AdminEmpty) (*proto.Complaint, error) {
 	complaint, err := as.ComplaintService.GetNextComplaint(ctx)
-	if errors.Is(err, static.ErrNoData) {
+	if errors.Is(err, constants.ErrNoData) {
 		return &proto.Complaint{}, status.Error(codes.NotFound, "complaints ended")
 	}
 	if err != nil {
 		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
 	}
-	createdAt, err := ptypes.TimestampProto(*complaint.CreatedAt)
+	createdAt := timestamppb.New(*complaint.CreatedAt)
 	if err != nil {
 		return &proto.Complaint{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &proto.Complaint{
-		Id: int32(complaint.Id),
-		ReporterUserId: int32(complaint.ReporterUserId),
-		ReportedUserId: int32(complaint.ReportedUserId),
-		ComplaintType: complaint.ComplaintType,
-		CreatedAt: createdAt,
+		Id:              int32(complaint.Id),
+		ReporterUserId:  int32(complaint.ReporterUserId),
+		ReportedUserId:  int32(complaint.ReportedUserId),
+		ComplaintTypeId: int32(complaint.ComplaintTypeId),
+		ComplaintText:   *complaint.ComplaintText,
+		CreatedAt:       createdAt,
 	}, nil
 }
 
 func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {
-	recommend := int(rec.Recommend)
+	rating := int(rec.Rating)
 	_, err := as.AdminService.CreateRecommendation(
 		ctx,
-		model.Recommendation{
-			Id:        int(rec.Id),
-			UserId:    int(rec.UserId),
-			Recommend: &recommend,
-			Show:      rec.Show,
+		core2.Recommendation{
+			Id:     int(rec.Id),
+			UserId: int(rec.UserId),
+			Rating: &rating,
 		})
 
 	if err != nil {
@@ -86,14 +86,13 @@ func (as *AdminServer) CreateRecommendation(ctx context.Context, rec *proto.Reco
 }
 
 func (as *AdminServer) CreateFeedFeedback(ctx context.Context, rec *proto.Recommendation) (*proto.AdminEmpty, error) {
-	recommend := int(rec.Recommend)
+	rating := int(rec.Rating)
 	_, err := as.AdminService.CreateFeedFeedback(
 		ctx,
-		model.Recommendation{
-			Id:        int(rec.Id),
-			UserId:    int(rec.UserId),
-			Recommend: &recommend,
-			Show:      rec.Show,
+		core2.Recommendation{
+			Id:     int(rec.Id),
+			UserId: int(rec.UserId),
+			Rating: &rating,
 		})
 
 	if err != nil {
@@ -107,15 +106,13 @@ func (as *AdminServer) CreateFeedback(ctx context.Context, stat *proto.Feedback)
 	rating := int(stat.Rating)
 	_, err := as.AdminService.CreateFeedback(
 		ctx,
-		model.Feedback{
-			Id:         int(stat.Id),
-			UserId:     int(stat.UserId),
-			Rating:     &rating,
-			Liked:      &stat.Liked,
-			NeedFix:    &stat.NeedFix,
-			CommentFix: &stat.CommentFix,
-			Comment:    &stat.Comment,
-			Show:       stat.Show,
+		core2.Feedback{
+			Id:      int(stat.Id),
+			UserId:  int(stat.UserId),
+			Rating:  &rating,
+			Liked:   &stat.Liked,
+			NeedFix: &stat.NeedFix,
+			Comment: &stat.Comment,
 		})
 
 	if err != nil {
@@ -154,15 +151,15 @@ func (as *AdminServer) GetRecommendationStatistic(ctx context.Context, _ *proto.
 }
 
 func getProtoLikedMap(likedMap map[string]int32) []*proto.LikedMap {
-	result := []*proto.LikedMap{}
+	var result []*proto.LikedMap
 	for key, value := range likedMap {
 		result = append(result, &proto.LikedMap{Liked: key, Count: value})
 	}
 	return result
 }
 
-func getProtoNeedFixMap(needFixMap map[string]model.NeedFixObject) []*proto.NeedFixMap {
-	result := []*proto.NeedFixMap{}
+func getProtoNeedFixMap(needFixMap map[string]core2.NeedFixObject) []*proto.NeedFixMap {
+	var result []*proto.NeedFixMap
 	for key, value := range needFixMap {
 		result = append(
 			result,

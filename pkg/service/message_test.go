@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"testing"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +13,7 @@ import (
 
 func TestMessageService_GetDialogMessages(t *testing.T) {
 	messageText := "Message 1"
-	mockMessages := []model.Message{
+	mockMessages := []core.Message{
 		{Id: ptrToInt(1), Text: &messageText},
 		{Id: ptrToInt(2), Text: &messageText},
 	}
@@ -21,13 +21,13 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 	tests := []struct {
 		name           string
 		mockBehavior   func(r *mock_repository.MockMessage)
-		expectedResult []model.Message
+		expectedResult []core.Message
 		expectedError  error
 	}{
 		{
 			name: "Success",
 			mockBehavior: func(r *mock_repository.MockMessage) {
-				r.EXPECT().GetDialogMessages(gomock.Any(), 1).Return(mockMessages, nil)
+				r.EXPECT().GetDialogMessages(gomock.Any(), 1, 2).Return(mockMessages, nil)
 			},
 			expectedResult: mockMessages,
 			expectedError:  nil,
@@ -35,7 +35,7 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 		{
 			name: "Error",
 			mockBehavior: func(r *mock_repository.MockMessage) {
-				r.EXPECT().GetDialogMessages(gomock.Any(), 1).Return(nil, errors.New("error getting messages"))
+				r.EXPECT().GetDialogMessages(gomock.Any(), 1, 2).Return(nil, errors.New("error getting messages"))
 			},
 			expectedResult: nil,
 			expectedError:  errors.New("error getting messages"),
@@ -50,8 +50,8 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 			repoMessage := mock_repository.NewMockMessage(ctrl)
 			test.mockBehavior(repoMessage)
 
-			service := &MessageService{repoMessage: repoMessage}
-			messages, err := service.GetDialogMessages(context.Background(), 1)
+			service := NewMessageService(repoMessage)
+			messages, err := service.GetDialogMessages(context.Background(), 1, 2)
 
 			assert.Equal(t, test.expectedResult, messages)
 			assert.Equal(t, test.expectedError, err)
@@ -61,21 +61,21 @@ func TestMessageService_GetDialogMessages(t *testing.T) {
 
 func TestMessageService_SaveOrUpdateMessage(t *testing.T) {
 	messageText := "Message 1"
-	mockMessage := model.Message{
+	mockMessage := core.Message{
 		Id:   ptrToInt(1),
 		Text: &messageText,
 	}
 
 	tests := []struct {
 		name           string
-		inputMessage   model.Message
+		inputMessage   core.Message
 		mockBehavior   func(r *mock_repository.MockMessage)
-		expectedResult model.Message
+		expectedResult core.Message
 		expectedError  error
 	}{
 		{
 			name:         "Success Create",
-			inputMessage: model.Message{Text: &messageText},
+			inputMessage: core.Message{Text: &messageText},
 			mockBehavior: func(r *mock_repository.MockMessage) {
 				r.EXPECT().CreateMessage(gomock.Any(), gomock.Any()).Return(mockMessage, nil)
 			},
@@ -84,7 +84,7 @@ func TestMessageService_SaveOrUpdateMessage(t *testing.T) {
 		},
 		{
 			name:         "Success Update",
-			inputMessage: model.Message{Id: ptrToInt(1), Text: &messageText},
+			inputMessage: core.Message{Id: ptrToInt(1), Text: &messageText},
 			mockBehavior: func(r *mock_repository.MockMessage) {
 				r.EXPECT().UpdateMessage(gomock.Any(), gomock.Any()).Return(mockMessage, nil)
 			},
@@ -93,11 +93,11 @@ func TestMessageService_SaveOrUpdateMessage(t *testing.T) {
 		},
 		{
 			name:         "Error",
-			inputMessage: model.Message{},
+			inputMessage: core.Message{},
 			mockBehavior: func(r *mock_repository.MockMessage) {
-				r.EXPECT().CreateMessage(gomock.Any(), gomock.Any()).Return(model.Message{}, errors.New("error creating message"))
+				r.EXPECT().CreateMessage(gomock.Any(), gomock.Any()).Return(core.Message{}, errors.New("error creating message"))
 			},
-			expectedResult: model.Message{},
+			expectedResult: core.Message{},
 			expectedError:  errors.New("error creating message"),
 		},
 	}
@@ -110,7 +110,7 @@ func TestMessageService_SaveOrUpdateMessage(t *testing.T) {
 			repoMessage := mock_repository.NewMockMessage(ctrl)
 			test.mockBehavior(repoMessage)
 
-			service := &MessageService{repoMessage: repoMessage}
+			service := NewMessageService(repoMessage)
 			resultMessage, err := service.SaveOrUpdateMessage(context.Background(), test.inputMessage)
 
 			assert.Equal(t, test.expectedResult, resultMessage)

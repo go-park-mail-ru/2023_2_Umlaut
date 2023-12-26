@@ -1,5 +1,6 @@
 .idea
 .database
-
+vendor
 cover.out
 cover.out.tmp
+logs

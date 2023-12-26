@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 )
 
@@ -14,11 +14,11 @@ func NewMessageService(repoMessage repository.Message) *MessageService {
 	return &MessageService{repoMessage: repoMessage}
 }
 
-func (s *MessageService) GetDialogMessages(ctx context.Context, dialogId int) ([]model.Message, error) {
-	return s.repoMessage.GetDialogMessages(ctx, dialogId)
+func (s *MessageService) GetDialogMessages(ctx context.Context, userId int, recipientId int) ([]core.Message, error) {
+	return s.repoMessage.GetDialogMessages(ctx, userId, recipientId)
 }
 
-func (s *MessageService) SaveOrUpdateMessage(ctx context.Context, message model.Message) (model.Message, error) {
+func (s *MessageService) SaveOrUpdateMessage(ctx context.Context, message core.Message) (core.Message, error) {
 	if message.Id != nil && *message.Id > 0 {
 		return s.repoMessage.UpdateMessage(ctx, message)
 	}

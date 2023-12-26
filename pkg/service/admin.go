@@ -3,34 +3,33 @@ package service
 import (
 	"context"
 	"fmt"
-
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
 )
 
 type AdminService struct {
-	repoAdmin repository.Admin
-	repoUser  repository.User
+	RepoAdmin repository.Admin
+	RepoUser  repository.User
 }
 
 func NewAdminService(repoAdmin repository.Admin, repoUser repository.User) *AdminService {
-	return &AdminService{repoAdmin: repoAdmin, repoUser: repoUser}
+	return &AdminService{RepoAdmin: repoAdmin, RepoUser: repoUser}
 }
 
-func (s *AdminService) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
-	return s.repoAdmin.CreateRecommendation(ctx, rec)
+func (s *AdminService) CreateRecommendation(ctx context.Context, rec core.Recommendation) (int, error) {
+	return s.RepoAdmin.CreateRecommendation(ctx, rec)
 }
 
-func (s *AdminService) CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error) {
-	return s.repoAdmin.CreateFeedFeedback(ctx, rec)
+func (s *AdminService) CreateFeedFeedback(ctx context.Context, rec core.Recommendation) (int, error) {
+	return s.RepoAdmin.CreateFeedFeedback(ctx, rec)
 }
 
-func (s *AdminService) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
-	return s.repoAdmin.CreateFeedback(ctx, stat)
+func (s *AdminService) CreateFeedback(ctx context.Context, stat core.Feedback) (int, error) {
+	return s.RepoAdmin.CreateFeedback(ctx, stat)
 }
 
 func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error) {
-	ok, err := s.repoUser.ShowCSAT(ctx, userId)
+	ok, err := s.RepoUser.ShowCSAT(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}
@@ -38,7 +37,7 @@ func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error)
 		return 0, nil
 	}
 
-	ok, err = s.repoAdmin.ShowFeedback(ctx, userId)
+	ok, err = s.RepoAdmin.ShowFeedback(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}
@@ -46,7 +45,7 @@ func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error)
 		return 1, nil
 	}
 
-	ok, err = s.repoAdmin.ShowRecommendation(ctx, userId)
+	ok, err = s.RepoAdmin.ShowRecommendation(ctx, userId)
 	if err != nil {
 		return 0, fmt.Errorf("GetCSATType error: %v", err)
 	}
@@ -57,15 +56,15 @@ func (s *AdminService) GetCSATType(ctx context.Context, userId int) (int, error)
 	return 0, nil
 }
 
-func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (model.RecommendationStatistic, error) {
-	recommendations, err := s.repoAdmin.GetRecommendations(ctx)
-	var recommendationsStat model.RecommendationStatistic
+func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (core.RecommendationStatistic, error) {
+	recommendations, err := s.RepoAdmin.GetRecommendations(ctx)
+	var recommendationsStat core.RecommendationStatistic
 	var counter [11]int32
 	sum := 0
 	for _, recommendation := range recommendations {
-		if recommendation.Recommend != nil {
-			counter[*recommendation.Recommend] += 1
-			sum += *recommendation.Recommend
+		if recommendation.Rating != nil {
+			counter[*recommendation.Rating] += 1
+			sum += *recommendation.Rating
 		}
 	}
 	recommendationsStat.AvgRecommend = float32(sum) / float32(len(recommendations))
@@ -73,18 +72,18 @@ func (s *AdminService) GetRecommendationsStatistics(ctx context.Context) (model.
 	return recommendationsStat, err
 }
 
-func (s *AdminService) GetFeedbackStatistics(ctx context.Context) (model.FeedbackStatistic, error) {
-	feedbacks, err := s.repoAdmin.GetFeedbacks(ctx)
+func (s *AdminService) GetFeedbackStatistics(ctx context.Context) (core.FeedbackStatistic, error) {
+	feedbacks, err := s.RepoAdmin.GetFeedbacks(ctx)
 	if err != nil {
-		return model.FeedbackStatistic{}, err
+		return core.FeedbackStatistic{}, err
 	}
 
 	return getFeedbackStatistic(feedbacks), nil
 }
 
-func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {
+func getFeedbackStatistic(feedbacks []core.Feedback) core.FeedbackStatistic {
 	likedMap := make(map[string]int32)
-	needFixMap := make(map[string]model.NeedFixObject)
+	needFixMap := make(map[string]core.NeedFixObject)
 	var ratingCount [11]int32
 	var comment []string
 	sum := 0
@@ -95,8 +94,8 @@ func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {
 		if feedback.NeedFix != nil {
 			tmp := needFixMap[*feedback.NeedFix]
 			tmp.Count += 1
-			if feedback.CommentFix != nil {
-				tmp.CommentFix = append(tmp.CommentFix, *feedback.CommentFix)
+			if feedback.Comment != nil {
+				tmp.CommentFix = append(tmp.CommentFix, *feedback.Comment)
 			}
 			needFixMap[*feedback.NeedFix] = tmp
 		}
@@ -106,7 +105,7 @@ func getFeedbackStatistic(feedbacks []model.Feedback) model.FeedbackStatistic {
 		ratingCount[*feedback.Rating] += 1
 		sum += *feedback.Rating
 	}
-	return model.FeedbackStatistic{
+	return core.FeedbackStatistic{
 		AvgRating:   float32(sum) / float32(len(feedbacks)),
 		RatingCount: ratingCount[:],
 		LikedMap:    likedMap,

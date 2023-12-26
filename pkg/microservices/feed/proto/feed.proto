@@ -24,6 +24,11 @@ message User {
   repeated string tags = 16;
 }
 
+message FeedData {
+  User user = 1;
+  int32 like_counter = 2;
+}
+
 message FilterParams {
   int32 user_id = 1;
   int32 min_age = 2;
@@ -32,5 +37,5 @@ message FilterParams {
 }
 
 service Feed {
-  rpc Feed(FilterParams) returns(User) {}
+  rpc Feed(FilterParams) returns(FeedData) {}
 }

@@ -2,12 +2,12 @@ package repository
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"io"
 	"strings"
 
 	"fmt"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -31,16 +31,16 @@ func (m *MinioProvider) UploadFile(ctx context.Context, bucketName, fileName, co
 	if err != nil {
 		return "", fmt.Errorf("failed to upload file. err: %w", err)
 	}
-	fileName = fmt.Sprintf("%s/photos/%s/%s", static.Host, bucketName, fileName)
+	fileName = fmt.Sprintf("%s/photos/%s/%s", constants.Host, bucketName, fileName)
 	return fileName, nil
 }
 
 func (m *MinioProvider) DeleteFile(ctx context.Context, bucketName, link string) error {
 	i := strings.LastIndex(link, "/")
 	if i == -1 {
-		return fmt.Errorf("failed to upload file. Uncorrect link");
+		return fmt.Errorf("failed to upload file. Uncorrect link")
 	}
-	fileName := link[i + 1:]
+	fileName := link[i+1:]
 
 	err := m.client.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{})
 	if err != nil {

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/pashagolub/pgxmock/v3"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -17,15 +17,16 @@ func TestUserPostgres_CreateUser(t *testing.T) {
 
 	userRepo := NewUserPostgres(mock)
 
-	testUser := model.User{
+	testUser := core.User{
 		Name:         "John Doe",
 		Mail:         "john@example.com",
 		PasswordHash: "hashed_password",
 		Salt:         "salt",
+		InvitedBy:    nil,
 	}
 
 	mock.ExpectQuery(`INSERT INTO "user"`).
-		WithArgs(testUser.Name, testUser.Mail, testUser.PasswordHash, testUser.Salt).
+		WithArgs(testUser.Name, &testUser.Mail, testUser.PasswordHash, testUser.Salt, testUser.UserGender, testUser.PreferGender, testUser.Birthday, testUser.ImagePaths, testUser.InvitedBy, testUser.OauthId).
 		WillReturnRows(pgxmock.NewRows([]string{"id"}).AddRow(1))
 
 	createdID, err := userRepo.CreateUser(context.Background(), testUser)

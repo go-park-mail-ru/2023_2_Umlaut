@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -18,10 +18,10 @@ func NewAdminPostgres(db PgxPoolInterface) *AdminPostgres {
 	return &AdminPostgres{db: db}
 }
 
-func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin, error) {
-	var admin model.Admin
+func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (core.Admin, error) {
+	var admin core.Admin
 
-	query, args, err := psql.Select(static.AdminDbField).From(adminTable).Where(sq.Eq{"mail": mail}).ToSql()
+	query, args, err := psql.Select(constants.AdminDbField).From(adminTable).Where(sq.Eq{"mail": mail}).ToSql()
 
 	if err != nil {
 		return admin, err
@@ -31,7 +31,7 @@ func (r *AdminPostgres) GetAdmin(ctx context.Context, mail string) (model.Admin,
 	err = scanAdmin(row, &admin)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.Admin{}, fmt.Errorf("admin with mail: %s not found", mail)
+		return core.Admin{}, fmt.Errorf("admin with mail: %s not found", mail)
 	}
 
 	return admin, err
@@ -42,10 +42,7 @@ func (r *AdminPostgres) ShowFeedback(ctx context.Context, userId int) (bool, err
 
 	query, args, err := psql.Select("id").From(feedbackTable).Where(
 		sq.And{
-			sq.Or{
-				sq.Eq{"show": false},
-				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
-			},
+			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
 			sq.Eq{"user_id": userId},
 		}).ToSql()
 
@@ -68,10 +65,7 @@ func (r *AdminPostgres) ShowRecommendation(ctx context.Context, userId int) (boo
 
 	query, args, err := psql.Select("id").From(recommendationTable).Where(
 		sq.And{
-			sq.Or{
-				sq.Eq{"show": false},
-				sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
-			},
+			sq.Lt{"EXTRACT(DAY FROM NOW()-created_at)": "7"},
 			sq.Eq{"user_id": userId},
 		}).ToSql()
 
@@ -89,11 +83,11 @@ func (r *AdminPostgres) ShowRecommendation(ctx context.Context, userId int) (boo
 	return false, err
 }
 
-func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat model.Feedback) (int, error) {
+func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat core.Feedback) (int, error) {
 	var id int
 	query, args, err := psql.Insert(feedbackTable).
-		Columns("user_id", "rating", "liked", "need_fix", "comment_fix", "comment", "show").
-		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.CommentFix, stat.Comment, stat.Show).
+		Columns("user_id", "rating", "liked", "need_fix", "comment").
+		Values(stat.UserId, stat.Rating, stat.Liked, stat.NeedFix, stat.Comment).
 		ToSql()
 
 	if err != nil {
@@ -107,11 +101,11 @@ func (r *AdminPostgres) CreateFeedback(ctx context.Context, stat model.Feedback)
 	return id, err
 }
 
-func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Recommendation) (int, error) {
+func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec core.Recommendation) (int, error) {
 	var id int
 	query, args, err := psql.Insert(recommendationTable).
-		Columns("user_id", "recommend", "show").
-		Values(rec.UserId, rec.Recommend, rec.Show).
+		Columns("user_id", "rating").
+		Values(rec.UserId, rec.Rating).
 		ToSql()
 
 	if err != nil {
@@ -125,11 +119,11 @@ func (r *AdminPostgres) CreateRecommendation(ctx context.Context, rec model.Reco
 	return id, err
 }
 
-func (r *AdminPostgres) CreateFeedFeedback(ctx context.Context, rec model.Recommendation) (int, error) {
+func (r *AdminPostgres) CreateFeedFeedback(ctx context.Context, rec core.Recommendation) (int, error) {
 	var id int
 	query, args, err := psql.Insert(feedFeedbackTable).
-		Columns("user_id", "recommend", "show").
-		Values(rec.UserId, rec.Recommend, rec.Show).
+		Columns("user_id", "rating").
+		Values(rec.UserId, rec.Rating).
 		ToSql()
 
 	if err != nil {
@@ -143,11 +137,10 @@ func (r *AdminPostgres) CreateFeedFeedback(ctx context.Context, rec model.Recomm
 	return id, err
 }
 
-func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, error) {
+func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]core.Feedback, error) {
 	query, args, err := psql.
-		Select(static.FeedbackDbField).
+		Select(constants.FeedbackDbField).
 		From(feedbackTable).
-		Where(sq.Eq{"show": true}).
 		ToSql()
 
 	if err != nil {
@@ -168,11 +161,10 @@ func (r *AdminPostgres) GetFeedbacks(ctx context.Context) ([]model.Feedback, err
 	return feedbacks, nil
 }
 
-func (r *AdminPostgres) GetRecommendations(ctx context.Context) ([]model.Recommendation, error) {
+func (r *AdminPostgres) GetRecommendations(ctx context.Context) ([]core.Recommendation, error) {
 	query, args, err := psql.
-		Select("id", "user_id", "recommend", "show").
+		Select("id", "user_id", "rating").
 		From(recommendationTable).
-		Where(sq.Eq{"show": true}).
 		ToSql()
 
 	if err != nil {
@@ -193,7 +185,7 @@ func (r *AdminPostgres) GetRecommendations(ctx context.Context) ([]model.Recomme
 	return recommendations, nil
 }
 
-func scanAdmin(row pgx.Row, admin *model.Admin) error {
+func scanAdmin(row pgx.Row, admin *core.Admin) error {
 	err := row.Scan(
 		&admin.Id,
 		&admin.Mail,
@@ -204,20 +196,18 @@ func scanAdmin(row pgx.Row, admin *model.Admin) error {
 	return err
 }
 
-func scanFeedbacks(rows pgx.Rows) ([]model.Feedback, error) {
-	var feedbacks []model.Feedback
+func scanFeedbacks(rows pgx.Rows) ([]core.Feedback, error) {
+	var feedbacks []core.Feedback
 	var err error
 	for rows.Next() {
-		var feedback model.Feedback
+		var feedback core.Feedback
 		err = rows.Scan(
 			&feedback.Id,
 			&feedback.UserId,
 			&feedback.Rating,
 			&feedback.Liked,
 			&feedback.NeedFix,
-			&feedback.CommentFix,
 			&feedback.Comment,
-			&feedback.Show,
 			&feedback.CreatedAt,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -235,16 +225,15 @@ func scanFeedbacks(rows pgx.Rows) ([]model.Feedback, error) {
 
 	return feedbacks, nil
 }
-func scanRecommendations(rows pgx.Rows) ([]model.Recommendation, error) {
-	var recommendations []model.Recommendation
+func scanRecommendations(rows pgx.Rows) ([]core.Recommendation, error) {
+	var recommendations []core.Recommendation
 	var err error
 	for rows.Next() {
-		var feedback model.Recommendation
+		var feedback core.Recommendation
 		err = rows.Scan(
 			&feedback.Id,
 			&feedback.UserId,
-			&feedback.Recommend,
-			&feedback.Show,
+			&feedback.Rating,
 		)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

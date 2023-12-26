@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"testing"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -17,14 +17,14 @@ func TestAdminService_CreateRecommendation(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		inputRec       model.Recommendation
+		inputRec       core.Recommendation
 		mockBehavior   func(r *mock_repository.MockAdmin)
 		expectedResult int
 		expectedError  error
 	}{
 		{
 			name:     "Success",
-			inputRec: model.Recommendation{},
+			inputRec: core.Recommendation{},
 			mockBehavior: func(r *mock_repository.MockAdmin) {
 				r.EXPECT().CreateRecommendation(gomock.Any(), gomock.Any()).Return(mockID, nil)
 			},
@@ -33,7 +33,7 @@ func TestAdminService_CreateRecommendation(t *testing.T) {
 		},
 		{
 			name:     "Error",
-			inputRec: model.Recommendation{},
+			inputRec: core.Recommendation{},
 			mockBehavior: func(r *mock_repository.MockAdmin) {
 				r.EXPECT().CreateRecommendation(gomock.Any(), gomock.Any()).Return(0, errors.New("error creating recommendation"))
 			},
@@ -50,7 +50,7 @@ func TestAdminService_CreateRecommendation(t *testing.T) {
 			repoAdmin := mock_repository.NewMockAdmin(ctrl)
 			test.mockBehavior(repoAdmin)
 
-			service := &AdminService{repoAdmin: repoAdmin}
+			service := &AdminService{RepoAdmin: repoAdmin}
 			result, err := service.CreateRecommendation(context.Background(), test.inputRec)
 
 			assert.Equal(t, test.expectedResult, result)
@@ -64,14 +64,14 @@ func TestAdminService_CreateFeedFeedback(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		inputRec       model.Recommendation
+		inputRec       core.Recommendation
 		mockBehavior   func(r *mock_repository.MockAdmin)
 		expectedResult int
 		expectedError  error
 	}{
 		{
 			name:     "Success",
-			inputRec: model.Recommendation{},
+			inputRec: core.Recommendation{},
 			mockBehavior: func(r *mock_repository.MockAdmin) {
 				r.EXPECT().CreateFeedFeedback(gomock.Any(), gomock.Any()).Return(mockID, nil)
 			},
@@ -80,7 +80,7 @@ func TestAdminService_CreateFeedFeedback(t *testing.T) {
 		},
 		{
 			name:     "Error",
-			inputRec: model.Recommendation{},
+			inputRec: core.Recommendation{},
 			mockBehavior: func(r *mock_repository.MockAdmin) {
 				r.EXPECT().CreateFeedFeedback(gomock.Any(), gomock.Any()).Return(0, errors.New("error creating feed feedback"))
 			},
@@ -97,7 +97,7 @@ func TestAdminService_CreateFeedFeedback(t *testing.T) {
 			repoAdmin := mock_repository.NewMockAdmin(ctrl)
 			test.mockBehavior(repoAdmin)
 
-			service := &AdminService{repoAdmin: repoAdmin}
+			service := &AdminService{RepoAdmin: repoAdmin}
 			result, err := service.CreateFeedFeedback(context.Background(), test.inputRec)
 
 			assert.Equal(t, test.expectedResult, result)
@@ -111,14 +111,14 @@ func TestAdminService_CreateFeedback(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		inputStat      model.Feedback
+		inputStat      core.Feedback
 		mockBehavior   func(r *mock_repository.MockAdmin)
 		expectedResult int
 		expectedError  error
 	}{
 		{
 			name:      "Success",
-			inputStat: model.Feedback{},
+			inputStat: core.Feedback{},
 			mockBehavior: func(r *mock_repository.MockAdmin) {
 				r.EXPECT().CreateFeedback(gomock.Any(), gomock.Any()).Return(mockID, nil)
 			},
@@ -127,7 +127,7 @@ func TestAdminService_CreateFeedback(t *testing.T) {
 		},
 		{
 			name:      "Error",
-			inputStat: model.Feedback{},
+			inputStat: core.Feedback{},
 			mockBehavior: func(r *mock_repository.MockAdmin) {
 				r.EXPECT().CreateFeedback(gomock.Any(), gomock.Any()).Return(0, errors.New("error creating feedback"))
 			},
@@ -144,7 +144,7 @@ func TestAdminService_CreateFeedback(t *testing.T) {
 			repoAdmin := mock_repository.NewMockAdmin(ctrl)
 			test.mockBehavior(repoAdmin)
 
-			service := &AdminService{repoAdmin: repoAdmin}
+			service := &AdminService{RepoAdmin: repoAdmin}
 			result, err := service.CreateFeedback(context.Background(), test.inputStat)
 
 			assert.Equal(t, test.expectedResult, result)
@@ -244,7 +244,7 @@ func TestAdminService_GetCSATType(t *testing.T) {
 			repoUser := mock_repository.NewMockUser(ctrl)
 			test.mockBehavior(repoAdmin, repoUser)
 
-			service := &AdminService{repoAdmin: repoAdmin, repoUser: repoUser}
+			service := &AdminService{RepoAdmin: repoAdmin, RepoUser: repoUser}
 			result, err := service.GetCSATType(context.Background(), test.userID)
 
 			assert.Equal(t, test.expectedResult, result)

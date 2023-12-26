@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestDialogService_CreateDialog(t *testing.T) {
-	mockDialog := model.Dialog{
+	mockDialog := core.Dialog{
 		Id:      1,
 		User1Id: 1,
 		User2Id: 2,
@@ -59,7 +59,7 @@ func TestDialogService_CreateDialog(t *testing.T) {
 }
 
 func TestDialogService_GetDialogs(t *testing.T) {
-	mockDialogs := []model.Dialog{
+	mockDialogs := []core.Dialog{
 		{Id: 1, User1Id: 1, User2Id: 2},
 		{Id: 2, User1Id: 3, User2Id: 4},
 	}
@@ -67,7 +67,7 @@ func TestDialogService_GetDialogs(t *testing.T) {
 	tests := []struct {
 		name          string
 		mockBehavior  func(r *mock_repository.MockDialog)
-		expectedList  []model.Dialog
+		expectedList  []core.Dialog
 		expectedError error
 	}{
 		{

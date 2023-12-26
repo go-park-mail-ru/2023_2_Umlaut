@@ -3,40 +3,55 @@ package service
 import (
 	"context"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 )
 
 type LikeService struct {
 	repoLike   repository.Like
 	repoDialog repository.Dialog
+	repoUser   repository.User
 }
 
-func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog) *LikeService {
-	return &LikeService{repoLike: repoLike, repoDialog: repoDialog}
+func NewLikeService(repoLike repository.Like, repoDialog repository.Dialog, repoUser repository.User) *LikeService {
+	return &LikeService{repoLike: repoLike, repoDialog: repoDialog, repoUser: repoUser}
 }
 
-func (s *LikeService) CreateLike(ctx context.Context, like model.Like) error {
+func (s *LikeService) CreateLike(ctx context.Context, like core.Like) (core.Dialog, error) {
 	_, err := s.repoLike.CreateLike(ctx, like)
-	if err != nil {
-		return err
-	}
-	if !like.IsLike {
-		return nil
+	if !like.IsLike || err != nil {
+		return core.Dialog{}, err
 	}
 	mutual, err := s.repoLike.IsMutualLike(ctx, like)
 	if err != nil {
-		return err
+		return core.Dialog{}, err
 	}
 	if mutual {
-		dialog := model.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId}
-		_, err = s.repoDialog.CreateDialog(ctx, dialog)
+		dialog := core.Dialog{User1Id: like.LikedByUserId, User2Id: like.LikedToUserId}
+		id, err := s.repoDialog.CreateDialog(ctx, dialog)
 		if err != nil {
-			return err
+			return core.Dialog{}, err
 		}
-		return static.ErrMutualLike
+		dialog.Id = id
+		return dialog, constants.ErrMutualLike
 	}
 
-	return err
+	return core.Dialog{}, err
+}
+
+func (s *LikeService) GetUserLikedToLikes(ctx context.Context, userId int) (bool, []dto.PremiumLike, error) {
+	user, err := s.repoUser.GetUserById(ctx, userId)
+	if err != nil {
+		return false, nil, err
+	}
+	likes, err := s.repoLike.GetUserLikedToLikes(ctx, userId)
+	if err != nil {
+		return false, nil, err
+	}
+	if user.Role != 2 {
+		return false, likes, nil
+	}
+	return true, likes, nil
 }

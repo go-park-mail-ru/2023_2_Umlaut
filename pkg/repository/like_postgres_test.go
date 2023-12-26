@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/pashagolub/pgxmock/v3"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -19,7 +19,7 @@ func TestLikePostgres_CreateLike(t *testing.T) {
 
 	likeRepo := NewLikePostgres(mock)
 
-	testLike := model.Like{
+	testLike := core.Like{
 		LikedByUserId: 1,
 		LikedToUserId: 2,
 		IsLike:        true,
@@ -27,11 +27,11 @@ func TestLikePostgres_CreateLike(t *testing.T) {
 
 	mock.ExpectQuery(`INSERT INTO "like"`).
 		WithArgs(testLike.LikedByUserId, testLike.LikedToUserId, testLike.IsLike).
-		WillReturnError(static.ErrAlreadyExists)
+		WillReturnError(constants.ErrAlreadyExists)
 
 	_, err = likeRepo.CreateLike(context.Background(), testLike)
 
-	assert.ErrorIs(t, err, static.ErrAlreadyExists)
+	assert.ErrorIs(t, err, constants.ErrAlreadyExists)
 
 	mock.ExpectQuery(`INSERT INTO "like"`).
 		WithArgs(testLike.LikedByUserId, testLike.LikedToUserId, testLike.IsLike).
@@ -53,7 +53,7 @@ func TestLikePostgres_IsMutualLike(t *testing.T) {
 
 	likeRepo := NewLikePostgres(mock)
 
-	testLike := model.Like{
+	testLike := core.Like{
 		LikedByUserId: 1,
 		LikedToUserId: 2,
 		IsLike:        true,

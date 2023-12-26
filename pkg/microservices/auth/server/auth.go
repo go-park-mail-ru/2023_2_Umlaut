@@ -3,11 +3,10 @@ package server
 import (
 	"context"
 	"errors"
-
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/auth/proto"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -54,7 +53,7 @@ func (as *AuthServer) SignIn(ctx context.Context, input *proto.SignInInput) (*pr
 	}
 
 	user, err := as.Authorization.GetUser(ctx, input.Mail, input.Password)
-	if errors.Is(err, static.ErrBannedUser) {
+	if errors.Is(err, constants.ErrBannedUser) {
 		return &proto.Cookie{}, status.Error(codes.PermissionDenied, err.Error())
 	}
 	if err != nil {
@@ -74,7 +73,19 @@ func (as *AuthServer) SignUp(ctx context.Context, input *proto.SignUpInput) (*pr
 		return &proto.UserId{}, status.Error(codes.InvalidArgument, "missing required fields")
 	}
 
-	user := model.User{Name: input.Name, Mail: input.Mail, PasswordHash: input.Password}
+	var invitedBy *int
+	if input.InvitedBy != "" {
+		tmp, err := as.Authorization.GetDecodeUserId(ctx, input.InvitedBy)
+		if err != nil {
+			return &proto.UserId{}, status.Error(codes.DataLoss, "failed to activate link")
+		}
+		invitedBy = &tmp
+	}
+	user := core.User{Name: input.Name,
+		Mail:         input.Mail,
+		PasswordHash: input.Password,
+		InvitedBy:    invitedBy,
+	}
 
 	id, err := as.Authorization.CreateUser(ctx, user)
 	if err != nil {

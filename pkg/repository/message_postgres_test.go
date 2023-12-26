@@ -2,25 +2,25 @@ package repository
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/pashagolub/pgxmock/v3"
 	"testing"
 	"time"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	id          = 1
-	m           = "Test message"
-	b           = false
-	t           = time.Now()
-	testMessage = model.Message{
+	messageText = "Test message"
+	isRead      = false
+	createAt    = time.Now()
+	testMessage = core.Message{
 		SenderId:  &id,
 		DialogId:  &id,
-		Text:      &m,
-		IsRead:    &b,
-		CreatedAt: &t,
+		Text:      &messageText,
+		IsRead:    &isRead,
+		CreatedAt: &createAt,
 	}
 )
 
@@ -34,9 +34,9 @@ func TestMessagePostgres_CreateMessage(t *testing.T) {
 	messageRepo := NewMessagePostgres(mock)
 
 	mock.ExpectQuery(`INSERT INTO "message"`).
-		WithArgs(testMessage.SenderId, testMessage.DialogId, testMessage.Text).
-		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "message_text", "is_read", "created_at"}).
-			AddRow(&id, &id, &id, &m, &b, nil))
+		WithArgs(testMessage.SenderId, testMessage.RecipientId, testMessage.DialogId, testMessage.Text).
+		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "recipient_id", "message_text", "is_read", "created_at"}).
+			AddRow(&id, &id, &id, &id, &messageText, &isRead, nil))
 
 	newMessage, err := messageRepo.CreateMessage(context.Background(), testMessage)
 
@@ -55,8 +55,8 @@ func TestMessagePostgres_UpdateMessage(t *testing.T) {
 
 	mock.ExpectQuery(`UPDATE "message"`).
 		WithArgs(testMessage.Text, testMessage.IsRead).
-		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "message_text", "is_read", "created_at"}).
-			AddRow(&id, &id, &id, &m, &b, nil))
+		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "recipient_id", "message_text", "is_read", "created_at"}).
+			AddRow(&id, &id, &id, &id, &messageText, &isRead, nil))
 
 	updatedMessage, err := messageRepo.UpdateMessage(context.Background(), testMessage)
 
@@ -74,15 +74,15 @@ func TestMessagePostgres_GetDialogMessages(t *testing.T) {
 	messageRepo := NewMessagePostgres(mock)
 
 	dialogID := 1
-	testMessages := []model.Message{testMessage, testMessage}
+	testMessages := []core.Message{testMessage, testMessage}
 
 	mock.ExpectQuery(`SELECT`).
-		WithArgs(dialogID).
-		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "message_text", "is_read", "created_at"}).
-			AddRow(testMessages[0].Id, testMessages[0].DialogId, testMessages[0].SenderId, testMessages[0].Text, testMessages[0].IsRead, testMessages[0].CreatedAt).
-			AddRow(testMessages[1].Id, testMessages[1].DialogId, testMessages[1].SenderId, testMessages[1].Text, testMessages[1].IsRead, testMessages[1].CreatedAt))
+		WithArgs(dialogID, dialogID, dialogID, dialogID).
+		WillReturnRows(pgxmock.NewRows([]string{"id", "dialog_id", "sender_id", "recipient_id", "message_text", "is_read", "created_at"}).
+			AddRow(testMessages[0].Id, testMessages[0].DialogId, testMessages[0].SenderId, testMessages[0].RecipientId, testMessages[0].Text, testMessages[0].IsRead, testMessages[0].CreatedAt).
+			AddRow(testMessages[1].Id, testMessages[1].DialogId, testMessages[1].SenderId, testMessages[1].RecipientId, testMessages[1].Text, testMessages[1].IsRead, testMessages[1].CreatedAt))
 
-	messages, err := messageRepo.GetDialogMessages(context.Background(), dialogID)
+	messages, err := messageRepo.GetDialogMessages(context.Background(), dialogID, dialogID)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, messages)

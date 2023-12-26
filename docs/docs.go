@@ -31,7 +31,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_Complaint"
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_Complaint"
                         }
                     },
                     "401": {
@@ -150,7 +150,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_FeedbackStatistic"
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_FeedbackStatistic"
                         }
                     },
                     "500": {
@@ -179,7 +179,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_RecommendationStatistic"
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_RecommendationStatistic"
                         }
                     },
                     "500": {
@@ -211,7 +211,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.signInInput"
+                            "$ref": "#/definitions/dto.SignInInput"
                         }
                     }
                 ],
@@ -257,7 +257,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.signInInput"
+                            "$ref": "#/definitions/dto.SignInInput"
                         }
                     }
                 ],
@@ -338,7 +338,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.signUpInput"
+                            "$ref": "#/definitions/dto.SignUpInput"
                         }
                     }
                 ],
@@ -346,7 +346,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-handler_idResponse"
+                            "$ref": "#/definitions/handler.ClientResponseDto-dto_IdResponse"
                         }
                     },
                     "400": {
@@ -357,6 +357,99 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "414": {
+                        "description": "Request URI Too Long",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/vk-login": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vk-auth"
+                ],
+                "summary": "redirect to VK",
+                "operationId": "vk-login",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "invite_by value",
+                        "name": "invite_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/vk-sign-up": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vk-auth"
+                ],
+                "summary": "need call after redirect VK",
+                "operationId": "vk-sign-up",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "code from oauth",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "invite_by param",
+                        "name": "invite_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-dto_IdResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "414": {
+                        "description": "Request URI Too Long",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -384,7 +477,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Complaint"
+                            "$ref": "#/definitions/core.Complaint"
                         }
                     }
                 ],
@@ -439,7 +532,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_ComplaintType"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_core_ComplaintType"
                         }
                     },
                     "401": {
@@ -474,7 +567,51 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Dialog"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_core_Dialog"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/dialogs/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dialog"
+                ],
+                "summary": "get dialog by id",
+                "operationId": "dialogById",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "dialog ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_Dialog"
                         }
                     },
                     "401": {
@@ -507,7 +644,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Dialog ID",
+                        "description": "Recipient ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -517,7 +654,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-array_model_Message"
+                            "$ref": "#/definitions/handler.ClientResponseDto-array_core_Message"
                         }
                     },
                     "401": {
@@ -572,7 +709,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-dto_FeedData"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "402": {
+                        "description": "Payment Required",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
                     },
                     "500": {
@@ -604,7 +765,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Recommendation"
+                            "$ref": "#/definitions/core.Recommendation"
                         }
                     }
                 ],
@@ -644,7 +805,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Feedback"
+                            "$ref": "#/definitions/core.Feedback"
                         }
                     }
                 ],
@@ -684,13 +845,59 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Like"
+                            "$ref": "#/definitions/core.Like"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/premium/likes": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "like"
+                ],
+                "summary": "get users who have liked the user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-dto_PremiumLike"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "402": {
+                        "description": "Payment Required",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -724,7 +931,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Recommendation"
+                            "$ref": "#/definitions/core.Recommendation"
                         }
                     }
                 ],
@@ -825,7 +1032,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_User"
                         }
                     },
                     "404": {
@@ -861,7 +1068,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/core.User"
                         }
                     }
                 ],
@@ -869,7 +1076,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_User"
                         }
                     },
                     "401": {
@@ -950,7 +1157,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.deleteLink"
+                            "$ref": "#/definitions/dto.DeleteLink"
                         }
                     }
                 ],
@@ -975,6 +1182,37 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/share": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "get user share link",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-dto_ShareCridentialsOutput"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ClientResponseDto-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/handler.ClientResponseDto-string"
                         }
@@ -1008,7 +1246,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ClientResponseDto-model_User"
+                            "$ref": "#/definitions/handler.ClientResponseDto-core_User"
                         }
                     },
                     "404": {
@@ -1058,227 +1296,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.ClientResponseDto-array_model_ComplaintType": {
+        "core.Complaint": {
             "type": "object",
             "properties": {
-                "message": {
+                "complaint_text": {
                     "type": "string"
                 },
-                "payload": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.ComplaintType"
-                    }
-                },
-                "status": {
+                "complaint_type_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-array_model_Dialog": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Dialog"
-                    }
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-array_model_Message": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Message"
-                    }
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-array_string": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-handler_idResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "$ref": "#/definitions/handler.idResponse"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-int": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "integer"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-model_Complaint": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "$ref": "#/definitions/model.Complaint"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-model_FeedbackStatistic": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "$ref": "#/definitions/model.FeedbackStatistic"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-model_RecommendationStatistic": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "$ref": "#/definitions/model.RecommendationStatistic"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-model_User": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "$ref": "#/definitions/model.User"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.ClientResponseDto-string": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.deleteLink": {
-            "type": "object",
-            "properties": {
-                "link": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.idResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.signInInput": {
-            "type": "object",
-            "required": [
-                "mail",
-                "password"
-            ],
-            "properties": {
-                "mail": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.signUpInput": {
-            "type": "object",
-            "required": [
-                "mail",
-                "name",
-                "password"
-            ],
-            "properties": {
-                "mail": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Complaint": {
-            "type": "object",
-            "properties": {
-                "complaint_type": {
-                    "type": "string"
                 },
                 "created_at": {
                     "type": "string"
@@ -1294,7 +1319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.ComplaintType": {
+        "core.ComplaintType": {
             "type": "object",
             "properties": {
                 "id": {
@@ -1305,7 +1330,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Dialog": {
+        "core.Dialog": {
             "type": "object",
             "properties": {
                 "banned": {
@@ -1318,7 +1343,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "last_message": {
-                    "$ref": "#/definitions/model.Message"
+                    "$ref": "#/definitions/core.Message"
                 },
                 "user1_id": {
                     "type": "integer"
@@ -1334,13 +1359,10 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Feedback": {
+        "core.Feedback": {
             "type": "object",
             "properties": {
                 "comment": {
-                    "type": "string"
-                },
-                "comment_fix": {
                     "type": "string"
                 },
                 "created_at": {
@@ -1358,15 +1380,12 @@ const docTemplate = `{
                 "rating": {
                     "type": "integer"
                 },
-                "show": {
-                    "type": "boolean"
-                },
                 "user_id": {
                     "type": "integer"
                 }
             }
         },
-        "model.FeedbackStatistic": {
+        "core.FeedbackStatistic": {
             "type": "object",
             "properties": {
                 "avg-rating": {
@@ -1387,7 +1406,7 @@ const docTemplate = `{
                 "need-fix-map": {
                     "type": "object",
                     "additionalProperties": {
-                        "$ref": "#/definitions/model.NeedFixObject"
+                        "$ref": "#/definitions/core.NeedFixObject"
                     }
                 },
                 "rating-count": {
@@ -1398,7 +1417,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Like": {
+        "core.Like": {
             "type": "object",
             "properties": {
                 "is_like": {
@@ -1409,7 +1428,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Message": {
+        "core.Message": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1427,12 +1446,15 @@ const docTemplate = `{
                 "message_text": {
                     "type": "string"
                 },
+                "recipient_id": {
+                    "type": "integer"
+                },
                 "sender_id": {
                     "type": "integer"
                 }
             }
         },
-        "model.NeedFixObject": {
+        "core.NeedFixObject": {
             "type": "object",
             "properties": {
                 "comment_fix": {
@@ -1446,7 +1468,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Recommendation": {
+        "core.Recommendation": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -1455,18 +1477,15 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "recommend": {
+                "rating": {
                     "type": "integer"
-                },
-                "show": {
-                    "type": "boolean"
                 },
                 "user_id": {
                     "type": "integer"
                 }
             }
         },
-        "model.RecommendationStatistic": {
+        "core.RecommendationStatistic": {
             "type": "object",
             "properties": {
                 "avg-recommend": {
@@ -1483,7 +1502,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.User": {
+        "core.User": {
             "type": "object",
             "required": [
                 "mail",
@@ -1524,6 +1543,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "oauthId": {
+                    "type": "integer"
+                },
                 "online": {
                     "type": "boolean"
                 },
@@ -1533,6 +1555,9 @@ const docTemplate = `{
                 "prefer_gender": {
                     "type": "integer"
                 },
+                "role": {
+                    "type": "integer"
+                },
                 "tags": {
                     "type": "array",
                     "items": {
@@ -1540,6 +1565,321 @@ const docTemplate = `{
                     }
                 },
                 "user_gender": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DeleteLink": {
+            "type": "object",
+            "properties": {
+                "link": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FeedData": {
+            "type": "object",
+            "properties": {
+                "like_counter": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/core.User"
+                }
+            }
+        },
+        "dto.IdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.PremiumLike": {
+            "type": "object",
+            "properties": {
+                "image_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "liked_by_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ShareCridentialsOutput": {
+            "type": "object",
+            "required": [
+                "invites_count",
+                "share_link"
+            ],
+            "properties": {
+                "invites_count": {
+                    "type": "integer"
+                },
+                "share_link": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SignInInput": {
+            "type": "object",
+            "required": [
+                "mail",
+                "password"
+            ],
+            "properties": {
+                "mail": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SignUpInput": {
+            "type": "object",
+            "required": [
+                "mail",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "invited_by": {
+                    "type": "string"
+                },
+                "mail": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.ClientResponseDto-array_core_ComplaintType": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/core.ComplaintType"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-array_core_Dialog": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/core.Dialog"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-array_core_Message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/core.Message"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-array_string": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-core_Complaint": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/core.Complaint"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-core_Dialog": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/core.Dialog"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-core_FeedbackStatistic": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/core.FeedbackStatistic"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-core_RecommendationStatistic": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/core.RecommendationStatistic"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-core_User": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/core.User"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-dto_FeedData": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/dto.FeedData"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-dto_IdResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/dto.IdResponse"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-dto_PremiumLike": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/dto.PremiumLike"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-dto_ShareCridentialsOutput": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/dto.ShareCridentialsOutput"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-int": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.ClientResponseDto-string": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "integer"
                 }
             }

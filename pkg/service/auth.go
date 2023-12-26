@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
-
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/service/utils.go"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/utils"
+	"strconv"
 )
 
 type AuthService struct {
@@ -22,23 +21,26 @@ func NewAuthService(repoUser repository.User, repoStore repository.Store, repoAd
 	return &AuthService{repoUser: repoUser, repoStore: repoStore, repoAdmin: repoAdmin}
 }
 
-func (s *AuthService) CreateUser(ctx context.Context, user model.User) (int, error) {
+func (s *AuthService) CreateUser(ctx context.Context, user core.User) (int, error) {
 	if !user.IsValid() {
 		return 0, errors.New("invalid fields")
+	}
+	if user.InvitedBy != nil && *user.InvitedBy == 0 {
+		user.InvitedBy = nil
 	}
 	user.Salt = utils.GenerateUuid()
 	user.PasswordHash = utils.GeneratePasswordHash(user.PasswordHash, user.Salt)
 	id, err := s.repoUser.CreateUser(ctx, user)
-	if errors.Is(err, static.ErrAlreadyExists) {
+	if errors.Is(err, constants.ErrAlreadyExists) {
 		fmt.Println("account with this email already exists")
 	}
 	return id, err
 }
 
-func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model.User, error) {
+func (s *AuthService) GetUser(ctx context.Context, mail, password string) (core.User, error) {
 	user, err := s.repoUser.GetUser(ctx, mail)
-	if errors.Is(err, static.ErrBannedUser) {
-		return model.User{}, err
+	if errors.Is(err, constants.ErrBannedUser) {
+		return core.User{}, err
 	}
 	if err != nil {
 		return user, err
@@ -51,7 +53,7 @@ func (s *AuthService) GetUser(ctx context.Context, mail, password string) (model
 	return user, nil
 }
 
-func (s *AuthService) GetAdmin(ctx context.Context, mail, password string) (model.Admin, error) {
+func (s *AuthService) GetAdmin(ctx context.Context, mail, password string) (core.Admin, error) {
 	admin, err := s.repoAdmin.GetAdmin(ctx, mail)
 	if err != nil {
 		return admin, err
@@ -64,9 +66,21 @@ func (s *AuthService) GetAdmin(ctx context.Context, mail, password string) (mode
 	return admin, nil
 }
 
+func (s *AuthService) OAuth(ctx context.Context, user core.User, invite string) (int, error) {
+	tmp, _ := s.GetDecodeUserId(ctx, invite)
+	if tmp > 0 {
+		user.InvitedBy = &tmp
+	}
+	id, err := s.repoUser.InsertOrUpdateUser(ctx, user)
+	if errors.Is(err, constants.ErrAlreadyExists) {
+		fmt.Println("account with this email already exists")
+	}
+	return id, err
+}
+
 func (s *AuthService) GenerateCookie(ctx context.Context, id int) (string, error) {
 	SID := utils.GenerateUuid()
-	if err := s.repoStore.SetSession(ctx, SID, id, 10*time.Hour); err != nil {
+	if err := s.repoStore.SetSession(ctx, SID, id, constants.CookieExpire); err != nil {
 		return SID, err
 	}
 
@@ -88,4 +102,13 @@ func (s *AuthService) GetSessionValue(ctx context.Context, session string) (int,
 	}
 
 	return id, nil
+}
+
+func (s *AuthService) GetDecodeUserId(ctx context.Context, message string) (int, error) {
+	newMessage, err := utils.DecryptString(message)
+	if err != nil {
+		return 0, fmt.Errorf("GetDecodeUserId error: %v", err)
+	}
+
+	return strconv.Atoi(newMessage)
 }

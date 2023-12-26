@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc/keepalive"
 
+	initial "github.com/go-park-mail-ru/2023_2_Umlaut/cmd"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/proto"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/interceptors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/utils"
 
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/microservices/admin/server"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository"
@@ -23,30 +23,31 @@ import (
 )
 
 func main() {
+	initial.InitConfig()
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	ctx := context.Background()
 
-	db_admin, err := utils.InitPostgresAdmin(ctx)
+	dbAdmin, err := initial.InitPostgresAdmin(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize Postgres admin: %s", err.Error())
 	}
 
-	db_umlaut, err := utils.InitPostgres(ctx)
+	dbUmlaut, err := initial.InitPostgres(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize Postgres umlaut: %s", err.Error())
 	}
 
-	sessionStore, err := utils.InitRedis()
+	sessionStore, err := initial.InitRedis()
 	if err != nil {
 		log.Fatalf("failed to initialize redisDb: %s", err.Error())
 	}
 	defer sessionStore.Close()
 
 	adminService := service.NewAdminService(
-		repository.NewAdminPostgres(db_admin),
-		repository.NewUserPostgres(db_umlaut),
+		repository.NewAdminPostgres(dbAdmin),
+		repository.NewUserPostgres(dbUmlaut),
 	)
-	complaintService := service.NewComplaintService(repository.NewComplaintPostgres(db_umlaut))
+	complaintService := service.NewComplaintService(repository.NewComplaintPostgres(dbUmlaut))
 
 	adminServer := server.NewAdminServer(adminService, complaintService)
 	viper.GetString("admin.port")
@@ -57,8 +58,8 @@ func main() {
 
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			grpc.UnaryServerInterceptor(interceptors.PanicRecoveryInterceptor),
-			grpc.UnaryServerInterceptor(grpc_prometheus.UnaryServerInterceptor),
+			interceptors.PanicRecoveryInterceptor,
+			grpc_prometheus.UnaryServerInterceptor,
 		),
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),

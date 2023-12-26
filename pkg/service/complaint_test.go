@@ -3,16 +3,16 @@ package service
 import (
 	"context"
 	"errors"
+	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"testing"
 
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestComplaintService_GetComplaintTypes(t *testing.T) {
-	mockComplaintTypes := []model.ComplaintType{
+	mockComplaintTypes := []core2.ComplaintType{
 		{Id: 1, TypeName: "Type1"},
 		{Id: 2, TypeName: "Type2"},
 	}
@@ -20,7 +20,7 @@ func TestComplaintService_GetComplaintTypes(t *testing.T) {
 	tests := []struct {
 		name           string
 		mockBehavior   func(r *mock_repository.MockComplaint)
-		expectedResult []model.ComplaintType
+		expectedResult []core2.ComplaintType
 		expectedError  error
 	}{
 		{
@@ -49,7 +49,7 @@ func TestComplaintService_GetComplaintTypes(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			complaintTypes, err := service.GetComplaintTypes(context.Background())
 
 			assert.Equal(t, test.expectedResult, complaintTypes)
@@ -63,14 +63,14 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		inputComplaint model.Complaint
+		inputComplaint core2.Complaint
 		mockBehavior   func(r *mock_repository.MockComplaint)
 		expectedResult int
 		expectedError  error
 	}{
 		{
 			name:           "Success",
-			inputComplaint: model.Complaint{ComplaintType: "Test Complaint"},
+			inputComplaint: core2.Complaint{ComplaintTypeId: 1},
 			mockBehavior: func(r *mock_repository.MockComplaint) {
 				r.EXPECT().CreateComplaint(gomock.Any(), gomock.Any()).Return(mockComplaintID, nil)
 			},
@@ -79,7 +79,7 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 		},
 		{
 			name:           "Error",
-			inputComplaint: model.Complaint{},
+			inputComplaint: core2.Complaint{},
 			mockBehavior: func(r *mock_repository.MockComplaint) {
 				r.EXPECT().CreateComplaint(gomock.Any(), gomock.Any()).Return(0, errors.New("error creating complaint"))
 			},
@@ -96,7 +96,7 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			complaintID, err := service.CreateComplaint(context.Background(), test.inputComplaint)
 
 			assert.Equal(t, test.expectedResult, complaintID)
@@ -106,15 +106,15 @@ func TestComplaintService_CreateComplaint(t *testing.T) {
 }
 
 func TestComplaintService_GetNextComplaint(t *testing.T) {
-	mockComplaint := model.Complaint{
-		Id:            1,
-		ComplaintType: "Test Complaint",
+	mockComplaint := core2.Complaint{
+		Id:              1,
+		ComplaintTypeId: 1,
 	}
 
 	tests := []struct {
 		name           string
 		mockBehavior   func(r *mock_repository.MockComplaint)
-		expectedResult model.Complaint
+		expectedResult core2.Complaint
 		expectedError  error
 	}{
 		{
@@ -128,9 +128,9 @@ func TestComplaintService_GetNextComplaint(t *testing.T) {
 		{
 			name: "Error",
 			mockBehavior: func(r *mock_repository.MockComplaint) {
-				r.EXPECT().GetNextComplaint(gomock.Any()).Return(model.Complaint{}, errors.New("error getting next complaint"))
+				r.EXPECT().GetNextComplaint(gomock.Any()).Return(core2.Complaint{}, errors.New("error getting next complaint"))
 			},
-			expectedResult: model.Complaint{},
+			expectedResult: core2.Complaint{},
 			expectedError:  errors.New("error getting next complaint"),
 		},
 	}
@@ -143,7 +143,7 @@ func TestComplaintService_GetNextComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			complaint, err := service.GetNextComplaint(context.Background())
 
 			assert.Equal(t, test.expectedResult, complaint)
@@ -163,7 +163,7 @@ func TestComplaintService_AcceptComplaint(t *testing.T) {
 			name:        "Success",
 			complaintID: 1,
 			mockBehavior: func(r *mock_repository.MockComplaint) {
-				r.EXPECT().AcceptComplaint(gomock.Any(), 1).Return(model.Complaint{}, nil)
+				r.EXPECT().AcceptComplaint(gomock.Any(), 1).Return(core2.Complaint{}, nil)
 			},
 			expectedError: nil,
 		},
@@ -171,7 +171,7 @@ func TestComplaintService_AcceptComplaint(t *testing.T) {
 			name:        "Error",
 			complaintID: 0,
 			mockBehavior: func(r *mock_repository.MockComplaint) {
-				r.EXPECT().AcceptComplaint(gomock.Any(), 0).Return(model.Complaint{}, errors.New("error accepting complaint"))
+				r.EXPECT().AcceptComplaint(gomock.Any(), 0).Return(core2.Complaint{}, errors.New("error accepting complaint"))
 			},
 			expectedError: errors.New("AcceptComplaint error: error accepting complaint"),
 		},
@@ -185,7 +185,7 @@ func TestComplaintService_AcceptComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			err := service.AcceptComplaint(context.Background(), test.complaintID)
 
 			assert.Equal(t, test.expectedError, err)
@@ -226,7 +226,7 @@ func TestComplaintService_DeleteComplaint(t *testing.T) {
 			repoComplaint := mock_repository.NewMockComplaint(ctrl)
 			test.mockBehavior(repoComplaint)
 
-			service := &ComplaintService{repoComplaint: repoComplaint}
+			service := &ComplaintService{RepoComplaint: repoComplaint}
 			err := service.DeleteComplaint(context.Background(), test.complaintID)
 
 			assert.Equal(t, test.expectedError, err)

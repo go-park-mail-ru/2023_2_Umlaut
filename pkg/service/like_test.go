@@ -3,16 +3,16 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	core2 "github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
 	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/repository/mocks"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestLikeService_CreateLike(t *testing.T) {
-	mockLike := model.Like{
+	mockLike := core2.Like{
 		LikedByUserId: 1,
 		LikedToUserId: 2,
 		IsLike:        true,
@@ -30,7 +30,7 @@ func TestLikeService_CreateLike(t *testing.T) {
 				r.EXPECT().IsMutualLike(gomock.Any(), mockLike).Return(true, nil)
 				d.EXPECT().CreateDialog(gomock.Any(), gomock.Any()).Return(0, nil)
 			},
-			expectedError: static.ErrMutualLike,
+			expectedError: constants.ErrMutualLike,
 		},
 		{
 			name: "Non-Mutual Like",
@@ -73,11 +73,12 @@ func TestLikeService_CreateLike(t *testing.T) {
 
 			repoLike := mock_repository.NewMockLike(c)
 			repoDialog := mock_repository.NewMockDialog(c)
+			repoUser := mock_repository.NewMockUser(c)
 
 			test.mockBehavior(repoLike, repoDialog)
 
-			service := &LikeService{repoLike, repoDialog}
-			result := service.CreateLike(context.Background(), mockLike)
+			service := &LikeService{repoLike, repoDialog, repoUser}
+			_, result := service.CreateLike(context.Background(), mockLike)
 
 			assert.Equal(t, test.expectedError, result)
 		})

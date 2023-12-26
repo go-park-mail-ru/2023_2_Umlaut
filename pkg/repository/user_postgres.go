@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/constants"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/core"
+	"github.com/go-park-mail-ru/2023_2_Umlaut/pkg/model/dto"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/model"
-	"github.com/go-park-mail-ru/2023_2_Umlaut/static"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -22,11 +23,16 @@ func NewUserPostgres(db PgxPoolInterface) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
-func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, error) {
+func (r *UserPostgres) CreateUser(ctx context.Context, user core.User) (int, error) {
 	var id int
+
+	var mail *string
+	if len(user.Mail) > 1 {
+		mail = &user.Mail
+	}
 	query, args, err := psql.Insert(userTable).
-		Columns("name", "mail", "password_hash", "salt").
-		Values(user.Name, user.Mail, user.PasswordHash, user.Salt).
+		Columns("name", "mail", "password_hash", "salt", "user_gender", "prefer_gender", "birthday", "image_paths", "invited_by", "oauth_id").
+		Values(user.Name, mail, user.PasswordHash, user.Salt, user.UserGender, user.PreferGender, user.Birthday, user.ImagePaths, user.InvitedBy, user.OauthId).
 		ToSql()
 
 	if err != nil {
@@ -38,17 +44,37 @@ func (r *UserPostgres) CreateUser(ctx context.Context, user model.User) (int, er
 	err = row.Scan(&id)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return 0, static.ErrAlreadyExists
+			return 0, constants.ErrAlreadyExists
 		}
 		return 0, err
 	}
 	return id, err
 }
 
-func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, error) {
-	var user model.User
+func (r *UserPostgres) InsertOrUpdateUser(ctx context.Context, user core.User) (int, error) {
+	var id int
+	query, args, err := psql.Select("id").From(userTable).
+		Where(sq.Eq{"oauth_id": user.OauthId}).ToSql()
 
-	query, args, err := psql.Select(static.UserDbField).From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
+	if err != nil {
+		return 0, err
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return r.CreateUser(ctx, user)
+	} else if err != nil || id > 0 {
+		return id, err
+	}
+
+	return r.CreateUser(ctx, user)
+}
+
+func (r *UserPostgres) GetUser(ctx context.Context, mail string) (core.User, error) {
+	var user core.User
+
+	query, args, err := psql.Select(constants.UserDbField).From(userTable).Where(sq.Eq{"mail": mail}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -58,19 +84,19 @@ func (r *UserPostgres) GetUser(ctx context.Context, mail string) (model.User, er
 	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, fmt.Errorf("user with mail: %s not found", mail)
+		return core.User{}, fmt.Errorf("user with mail: %s not found", mail)
 	}
-	if user.Banned {
-		return model.User{}, static.ErrBannedUser
+	if user.Role == constants.Banned {
+		return core.User{}, constants.ErrBannedUser
 	}
 
 	return user, err
 }
 
-func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, error) {
-	var user model.User
+func (r *UserPostgres) GetUserById(ctx context.Context, id int) (core.User, error) {
+	var user core.User
 
-	query, args, err := psql.Select(static.UserDbField).From(userTable).Where(sq.Eq{"id": id}).ToSql()
+	query, args, err := psql.Select(constants.UserDbField).From(userTable).Where(sq.Eq{"id": id}).ToSql()
 
 	if err != nil {
 		return user, err
@@ -80,19 +106,19 @@ func (r *UserPostgres) GetUserById(ctx context.Context, id int) (model.User, err
 	err = scanUser(row, &user)
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return model.User{}, fmt.Errorf("user with id: %d not found", id)
+		return core.User{}, fmt.Errorf("user with id: %d not found", id)
 	}
-	if user.Banned {
-		return model.User{}, static.ErrBannedUser
+	if user.Role == constants.Banned {
+		return core.User{}, constants.ErrBannedUser
 	}
 
 	return user, err
 }
 
-func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params model.FilterParams) (model.User, error) {
-	var nextUser model.User
+func (r *UserPostgres) GetNextUser(ctx context.Context, user core.User, params dto.FilterParams) (core.User, error) {
+	var nextUser core.User
 
-	queryBuilder := psql.Select(static.UserDbField).
+	queryBuilder := psql.Select(constants.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
 		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)).
@@ -121,7 +147,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user model.User, params 
 	err = scanUser(row, &nextUser)
 
 	if errors.Is(err, pgx.ErrNoRows) || nextUser.Id == 0 {
-		return model.User{}, fmt.Errorf("user for: %s not found", user.Mail)
+		return core.User{}, fmt.Errorf("user for: %s not found", user.Mail)
 	}
 
 	return nextUser, err
@@ -138,10 +164,14 @@ func buildTagArray(tags []string) string {
 	return arrayString
 }
 
-func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.User, error) {
+func (r *UserPostgres) UpdateUser(ctx context.Context, user core.User) (core.User, error) {
+	var mail *string
+	if len(user.Mail) > 1 {
+		mail = &user.Mail
+	}
 	query, args, err := psql.Update(userTable).
 		Set("name", user.Name).
-		Set("mail", user.Mail).
+		Set("mail", mail).
 		Set("user_gender", user.UserGender).
 		Set("prefer_gender", user.PreferGender).
 		Set("description", user.Description).
@@ -155,24 +185,24 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user model.User) (model.U
 		ToSql()
 
 	if err != nil {
-		return model.User{}, err
+		return core.User{}, err
 	}
 
-	query += fmt.Sprintf(" RETURNING %s", static.UserDbField)
-	var updatedUser model.User
+	query += fmt.Sprintf(" RETURNING %s", constants.UserDbField)
+	var updatedUser core.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-			return updatedUser, static.ErrAlreadyExists
+			return updatedUser, constants.ErrAlreadyExists
 		}
 	}
 
 	return updatedUser, err
 }
 
-func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) error {
+func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core.User) error {
 	query, args, err := psql.Update(userTable).
 		Set("password_hash", user.PasswordHash).
 		Set("salt", user.Salt).
@@ -183,8 +213,8 @@ func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user model.User) 
 		return err
 	}
 
-	query += fmt.Sprintf(" RETURNING %s", static.UserDbField)
-	var updatedUser model.User
+	query += fmt.Sprintf(" RETURNING %s", constants.UserDbField)
+	var updatedUser core.User
 	row := r.db.QueryRow(ctx, query, args...)
 	err = scanUser(row, &updatedUser)
 
@@ -214,11 +244,38 @@ func (r *UserPostgres) ShowCSAT(ctx context.Context, userId int) (bool, error) {
 	return false, err
 }
 
-func scanUser(row pgx.Row, user *model.User) error {
+func (r *UserPostgres) GetUserInvites(ctx context.Context, userId int) (int, error) {
+	var count int
+
+	query, args, err := psql.Select("count(id)").From(userTable).
+		Where(fmt.Sprintf("invited_by = %d AND description IS NOT NULL", userId)).
+		ToSql()
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to get user invites. err: %w", err)
+	}
+
+	row := r.db.QueryRow(ctx, query, args...)
+	err = row.Scan(&count)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, nil
+	}
+
+	return count, err
+}
+
+func (r *UserPostgres) ResetLikeCounter(ctx context.Context) error {
+	_, err := r.db.Exec(ctx, fmt.Sprintf("update %s set like_counter = default where role != 2;", userTable))
+	return err
+}
+
+func scanUser(row pgx.Row, user *core.User) error {
+	var mail *string
 	err := row.Scan(
 		&user.Id,
 		&user.Name,
-		&user.Mail,
+		&mail,
 		&user.PasswordHash,
 		&user.Salt,
 		&user.UserGender,
@@ -229,10 +286,15 @@ func scanUser(row pgx.Row, user *model.User) error {
 		&user.Education,
 		&user.Hobbies,
 		&user.Birthday,
-		&user.Banned,
+		&user.Role,
+		&user.LikeCounter,
 		&user.Online,
 		&user.Tags,
+		&user.OauthId,
 	)
+	if mail != nil {
+		user.Mail = *mail
+	}
 
 	user.CalculateAge()
 	return err
