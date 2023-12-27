@@ -210,8 +210,8 @@ func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, user core.User) erro
 	if err != nil {
 		return err
 	}
-	_ = r.db.QueryRow(ctx, query, args...)
-	return nil
+	_, err = r.db.Exec(ctx, query, args...)
+	return err
 }
 
 func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core.User) error {
