@@ -24,6 +24,7 @@ type User interface {
 	GetUserById(ctx context.Context, id int) (core.User, error)
 	GetNextUser(ctx context.Context, user core.User, params dto.FilterParams) (core.User, error)
 	UpdateUser(ctx context.Context, user core.User) (core.User, error)
+	UpdateUserPhoto(ctx context.Context, user core.User) error
 	UpdateUserPassword(ctx context.Context, user core.User) error
 	ShowCSAT(ctx context.Context, userId int) (bool, error)
 	GetUserInvites(ctx context.Context, userId int) (int, error)
