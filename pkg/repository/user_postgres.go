@@ -201,6 +201,19 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user core.User) (core.Use
 	return updatedUser, err
 }
 
+func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, user core.User) error {
+	query, args, err := psql.Update(userTable).
+		Set("image_paths", user.ImagePaths).
+		Where(sq.Eq{"id": user.Id}).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+	_ = r.db.QueryRow(ctx, query, args...)
+	return nil
+}
+
 func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core.User) error {
 	query, args, err := psql.Update(userTable).
 		Set("password_hash", user.PasswordHash).

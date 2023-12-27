@@ -188,6 +188,20 @@ func (mr *MockUserMockRecorder) UpdateUserPassword(ctx, user interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPassword", reflect.TypeOf((*MockUser)(nil).UpdateUserPassword), ctx, user)
 }
 
+// UpdateUserPhoto mocks base method.
+func (m *MockUser) UpdateUserPhoto(ctx context.Context, user core.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUserPhoto", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUserPhoto indicates an expected call of UpdateUserPhoto.
+func (mr *MockUserMockRecorder) UpdateUserPhoto(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserPhoto", reflect.TypeOf((*MockUser)(nil).UpdateUserPhoto), ctx, user)
+}
+
 // MockLike is a mock of Like interface.
 type MockLike struct {
 	ctrl     *gomock.Controller

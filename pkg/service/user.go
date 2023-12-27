@@ -91,7 +91,7 @@ func (s *UserService) CreateFile(ctx context.Context, userId int, file multipart
 	} else {
 		*currentUser.ImagePaths = append(*currentUser.ImagePaths, link)
 	}
-	_, err = s.repoUser.UpdateUser(ctx, currentUser)
+	err = s.repoUser.UpdateUserPhoto(ctx, currentUser)
 	if err != nil {
 		return link, fmt.Errorf("CreateFile error: %v", err)
 	}
@@ -117,7 +117,7 @@ func (s *UserService) DeleteFile(ctx context.Context, userId int, link string) e
 	}
 	*currentUser.ImagePaths = utils.Remove(*currentUser.ImagePaths, link)
 
-	_, err = s.repoUser.UpdateUser(ctx, currentUser)
+	err = s.repoUser.UpdateUserPhoto(ctx, currentUser)
 	if err != nil {
 		return fmt.Errorf("DeleteFile error: %v", err)
 	}
