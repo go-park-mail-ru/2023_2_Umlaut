@@ -1,3 +1,14 @@
+CREATE
+    OR REPLACE FUNCTION calculate_age(birth_date DATE)
+    RETURNS INTEGER AS
+$$
+BEGIN
+    RETURN DATE_PART('year', CURRENT_DATE) - DATE_PART('year', birth_date);
+END;
+$$
+    LANGUAGE plpgsql
+    IMMUTABLE;
+
 CREATE TABLE "user"
 (
     id            SERIAL PRIMARY KEY,
@@ -15,9 +26,10 @@ CREATE TABLE "user"
     birthday      DATE,
     role          SMALLINT NOT NULL DEFAULT 1 CHECK (role BETWEEN 1 AND 3),
     invited_by    INT      REFERENCES "user" (id) ON DELETE SET NULL,
-    like_counter  INT               DEFAULT 50,
+    like_counter  INT               DEFAULT 30,
     online        BOOLEAN  NOT NULL DEFAULT FALSE,
     tags          TEXT[]            DEFAULT ARRAY []::TEXT[],
+    age           INTEGER GENERATED ALWAYS AS (calculate_age(birthday)) STORED,
     oauth_id      INT UNIQUE,
     created_at    TIMESTAMPTZ       DEFAULT timezone('Europe/Moscow'::text, NOW()),
     updated_at    TIMESTAMPTZ       DEFAULT timezone('Europe/Moscow'::text, NOW())

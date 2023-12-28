@@ -121,16 +121,17 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user core.User, params d
 	queryBuilder := psql.Select(constants.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
+		Where(sq.NotEq{"role": constants.Banned}).
 		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)).
 		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = %d)", likeTable, user.Id))
 
 	if user.PreferGender != nil && user.UserGender != nil {
 		queryBuilder = queryBuilder.Where(sq.Eq{"user_gender": user.PreferGender, "prefer_gender": user.UserGender})
 	}
-	if params.MinAge > 0 {
+	if params.MinAge != 0 {
 		queryBuilder = queryBuilder.Where(sq.GtOrEq{"age": params.MinAge})
 	}
-	if params.MaxAge > 0 {
+	if params.MaxAge != 0 {
 		queryBuilder = queryBuilder.Where(sq.LtOrEq{"age": params.MaxAge})
 	}
 	if len(params.Tags) > 0 && len(params.Tags[0]) > 1 {
@@ -177,7 +178,6 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user core.User) (core.Use
 		Set("description", user.Description).
 		Set("birthday", user.Birthday).
 		Set("looking", user.Looking).
-		Set("image_paths", user.ImagePaths).
 		Set("education", user.Education).
 		Set("hobbies", user.Hobbies).
 		Set("tags", user.Tags).
@@ -200,6 +200,19 @@ func (r *UserPostgres) UpdateUser(ctx context.Context, user core.User) (core.Use
 	}
 
 	return updatedUser, err
+}
+
+func (r *UserPostgres) UpdateUserPhoto(ctx context.Context, user core.User) error {
+	query, args, err := psql.Update(userTable).
+		Set("image_paths", user.ImagePaths).
+		Where(sq.Eq{"id": user.Id}).
+		ToSql()
+
+	if err != nil {
+		return err
+	}
+	_, err = r.db.Exec(ctx, query, args...)
+	return err
 }
 
 func (r *UserPostgres) UpdateUserPassword(ctx context.Context, user core.User) error {
