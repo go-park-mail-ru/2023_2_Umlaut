@@ -121,6 +121,7 @@ func (r *UserPostgres) GetNextUser(ctx context.Context, user core.User, params d
 	queryBuilder := psql.Select(constants.UserDbField).
 		From(userTable).
 		Where(sq.NotEq{"id": user.Id}).
+		Where(sq.NotEq{"role": constants.Banned}).
 		Where(fmt.Sprintf("id NOT IN (SELECT reported_user_id FROM %s WHERE reporter_user_id = %d)", complaintTable, user.Id)).
 		Where(fmt.Sprintf("id NOT IN (SELECT liked_to_user_id FROM %s WHERE liked_by_user_id = %d)", likeTable, user.Id))
 
